@@ -1,26 +1,122 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Stitch Design Tokens: Midnight Luxe */
+  --background: #0A0A0A;
+  --foreground: #F5F5F5;
+  --primary: #D4AF37; /* GOLD */
+  --primary-foreground: #000000;
+  --secondary: #1A1A1A;
+  --secondary-foreground: #A1A1AA;
+  --accent: #D4AF37;
+  --accent-foreground: #000000;
+  --card: #141414;
+  --card-foreground: #F5F5F5;
+  --border: rgba(212, 175, 55, 0.15); /* Gold border */
+  --radius: 0px; /* SHARP DESIGN */
+
+  /* Spacing Tokens */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3.5rem;
+  --space-3xl: 6rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.5);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.5);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.5);
+}
+
+.dark {
+  --background: #0A0A0A;
+  --foreground: #F5F5F5;
+  --primary: #D4AF37;
+  --primary-foreground: #000000;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-gold: #D4AF37;
+  
+  --radius-lg: var(--radius);
+  --radius-md: var(--radius);
+  --radius-sm: var(--radius);
+  
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-bodoni), ui-serif, Georgia, serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+}
+
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B8962E;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .glass {
+    @apply bg-background/80 backdrop-blur-2xl border border-white/5;
+  }
+  
+  .liquid-glass {
+    @apply bg-black/60 backdrop-blur-[40px] border-b border-white/5;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+  }
+
+  .gold-text-glow {
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  }
+
+  .serif-heading {
+    @apply font-serif font-medium tracking-tight;
+  }
+
+  .caps-label {
+    @apply text-[10px] font-bold uppercase tracking-[0.4em];
+  }
+}
+
