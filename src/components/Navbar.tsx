@@ -17,7 +17,7 @@ const desktopLinks = [
 const bottomNavLinks = [
   { name: "HOME", href: "/", icon: Home },
   { name: "DRINKS", href: "/products", icon: LayoutGrid },
-  { name: "CONCIERGE", href: "/contact", icon: MessageSquare },
+  { name: "CONTACT", href: "/contact", icon: MessageSquare },
   { name: "CLUB", href: "/about", icon: ShieldCheck },
 ];
 
