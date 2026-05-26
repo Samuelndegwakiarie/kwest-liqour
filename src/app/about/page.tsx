@@ -72,7 +72,7 @@ export default function Heritage() {
           <ScrollReveal direction="scale">
             <div className="aspect-[4/5] relative overflow-hidden rounded-2xl border border-white/[0.06]">
               <img
-                src="https://images.unsplash.com/photo-1550985543-f47f38aee65e?auto=format&fit=crop&q=80&w=1200"
+                src="/story_bottle_noir.png"
                 className="w-full h-full object-cover"
                 alt="Story Bottle"
               />

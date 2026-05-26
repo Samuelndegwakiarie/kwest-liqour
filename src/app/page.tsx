@@ -117,22 +117,22 @@ export default function Home() {
             </div>
           </ScrollReveal>
 
-          <StaggerContainer className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Rare Malts — Large */}
-            <StaggerItem className="lg:col-span-2">
-              <Link href="/products?category=whisky" className="group relative aspect-[21/9] overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Rare Malts */}
+            <StaggerItem>
+              <Link href="/products?category=whisky" className="group relative aspect-[3/4] overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
                 <img
-                  src="https://images.unsplash.com/photo-1599490659213-e2b9527bb087?auto=format&fit=crop&q=80&w=1200"
+                  src="/rare_malts_category_noir.png"
                   className="w-full h-full object-cover grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-80 group-hover:scale-105 transition-all duration-[2000ms]"
                   alt="Rare Malts"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
-                <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-center">
-                  <span className="caps-label text-primary text-[9px] mb-4 block tracking-[0.4em]">DISCOVER</span>
-                  <h3 className="text-3xl md:text-5xl font-serif font-bold text-white mb-4 tracking-tight">
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+                <div className="absolute inset-0 p-8 flex flex-col justify-end text-left">
+                  <span className="caps-label text-primary text-[9px] mb-2 block tracking-[0.4em]">DISCOVER</span>
+                  <h3 className="text-3xl font-serif font-bold text-white mb-2 tracking-tight">
                     Rare Malts
                   </h3>
-                  <p className="text-text-muted text-sm max-w-sm mb-6 leading-relaxed hidden md:block">
+                  <p className="text-text-muted text-xs mb-4 leading-relaxed transition-all duration-500 ease-out translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 max-h-0 group-hover:max-h-20 overflow-hidden">
                     Single origin legends from the highlands, curated for Nairobi&apos;s finest collections.
                   </p>
                   <div className="flex items-center gap-3 text-primary group-hover:text-white transition-colors">
@@ -145,19 +145,22 @@ export default function Home() {
 
             {/* Vintage Wines */}
             <StaggerItem>
-              <Link href="/products?category=wine" className="group relative aspect-[3/4] lg:aspect-auto lg:h-full overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
+              <Link href="/products?category=wine" className="group relative aspect-[3/4] overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
                 <img
-                  src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=1200"
+                  src="/vintage_wines_category_noir.png"
                   className="w-full h-full object-cover grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-80 group-hover:scale-105 transition-all duration-[2000ms]"
                   alt="Vintage Wines"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-                <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+                <div className="absolute inset-0 p-8 flex flex-col justify-end text-left">
+                  <span className="caps-label text-primary text-[9px] mb-2 block tracking-[0.4em]">DISCOVER</span>
                   <h3 className="text-3xl font-serif font-bold text-white mb-2 tracking-tight">Vintage Wines</h3>
-                  <p className="text-text-muted text-xs mb-4">Old world estates meets modern luxury.</p>
+                  <p className="text-text-muted text-xs mb-4 leading-relaxed transition-all duration-500 ease-out translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 max-h-0 group-hover:max-h-20 overflow-hidden">
+                    Old world estates meets modern luxury. Carefully preserved vintage collections.
+                  </p>
                   <div className="flex items-center gap-3 text-primary group-hover:text-white transition-colors">
                     <span className="caps-label text-[10px] tracking-[0.2em]">EXPLORE</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </Link>
@@ -165,25 +168,29 @@ export default function Home() {
 
             {/* Artisanal Gins */}
             <StaggerItem>
-              <Link href="/products?category=gin" className="group relative aspect-square lg:aspect-auto overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
+              <Link href="/products?category=gin" className="group relative aspect-[3/4] overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
                 <img
-                  src="https://images.unsplash.com/photo-1596451190630-186aff535bf2?auto=format&fit=crop&q=80&w=1200"
+                  src="/artisanal_gins_category_noir.png"
                   className="w-full h-full object-cover grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-80 group-hover:scale-105 transition-all duration-[2000ms]"
                   alt="Artisanal Gins"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-                <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+                <div className="absolute inset-0 p-8 flex flex-col justify-end text-left">
+                  <span className="caps-label text-primary text-[9px] mb-2 block tracking-[0.4em]">DISCOVER</span>
                   <h3 className="text-3xl font-serif font-bold text-white mb-2 tracking-tight">Artisanal Gins</h3>
+                  <p className="text-text-muted text-xs mb-4 leading-relaxed transition-all duration-500 ease-out translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 max-h-0 group-hover:max-h-20 overflow-hidden">
+                    Small batch botanical infusions and premium international craft distillations.
+                  </p>
                   <div className="flex items-center gap-3 text-primary group-hover:text-white transition-colors">
                     <span className="caps-label text-[10px] tracking-[0.2em]">EXPLORE</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </Link>
             </StaggerItem>
 
             {/* Membership CTA */}
-            <StaggerItem className="lg:col-span-2">
+            <StaggerItem className="md:col-span-3">
               <GlassCard glow padding="p-10 md:p-16" className="h-full flex flex-col justify-center rounded-2xl">
                 <span className="caps-label text-secondary text-[9px] mb-6 block tracking-[0.5em] text-glow-amber">
                   MEMBER EXCLUSIVE
@@ -191,7 +198,7 @@ export default function Home() {
                 <h3 className="text-4xl md:text-5xl font-serif font-bold text-white mb-8 tracking-tighter leading-none">
                   Join The Kwest Circle
                 </h3>
-                <p className="text-text-muted text-sm md:text-base max-w-2xl mb-10 leading-relaxed">
+                <p className="text-text-muted text-sm md:text-base max-w-2xl mb-10 leading-relaxed text-left">
                   Gain early access to limited edition releases and private tasting
                   events across Nairobi. Our members enjoy concierge delivery and
                   exclusive pricing.

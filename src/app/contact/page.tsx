@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
 import { GlassCard } from "@/components/GlassCard";
 import { ParticleField } from "@/components/ParticleField";
+import dynamic from "next/dynamic";
+import contactAnimation from "../../../public/contact_animation.json";
 
 const serviceCards = [
   {
@@ -29,6 +31,8 @@ const serviceCards = [
     img: "/boutique_flagship_noir.png",
   },
 ];
+
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 export default function Concierge() {
   return (
@@ -102,54 +106,70 @@ export default function Concierge() {
 
       {/* ═══ Inquiry Form ═══ */}
       <section className="py-16 md:py-24 px-6 md:px-12 bg-background border-t border-white/[0.04]">
-        <div className="max-w-[800px] mx-auto">
+        <div className="max-w-[1280px] mx-auto">
           <ScrollReveal>
             <h2 className="text-4xl md:text-6xl font-serif font-bold text-white mb-12 tracking-tighter">
               Send an Inquiry
             </h2>
           </ScrollReveal>
 
-          <ScrollReveal delay={0.1}>
-            <GlassCard hover={false} padding="p-8 md:p-12" className="rounded-2xl">
-              <form className="space-y-8">
-                <div className="space-y-6">
-                  <div className="group">
-                    <input
-                      type="text"
-                      placeholder="FULL NAME"
-                      className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
-                    />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            {/* Left Column: Lottie Animation */}
+            <ScrollReveal direction="left" className="w-full flex items-center justify-center">
+              <div className="w-full max-w-md aspect-square relative rounded-2xl overflow-hidden glass-card flex items-center justify-center p-8 border border-white/[0.04] bg-white/[0.01]">
+                <Lottie
+                  animationData={contactAnimation}
+                  loop={true}
+                  autoplay={true}
+                  className="w-full h-full opacity-60 hover:opacity-80 transition-opacity duration-500 scale-90"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-transparent pointer-events-none" />
+              </div>
+            </ScrollReveal>
+
+            {/* Right Column: Contact Form */}
+            <ScrollReveal direction="right" delay={0.1}>
+              <GlassCard hover={false} padding="p-8 md:p-12" className="rounded-2xl w-full">
+                <form className="space-y-8">
+                  <div className="space-y-6">
+                    <div className="group">
+                      <input
+                        type="text"
+                        placeholder="FULL NAME"
+                        className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
+                      />
+                    </div>
+                    <div className="group">
+                      <input
+                        type="email"
+                        placeholder="EMAIL ADDRESS"
+                        className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
+                      />
+                    </div>
+                    <div className="relative group">
+                      <select className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label text-white/40 focus:text-white focus:border-primary outline-none appearance-none cursor-pointer transition-all duration-300">
+                        <option className="bg-background-elevated">SELECT SERVICE TYPE</option>
+                        <option className="bg-background-elevated">PRIVATE TASTING</option>
+                        <option className="bg-background-elevated">WHOLESALE</option>
+                        <option className="bg-background-elevated">MEMBERSHIP</option>
+                      </select>
+                      <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
+                    </div>
+                    <div className="group">
+                      <textarea
+                        placeholder="MESSAGE"
+                        rows={4}
+                        className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 resize-none transition-all duration-300"
+                      />
+                    </div>
                   </div>
-                  <div className="group">
-                    <input
-                      type="email"
-                      placeholder="EMAIL ADDRESS"
-                      className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
-                    />
-                  </div>
-                  <div className="relative group">
-                    <select className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label text-white/40 focus:text-white focus:border-primary outline-none appearance-none cursor-pointer transition-all duration-300">
-                      <option className="bg-background-elevated">SELECT SERVICE TYPE</option>
-                      <option className="bg-background-elevated">PRIVATE TASTING</option>
-                      <option className="bg-background-elevated">WHOLESALE</option>
-                      <option className="bg-background-elevated">MEMBERSHIP</option>
-                    </select>
-                    <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
-                  </div>
-                  <div className="group">
-                    <textarea
-                      placeholder="MESSAGE"
-                      rows={4}
-                      className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 resize-none transition-all duration-300"
-                    />
-                  </div>
-                </div>
-                <button className="w-full py-5 bg-primary text-background font-bold uppercase tracking-[0.2em] text-[11px] rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all duration-500 cursor-pointer">
-                  SEND MESSAGE
-                </button>
-              </form>
-            </GlassCard>
-          </ScrollReveal>
+                  <button className="w-full py-5 bg-primary text-background font-bold uppercase tracking-[0.2em] text-[11px] rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all duration-500 cursor-pointer">
+                    SEND MESSAGE
+                  </button>
+                </form>
+              </GlassCard>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
 
