@@ -123,7 +123,7 @@ export default function Home() {
               <Link href="/products?category=whisky" className="group relative aspect-[3/4] overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
                 <img
                   src="/rare_malts_category_noir.png"
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-80 group-hover:scale-105 transition-all duration-[2000ms]"
+                  className="w-full h-full object-cover opacity-40 group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1200ms]"
                   alt="Rare Malts"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
@@ -148,7 +148,7 @@ export default function Home() {
               <Link href="/products?category=wine" className="group relative aspect-[3/4] overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
                 <img
                   src="/vintage_wines_category_noir.png"
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-80 group-hover:scale-105 transition-all duration-[2000ms]"
+                  className="w-full h-full object-cover opacity-40 group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1200ms]"
                   alt="Vintage Wines"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
@@ -171,7 +171,7 @@ export default function Home() {
               <Link href="/products?category=gin" className="group relative aspect-[3/4] overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
                 <img
                   src="/artisanal_gins_category_noir.png"
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-80 group-hover:scale-105 transition-all duration-[2000ms]"
+                  className="w-full h-full object-cover opacity-40 group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1200ms]"
                   alt="Artisanal Gins"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
