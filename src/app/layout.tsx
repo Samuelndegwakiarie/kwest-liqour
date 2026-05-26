@@ -3,6 +3,7 @@ import { Bodoni_Moda, Jost } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { CartProvider } from "@/context/CartContext";
 
 const bodoni = Bodoni_Moda({
   subsets: ["latin"],
@@ -34,10 +35,13 @@ export default function RootLayout({
       <body
         className={`${bodoni.variable} ${jost.variable} font-sans antialiased bg-background text-foreground`}
       >
-        <Navbar />
-        {children}
-        <Footer />
+        <CartProvider>
+          <Navbar />
+          {children}
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );
 }
+

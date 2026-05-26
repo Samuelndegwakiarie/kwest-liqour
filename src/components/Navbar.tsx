@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Search, ShoppingBag, User, Home, LayoutGrid, MessageSquare, ShieldCheck } from "lucide-react";
 import { motion } from "motion/react";
 import { usePathname } from "next/navigation";
+import { useCart } from "@/context/CartContext";
+
 
 const desktopLinks = [
   { name: "Gallery", href: "/products" },
@@ -22,6 +24,8 @@ const bottomNavLinks = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const { cartCount } = useCart();
+
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -86,7 +90,7 @@ export function Navbar() {
           <Link href="/cart" className="relative group cursor-pointer">
             <ShoppingBag className="w-5 h-5 text-white/40 group-hover:text-primary transition-colors duration-300" />
             <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-primary text-background text-[8px] font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.4)]">
-              0
+              {cartCount}
             </span>
           </Link>
           <Link

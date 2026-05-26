@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ShoppingBag,
@@ -9,13 +9,7 @@ import {
   Minus,
   ArrowRight,
   Lock,
-  ShieldCheck,
-  Check,
-  MapPin,
   ChevronLeft,
-  Calendar,
-  Phone,
-  User as UserIcon,
   Store,
   Bike,
 } from "lucide-react";
@@ -23,101 +17,38 @@ import { motion, AnimatePresence } from "motion/react";
 import { ParticleField } from "@/components/ParticleField";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
 import { GlassCard } from "@/components/GlassCard";
-
-interface CartItem {
-  id: number;
-  brand: string;
-  name: string;
-  price: number;
-  img: string;
-  quantity: number;
-  tag?: string | null;
-}
+import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      brand: "JOHNNIE WALKER",
-      name: "Black Label Scotch",
-      price: 5800,
-      img: "/johnnie_walker_black_noir_1778448563770.png",
-      quantity: 1,
-      tag: "BEST SELLER",
-    },
-    {
-      id: 3,
-      brand: "HENNESSY",
-      name: "VS Cognac",
-      price: 6500,
-      img: "/hennessy_vs_noir_1778448600750.png",
-      quantity: 1,
-      tag: "LUXURY",
-    },
-    {
-      id: 6,
-      brand: "TANQUERAY",
-      name: "London Dry Gin",
-      price: 3500,
-      img: "/tanqueray_london_dry_noir.png",
-      quantity: 2,
-      tag: null,
-    },
-  ]);
-
+  const { cart, updateQuantity, removeFromCart } = useCart();
   const [deliveryMethod, setDeliveryMethod] = useState<"shop" | "rider">("rider");
+  const [isClient, setIsClient] = useState(false);
 
-  // Checkout modal states
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [checkoutStep, setCheckoutStep] = useState(1); // 1 = Details, 2 = Success
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [deliveryTime, setDeliveryTime] = useState("Immediate");
-  const [customNotes, setCustomNotes] = useState("");
+  // Avoid Next.js hydration issues with local storage
+  useEffect(() => {
+    setIsClient(true);
+    const savedMethod = localStorage.getItem("kwest_delivery_method") as "shop" | "rider" | null;
+    if (savedMethod) {
+      setDeliveryMethod(savedMethod);
+    }
+  }, []);
 
-  const updateQuantity = (id: number, delta: number) => {
-    setCartItems((items) =>
-      items.map((item) => {
-        if (item.id === id) {
-          const newQty = Math.max(1, item.quantity + delta);
-          return { ...item, quantity: newQty };
-        }
-        return item;
-      })
-    );
-  };
-
-  const removeItem = (id: number) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
+  const handleDeliveryChange = (method: "shop" | "rider") => {
+    setDeliveryMethod(method);
+    localStorage.setItem("kwest_delivery_method", method);
   };
 
   // Calculations
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const total = subtotal; // delivery is either free (pickup) or paid directly to rider on delivery
+  const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const total = subtotal;
 
-  const handleCheckoutSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!fullName || !phone) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-    if (deliveryMethod === "rider" && !address) {
-      alert("Please enter a delivery address for the rider.");
-      return;
-    }
-    setCheckoutStep(2);
-  };
-
-  const handleResetCart = () => {
-    setCartItems([]);
-    setIsCheckoutOpen(false);
-    setCheckoutStep(1);
-    setFullName("");
-    setPhone("");
-    setAddress("");
-    setDeliveryMethod("rider");
-  };
+  if (!isClient) {
+    return (
+      <main className="bg-background min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
 
   return (
     <main className="bg-background min-h-screen pb-[var(--bottom-nav-height)] lg:pb-16 overflow-x-hidden">
@@ -155,7 +86,7 @@ export default function CartPage() {
       {/* ═══ Main Cart Interface ═══ */}
       <section className="px-6 md:px-12 max-w-[1280px] mx-auto py-12">
         <AnimatePresence mode="wait">
-          {cartItems.length === 0 ? (
+          {cart.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -187,7 +118,7 @@ export default function CartPage() {
                 </div>
 
                 <StaggerContainer className="space-y-4">
-                  {cartItems.map((item) => (
+                  {cart.map((item) => (
                     <StaggerItem key={item.id}>
                       <GlassCard padding="p-5 md:p-6" hover={false} className="relative group">
                         <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -225,7 +156,7 @@ export default function CartPage() {
                             {/* Quantity selector */}
                             <div className="flex items-center bg-black/40 border border-white/[0.08] rounded-full p-1">
                               <button
-                                onClick={() => updateQuantity(item.id, -1)}
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white hover:bg-white/[0.04] transition-all cursor-pointer"
                                 aria-label="Decrease quantity"
                               >
@@ -235,7 +166,7 @@ export default function CartPage() {
                                 {item.quantity}
                               </span>
                               <button
-                                onClick={() => updateQuantity(item.id, 1)}
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white hover:bg-white/[0.04] transition-all cursor-pointer"
                                 aria-label="Increase quantity"
                               >
@@ -252,7 +183,7 @@ export default function CartPage() {
 
                             {/* Delete button */}
                             <button
-                              onClick={() => removeItem(item.id)}
+                              onClick={() => removeFromCart(item.id)}
                               className="text-white/20 hover:text-destructive transition-colors duration-300 cursor-pointer p-2 rounded-full hover:bg-white/[0.02]"
                               aria-label="Remove item"
                             >
@@ -290,7 +221,7 @@ export default function CartPage() {
                     <div className="grid grid-cols-2 gap-3">
                       {/* Pick at Shop */}
                       <button
-                        onClick={() => setDeliveryMethod("shop")}
+                        onClick={() => handleDeliveryChange("shop")}
                         className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between h-20 ${
                           deliveryMethod === "shop"
                             ? "bg-primary/10 border-primary text-primary shadow-[0_0_15px_rgba(0,240,255,0.08)]"
@@ -306,7 +237,7 @@ export default function CartPage() {
 
                       {/* Rider */}
                       <button
-                        onClick={() => setDeliveryMethod("rider")}
+                        onClick={() => handleDeliveryChange("rider")}
                         className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between h-20 ${
                           deliveryMethod === "rider"
                             ? "bg-primary/10 border-primary text-primary shadow-[0_0_15px_rgba(0,240,255,0.08)]"
@@ -359,13 +290,14 @@ export default function CartPage() {
                   </div>
 
                   {/* Checkout Action */}
-                  <button
-                    onClick={() => setIsCheckoutOpen(true)}
-                    className="w-full py-4 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_35px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2 group"
-                  >
-                    checkout
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                  </button>
+                  <Link href="/checkout" className="block w-full">
+                    <button
+                      className="w-full py-4 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_35px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2 group"
+                    >
+                      checkout
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                    </button>
+                  </Link>
 
                   <div className="flex items-center justify-center gap-2 text-[10px] text-text-subtle mt-4">
                     <Lock className="w-3.5 h-3.5 text-primary" />
@@ -377,263 +309,6 @@ export default function CartPage() {
           )}
         </AnimatePresence>
       </section>
-
-      {/* ═══ Checkout Details Modal ═══ */}
-      <AnimatePresence>
-        {isCheckoutOpen && (
-          <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => checkoutStep === 1 && setIsCheckoutOpen(false)}
-              className="absolute inset-0 bg-background/80 backdrop-blur-md"
-            />
-
-            {/* Modal Box */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              transition={{ type: "spring", damping: 25 }}
-              className="w-full max-w-xl relative z-10"
-            >
-              <GlassCard padding="p-6 md:p-8 animate-pulse-glow" hover={false} glow={true}>
-                {checkoutStep === 1 ? (
-                  /* Form Step */
-                  <form onSubmit={handleCheckoutSubmit} className="space-y-6">
-                    <div className="flex justify-between items-start border-b border-white/[0.06] pb-4">
-                      <div>
-                        <span className="caps-label text-primary text-[9px]">
-                          {deliveryMethod === "shop" ? "STORE PICKUP" : "RIDER DISPATCH"}
-                        </span>
-                        <h3 className="text-2xl font-serif font-bold text-white mt-1">Dispatch Details</h3>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setIsCheckoutOpen(false)}
-                        className="text-white/40 hover:text-white cursor-pointer text-xs uppercase tracking-widest font-bold"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-
-                    <div className="space-y-4">
-                      {/* Full Name */}
-                      <div className="space-y-1">
-                        <label className="text-[10px] caps-label text-text-muted">Recipient Name *</label>
-                        <div className="relative">
-                          <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                          <input
-                            type="text"
-                            required
-                            value={fullName}
-                            onChange={(e) => setFullName(e.target.value)}
-                            placeholder="Arthur Pendragon"
-                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder:text-white/20 transition-all"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Phone Number */}
-                      <div className="space-y-1">
-                        <label className="text-[10px] caps-label text-text-muted">Contact Phone *</label>
-                        <div className="relative">
-                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                          <input
-                            type="tel"
-                            required
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            placeholder="+254 700 000 000"
-                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder:text-white/20 transition-all"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Delivery Address (only for rider) */}
-                      {deliveryMethod === "rider" ? (
-                        <div className="space-y-1">
-                          <label className="text-[10px] caps-label text-text-muted">Nairobi Delivery Address *</label>
-                          <div className="relative">
-                            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                            <input
-                              type="text"
-                              required
-                              value={address}
-                              onChange={(e) => setAddress(e.target.value)}
-                              placeholder="Suite 4B, Signature Towers, Westlands"
-                              className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder:text-white/20 transition-all"
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-1 text-xs">
-                          <p className="text-white font-semibold flex items-center gap-1.5">
-                            <Store className="w-4 h-4 text-primary" /> Store Pickup Location
-                          </p>
-                          <p className="text-text-muted">
-                            Kwest Flagship Vault, Landmark Plaza, Westlands, Nairobi.
-                          </p>
-                          <p className="text-primary font-medium text-[10px] caps-label tracking-wider pt-1">
-                            Ready in 30 minutes. No extra fees.
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Schedule Selection */}
-                      <div className="space-y-1">
-                        <label className="text-[10px] caps-label text-text-muted">
-                          {deliveryMethod === "shop" ? "Pickup Timing" : "Rider Dispatch Timing"}
-                        </label>
-                        <div className="grid grid-cols-3 gap-3">
-                          {[
-                            { name: "Immediate", desc: "Under 90 min" },
-                            { name: "Same-Day Evening", desc: "6 PM - 9 PM" },
-                            { name: "Scheduled", desc: "Select Date" },
-                          ].map((t) => (
-                            <button
-                              key={t.name}
-                              type="button"
-                              onClick={() => setDeliveryTime(t.name)}
-                              className={`p-3 rounded-xl border text-center cursor-pointer transition-all ${
-                                deliveryTime === t.name
-                                  ? "bg-primary/10 border-primary text-primary shadow-[0_0_15px_rgba(0,240,255,0.1)]"
-                                  : "bg-black/20 border-white/[0.06] text-text-muted hover:border-white/20"
-                              }`}
-                            >
-                              <p className="text-[10px] font-bold uppercase tracking-wider">{t.name}</p>
-                              <p className="text-[8px] text-text-subtle mt-0.5">{t.desc}</p>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Custom Notes */}
-                      <div className="space-y-1">
-                        <label className="text-[10px] caps-label text-text-muted">Notes (Optional)</label>
-                        <textarea
-                          value={customNotes}
-                          onChange={(e) => setCustomNotes(e.target.value)}
-                          placeholder="e.g. Leave with reception, dial down chill temperature..."
-                          rows={2}
-                          className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 transition-all resize-none"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Summary row */}
-                    <div className="bg-black/30 border border-white/[0.04] rounded-xl p-4 flex justify-between items-center text-xs">
-                      <div>
-                        <p className="text-text-muted uppercase tracking-widest text-[9px]">INVOICE TOTAL</p>
-                        <p className="text-lg font-bold text-white font-serif mt-0.5">KES {total.toLocaleString()}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-primary font-bold text-[9px] uppercase tracking-wider">
-                          {deliveryMethod === "shop" ? "STORE COLLECT" : "RIDER DELIVERY"}
-                        </p>
-                        <p className="text-[9px] text-text-subtle">
-                          {deliveryMethod === "shop" ? "Collect at flagship" : "Pay rider on arrival"}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Action */}
-                    <button
-                      type="submit"
-                      className="w-full py-4 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_35px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2"
-                    >
-                      Confirm Order
-                      <ShieldCheck className="w-4 h-4" />
-                    </button>
-                  </form>
-                ) : (
-                  /* Success Step */
-                  <div className="text-center py-6 space-y-6">
-                    <div className="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500 flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(34,197,94,0.2)]">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-                      >
-                        <Check className="w-10 h-10 text-emerald-400 stroke-[3]" />
-                      </motion.div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <span className="text-[9px] font-bold text-emerald-400 tracking-[0.3em] uppercase">
-                        Order Confirmed
-                      </span>
-                      <h3 className="text-3xl font-serif font-bold text-white">Cellar Request Received</h3>
-                      <p className="text-text-muted text-sm max-w-sm mx-auto leading-relaxed">
-                        Your request has been dispatched to the Kwest Master Cellar. A curator is preparing your selection now.
-                      </p>
-                    </div>
-
-                    {/* Order summary info */}
-                    <div className="max-w-md mx-auto bg-black/40 border border-white/[0.06] rounded-2xl p-5 text-left text-xs space-y-3.5">
-                      <div className="flex justify-between border-b border-white/[0.04] pb-2 text-[10px] caps-label text-text-muted">
-                        <span>Invoice Reference</span>
-                        <span className="text-white font-mono font-bold text-glow">
-                          KW-{Math.floor(1000 + Math.random() * 9000)}-2026
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-text-muted">Recipient</span>
-                        <span className="text-white font-medium">{fullName}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-text-muted">Phone</span>
-                        <span className="text-white font-medium">{phone}</span>
-                      </div>
-                      {deliveryMethod === "rider" ? (
-                        <div className="flex justify-between">
-                          <span className="text-text-muted">Delivery Address</span>
-                          <span className="text-white font-medium text-right truncate max-w-[200px]" title={address}>
-                            {address}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex justify-between">
-                          <span className="text-text-muted">Pickup Location</span>
-                          <span className="text-primary font-bold uppercase tracking-wider text-[9px]">
-                            Westlands Flagship
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex justify-between">
-                        <span className="text-text-muted">Dispatch Schedule</span>
-                        <span className="text-primary font-bold uppercase tracking-wider text-[9px] flex items-center gap-1">
-                          <Calendar className="w-3 h-3" /> {deliveryTime}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="p-4 bg-white/[0.02] border border-white/[0.04] rounded-xl text-left max-w-md mx-auto">
-                      <p className="text-xs font-semibold text-white flex items-center gap-1.5 mb-1">
-                        <Phone className="w-3.5 h-3.5 text-primary" /> Curatorial Verification
-                      </p>
-                      <p className="text-text-muted text-[11px] leading-relaxed">
-                        A Kwest representative will call or WhatsApp you at <span className="text-white font-bold">{phone}</span> within 10 minutes to verify your order, guide you through payment (M-Pesa / Card / Bank transfer), and coordinate the pickup or rider release.
-                      </p>
-                    </div>
-
-                    <div className="pt-4 flex gap-4 justify-center">
-                      <button
-                        onClick={handleResetCart}
-                        className="px-8 py-3.5 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all cursor-pointer"
-                      >
-                        Return to Gallery
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </GlassCard>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </main>
   );
 }

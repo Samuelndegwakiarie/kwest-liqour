@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ArrowRight, SlidersHorizontal, X, RotateCcw } from "lucide-react";
+import { ChevronDown, ArrowRight, SlidersHorizontal, X, RotateCcw, Plus, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { ParticleField } from "@/components/ParticleField";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
+import { useCart } from "@/context/CartContext";
+import { motion, AnimatePresence } from "motion/react";
 
 const categories = ["Whisky", "Gin", "Wines", "Cognac", "Tequila"];
 const volumes = ["250ml", "350ml", "500ml", "750ml", "1000ml"];
@@ -31,10 +33,12 @@ const products = [
 ];
 
 export default function Gallery() {
+  const { addToCart } = useCart();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [selectedVolumes, setSelectedVolumes] = useState<string[]>([]);
+  const [toastMessage, setToastMessage] = useState("");
 
   // Mobile drawer state
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
@@ -56,6 +60,21 @@ export default function Gallery() {
     setMinPrice("");
     setMaxPrice("");
     setSelectedVolumes([]);
+  };
+
+  const handleQuickAdd = (product: typeof products[0]) => {
+    addToCart({
+      id: product.id,
+      brand: product.brand,
+      name: product.name,
+      price: product.price,
+      img: product.img,
+      category: product.category,
+      volume: product.volume,
+      tag: product.tag,
+    });
+    setToastMessage(`Added ${product.name} to Cart`);
+    setTimeout(() => setToastMessage(""), 2000);
   };
 
   const filteredProducts = products.filter((product) => {
@@ -242,7 +261,10 @@ export default function Gallery() {
               <StaggerContainer className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" staggerDelay={0.05}>
                 {filteredProducts.map((product) => (
                   <StaggerItem key={product.id}>
-                    <div className="group flex flex-col cursor-pointer bg-white/[0.01] border border-white/[0.04] rounded-2xl p-3 hover:bg-white/[0.03] hover:border-primary/20 hover:shadow-[0_8px_32px_rgba(0,240,255,0.06)] transition-all duration-500">
+                    <Link
+                      href={`/products/${product.id}`}
+                      className="group flex flex-col cursor-pointer bg-white/[0.01] border border-white/[0.04] rounded-2xl p-3 hover:bg-white/[0.03] hover:border-primary/20 hover:shadow-[0_8px_32px_rgba(0,240,255,0.06)] transition-all duration-500"
+                    >
                       {/* Image Frame */}
                       <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden mb-4 bg-black/40 border border-white/[0.04] flex items-center justify-center p-4">
                         {product.tag && (
@@ -260,12 +282,32 @@ export default function Gallery() {
                           {product.volume}
                         </div>
 
+                        {/* Quick Add Button */}
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleQuickAdd(product);
+                          }}
+                          className="absolute right-2.5 top-2.5 z-15 w-8 h-8 rounded-full bg-background/80 hover:bg-primary border border-white/[0.08] hover:border-primary flex items-center justify-center text-white/60 hover:text-background transition-all duration-300 shadow-md cursor-pointer group/btn"
+                          title="Quick Add to Cellar"
+                        >
+                          <Plus className="w-4 h-4 transition-transform group-hover/btn:rotate-90" />
+                        </button>
+
                         <img
                           src={product.img}
                           className="h-[80%] object-contain opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                           alt={product.name}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        
+                        {/* Quick View Overlay */}
+                        <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                          <div className="flex items-center justify-center gap-2 text-primary text-[10px] caps-label">
+                            VIEW DETAILS <ArrowRight className="w-3 h-3" />
+                          </div>
+                        </div>
                       </div>
 
                       {/* Info Frame */}
@@ -283,7 +325,7 @@ export default function Gallery() {
                           </p>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   </StaggerItem>
                 ))}
               </StaggerContainer>
@@ -412,6 +454,20 @@ export default function Gallery() {
           </div>
         </div>
       )}
+
+      {/* Floating Notification Toast */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[250] bg-primary text-background font-bold text-[10px] caps-label tracking-widest px-6 py-3.5 rounded-full shadow-[0_0_30px_rgba(0,240,255,0.4)] flex items-center gap-2 whitespace-nowrap"
+          >
+            <ShoppingBag className="w-4 h-4" /> {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
