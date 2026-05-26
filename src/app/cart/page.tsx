@@ -53,7 +53,7 @@ export default function CartPage() {
   return (
     <main className="bg-background min-h-screen pb-[var(--bottom-nav-height)] lg:pb-16 overflow-x-hidden">
       {/* ═══ Hero ═══ */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/40 to-background z-10" />
           <img
@@ -72,15 +72,6 @@ export default function CartPage() {
             SECURE CHECKOUT PREPARATION
           </p>
         </ScrollReveal>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20"
-        >
-          <div className="w-[2px] h-10 bg-gradient-to-b from-primary/50 to-transparent rounded-full" />
-        </motion.div>
       </section>
 
       {/* ═══ Main Cart Interface ═══ */}

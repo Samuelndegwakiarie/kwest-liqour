@@ -47,8 +47,8 @@ export default function Concierge() {
           </ScrollReveal>
           <ScrollReveal delay={0.1}>
             <h1 className="text-5xl md:text-8xl font-serif font-bold text-white tracking-tighter mb-6 leading-none">
-              Concierge{" "}
-              <span className="gradient-text-static">Services</span>
+              Talk to{" "}
+              <span className="gradient-text-static">Us</span>
             </h1>
           </ScrollReveal>
           <ScrollReveal delay={0.2}>
