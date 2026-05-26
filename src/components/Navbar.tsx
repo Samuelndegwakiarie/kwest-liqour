@@ -101,6 +101,22 @@ export function Navbar() {
             <User className="w-5 h-5" />
           </Link>
         </div>
+
+        {/* Mobile Actions */}
+        <div className="flex lg:hidden items-center gap-5">
+          <Link href="/cart" className="relative group cursor-pointer text-white/60 hover:text-primary transition-colors">
+            <ShoppingBag className="w-5 h-5" />
+            <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-primary text-background text-[8px] font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.4)]">
+              {cartCount}
+            </span>
+          </Link>
+          <Link
+            href="/account"
+            className="text-white/60 hover:text-primary transition-colors duration-300 cursor-pointer"
+          >
+            <User className="w-5 h-5" />
+          </Link>
+        </div>
       </nav>
 
       {/* Mobile Bottom Navigation (only way to navigate on mobile screens now) */}
