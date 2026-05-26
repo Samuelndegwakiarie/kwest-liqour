@@ -97,7 +97,7 @@ export default function Gallery() {
   return (
     <main className="bg-background min-h-screen pb-[var(--bottom-nav-height)] lg:pb-16 overflow-x-hidden">
       {/* ═══ Reduced Height Hero ═══ */}
-      <section className="relative h-[45vh] lg:h-[60vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[45vh] lg:h-[60vh] flex items-center justify-center pt-16 lg:pt-24 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/60 to-background z-10" />
           <img
