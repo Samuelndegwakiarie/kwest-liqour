@@ -53,7 +53,7 @@ export default function CartPage() {
   return (
     <main className="bg-background min-h-screen pb-[var(--bottom-nav-height)] lg:pb-16 overflow-x-hidden">
       {/* ═══ Hero ═══ */}
-      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[50vh] flex items-center justify-center pt-20 lg:pt-28 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/40 to-background z-10" />
           <img

@@ -37,7 +37,7 @@ const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 export default function Concierge() {
   return (
     <main className="bg-background min-h-screen pb-[var(--bottom-nav-height)] lg:pb-0">
-      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden bg-background px-6 md:px-12">
+      <section className="relative h-[50vh] flex items-center justify-center pt-20 lg:pt-28 overflow-hidden bg-background px-6 md:px-12">
         <ParticleField count={30} className="z-[5]" />
         <div className="relative z-20 max-w-[900px] mx-auto text-center">
           <ScrollReveal>
