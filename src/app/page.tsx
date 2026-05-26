@@ -1,116 +1,257 @@
 "use client";
 
-import { Hero } from "@/components/Hero";
-import { Footer } from "@/components/Footer";
-import { motion } from "framer-motion";
-import { ShoppingCart, ArrowRight, Star, Zap, Trophy } from "lucide-react";
+import { motion } from "motion/react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import Link from "next/link";
-import { products, formatPrice } from "@/data/products";
+import { ParticleField } from "@/components/ParticleField";
+import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
+import { GlassCard } from "@/components/GlassCard";
+import { AnimatedCounter } from "@/components/AnimatedCounter";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <Hero />
-      
-      {/* The Boutique Collections */}
-      <section className="py-24 px-6 bg-black text-center">
-        <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-primary mb-4 block">CURATED SELECTIONS</span>
-        <h2 className="text-4xl md:text-6xl font-serif font-black text-white mb-16 tracking-tight uppercase">
-          The Boutique <br /> Collections
-        </h2>
+    <main className="bg-background min-h-screen pb-[var(--bottom-nav-height)] lg:pb-0">
+      {/* ═══ Hero Section ═══ */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background z-10" />
+          <img
+            src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=2000"
+            className="w-full h-full object-cover scale-105"
+            alt="Luxury Spirits Pour"
+          />
+        </div>
 
-        <div className="space-y-6 max-w-lg mx-auto">
-          {[
-            { name: "Rare Malts", image: "https://images.unsplash.com/photo-1569158062925-993d08596642?auto=format&fit=crop&q=80&w=800" },
-            { name: "Vintage Wines", image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=800" },
-            { name: "Artisanal Gins", image: "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?auto=format&fit=crop&q=80&w=800" },
-          ].map((cat, i) => (
-            <motion.div 
-              key={cat.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="relative aspect-[16/9] overflow-hidden group border border-white/5"
+        {/* Particles */}
+        <ParticleField count={50} className="z-[5]" />
+
+        {/* Hero Content */}
+        <div className="relative z-20 max-w-5xl text-center px-6">
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="caps-label text-primary mb-8 block tracking-[0.5em] text-[10px] text-glow"
+          >
+            ESTABLISHED IN NAIROBI
+          </motion.span>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="text-5xl md:text-[90px] font-serif font-bold text-white mb-8 leading-[0.95] tracking-tighter"
+          >
+            The Art of{" "}
+            <span className="gradient-text-static">Fine Spirits</span>.
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.25 }}
+            className="text-text-muted text-sm md:text-base max-w-2xl mx-auto mb-12 leading-relaxed"
+          >
+            Curated luxury delivered to your doorstep. Experience a selection of
+            the world&apos;s most rare and exceptional bottles, handpicked for the
+            discerning palate.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
+            <Link
+              href="/products"
+              className="group w-full sm:w-auto px-10 py-4 bg-primary text-background font-bold uppercase tracking-[0.2em] text-[11px] rounded-lg hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all duration-500 flex items-center justify-center gap-3 cursor-pointer"
             >
-              <img src={cat.image} className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" alt={cat.name} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end items-start p-8 text-left">
-                <h3 className="text-2xl font-serif font-black text-white mb-2 uppercase">{cat.name}</h3>
-                <Link href="/products" className="text-[8px] font-bold tracking-[0.3em] text-primary flex items-center gap-2 group/link">
-                  SHOP COLLECTION <ArrowRight className="w-3 h-3 group-hover/link:translate-x-1 transition-transform" />
-                </Link>
+              EXPLORE THE RESERVE
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="/about"
+              className="w-full sm:w-auto px-10 py-4 border border-white/[0.15] text-white font-bold uppercase tracking-[0.2em] text-[11px] rounded-lg hover:bg-white/[0.06] hover:border-primary/30 transition-all duration-500 text-center cursor-pointer"
+            >
+              OUR STORY
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20"
+        >
+          <div className="w-8 h-12 rounded-full border border-white/[0.15] flex items-start justify-center pt-2">
+            <motion.div
+              animate={{ opacity: [0.3, 1, 0.3], y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="w-1 h-2 bg-primary rounded-full"
+            />
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ═══ Curator's Choice ═══ */}
+      <section className="py-16 md:py-28 px-6 md:px-12 bg-background">
+        <div className="max-w-[1440px] mx-auto">
+          <ScrollReveal>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-4">
+              <div className="space-y-3">
+                <span className="caps-label text-primary text-[10px] tracking-[0.4em]">CURATED SELECTION</span>
+                <h2 className="text-4xl md:text-5xl font-serif font-bold text-white tracking-tight leading-none">
+                  The Curator&apos;s Choice
+                </h2>
               </div>
-            </motion.div>
-          ))}
+              <Link
+                href="/products"
+                className="caps-label text-primary/70 text-[10px] tracking-[0.2em] hover:text-primary transition-colors flex items-center gap-2 cursor-pointer"
+              >
+                VIEW ALL
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </ScrollReveal>
+
+          <StaggerContainer className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Rare Malts — Large */}
+            <StaggerItem className="lg:col-span-2">
+              <Link href="/products?category=whisky" className="group relative aspect-[21/9] overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
+                <img
+                  src="https://images.unsplash.com/photo-1599490659213-e2b9527bb087?auto=format&fit=crop&q=80&w=1200"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-80 group-hover:scale-105 transition-all duration-[2000ms]"
+                  alt="Rare Malts"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
+                <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-center">
+                  <span className="caps-label text-primary text-[9px] mb-4 block tracking-[0.4em]">DISCOVER</span>
+                  <h3 className="text-3xl md:text-5xl font-serif font-bold text-white mb-4 tracking-tight">
+                    Rare Malts
+                  </h3>
+                  <p className="text-text-muted text-sm max-w-sm mb-6 leading-relaxed hidden md:block">
+                    Single origin legends from the highlands, curated for Nairobi&apos;s finest collections.
+                  </p>
+                  <div className="flex items-center gap-3 text-primary group-hover:text-white transition-colors">
+                    <span className="caps-label text-[10px] tracking-[0.2em]">BROWSE COLLECTION</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </Link>
+            </StaggerItem>
+
+            {/* Vintage Wines */}
+            <StaggerItem>
+              <Link href="/products?category=wine" className="group relative aspect-[3/4] lg:aspect-auto lg:h-full overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
+                <img
+                  src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=1200"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-80 group-hover:scale-105 transition-all duration-[2000ms]"
+                  alt="Vintage Wines"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                  <h3 className="text-3xl font-serif font-bold text-white mb-2 tracking-tight">Vintage Wines</h3>
+                  <p className="text-text-muted text-xs mb-4">Old world estates meets modern luxury.</p>
+                  <div className="flex items-center gap-3 text-primary group-hover:text-white transition-colors">
+                    <span className="caps-label text-[10px] tracking-[0.2em]">EXPLORE</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </Link>
+            </StaggerItem>
+
+            {/* Artisanal Gins */}
+            <StaggerItem>
+              <Link href="/products?category=gin" className="group relative aspect-square lg:aspect-auto overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
+                <img
+                  src="https://images.unsplash.com/photo-1596451190630-186aff535bf2?auto=format&fit=crop&q=80&w=1200"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-80 group-hover:scale-105 transition-all duration-[2000ms]"
+                  alt="Artisanal Gins"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                  <h3 className="text-3xl font-serif font-bold text-white mb-2 tracking-tight">Artisanal Gins</h3>
+                  <div className="flex items-center gap-3 text-primary group-hover:text-white transition-colors">
+                    <span className="caps-label text-[10px] tracking-[0.2em]">EXPLORE</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </Link>
+            </StaggerItem>
+
+            {/* Membership CTA */}
+            <StaggerItem className="lg:col-span-2">
+              <GlassCard glow padding="p-10 md:p-16" className="h-full flex flex-col justify-center rounded-2xl">
+                <span className="caps-label text-secondary text-[9px] mb-6 block tracking-[0.5em] text-glow-amber">
+                  MEMBER EXCLUSIVE
+                </span>
+                <h3 className="text-4xl md:text-5xl font-serif font-bold text-white mb-8 tracking-tighter leading-none">
+                  Join The Kwest Circle
+                </h3>
+                <p className="text-text-muted text-sm md:text-base max-w-2xl mb-10 leading-relaxed">
+                  Gain early access to limited edition releases and private tasting
+                  events across Nairobi. Our members enjoy concierge delivery and
+                  exclusive pricing.
+                </p>
+                <button className="w-fit px-10 py-4 border border-primary/30 text-primary hover:bg-primary hover:text-background font-bold uppercase tracking-[0.2em] text-[11px] rounded-lg transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,240,255,0.2)] cursor-pointer">
+                  REQUEST INVITATION
+                </button>
+              </GlassCard>
+            </StaggerItem>
+          </StaggerContainer>
         </div>
       </section>
 
-      {/* Join The Kwest Circle */}
-      <section className="py-24 px-6 bg-[#0d0d0d]">
-        <div className="max-w-lg mx-auto bg-black border border-white/5 p-12 text-center rounded-sm">
-          <div className="flex justify-center mb-8">
-            <div className="w-12 h-12 rounded-full border border-primary flex items-center justify-center">
-              <Star className="w-6 h-6 text-primary" />
+      {/* ═══ Stats Section ═══ */}
+      <section className="py-12 md:py-20 px-6 md:px-12 bg-background border-y border-white/[0.04]">
+        <ScrollReveal>
+          <div className="max-w-[1000px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { target: 20, suffix: "+", label: "Years of Curation" },
+              { target: 500, suffix: "+", label: "Rare Bottles" },
+              { target: 100, suffix: "+", label: "Global Brands" },
+            ].map((stat) => (
+              <GlassCard key={stat.label} padding="p-8 md:p-10" className="text-center rounded-2xl">
+                <AnimatedCounter
+                  target={stat.target}
+                  suffix={stat.suffix}
+                  className="text-5xl md:text-6xl font-serif font-bold text-white text-glow"
+                  labelClassName="caps-label text-[10px] text-text-muted tracking-[0.3em]"
+                  label={stat.label}
+                />
+              </GlassCard>
+            ))}
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* ═══ Newsletter ═══ */}
+      <section className="py-16 md:py-32 px-6 md:px-12 bg-background">
+        <ScrollReveal>
+          <div className="max-w-3xl mx-auto text-center space-y-10">
+            <h2 className="text-4xl md:text-6xl font-serif font-bold text-white tracking-tighter leading-none">
+              Stay Informed
+            </h2>
+            <p className="text-text-muted text-sm md:text-base leading-relaxed max-w-xl mx-auto">
+              Subscribe to receive updates on new arrivals, vintage drops, and
+              exclusive event invitations.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-0 max-w-xl mx-auto overflow-hidden rounded-xl border border-white/[0.08]">
+              <input
+                type="email"
+                placeholder="Your email address"
+                className="flex-1 bg-white/[0.03] px-8 py-5 text-sm focus:outline-none focus:bg-white/[0.06] text-white placeholder:text-white/20 transition-all duration-300"
+              />
+              <button className="px-10 py-5 bg-primary text-background font-bold uppercase tracking-[0.2em] text-[11px] hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all duration-500 cursor-pointer">
+                JOIN
+              </button>
             </div>
           </div>
-          <h2 className="text-4xl font-serif font-black text-white mb-6 tracking-tight uppercase leading-none">
-            Join The Kwest <br /> Circle
-          </h2>
-          <p className="text-foreground/50 text-sm font-medium leading-relaxed mb-10 max-w-xs mx-auto">
-            Access members-only allocations, private tasting events, and the Nairobi concierge service.
-          </p>
-          <button className="w-full py-5 bg-primary text-black font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-white transition-colors">
-            Request Invitation
-          </button>
-        </div>
+        </ScrollReveal>
       </section>
-
-      {/* Commitment to Excellence */}
-      <section className="py-24 px-6 bg-black">
-        <div className="max-w-lg mx-auto">
-          <div className="aspect-[3/4] overflow-hidden mb-12 border border-white/5">
-            <img 
-              src="/commitment_excellence_man_1778434185488.png" 
-              className="w-full h-full object-cover grayscale opacity-80" 
-              alt="Commitment to Excellence"
-            />
-          </div>
-          <h2 className="text-4xl font-serif font-black text-white mb-8 tracking-tight uppercase">
-            Commitment to <br /> Excellence
-          </h2>
-          <blockquote className="border-l border-primary pl-6 py-2 mb-10">
-            <p className="text-foreground/60 italic text-lg leading-relaxed mb-6 font-medium">
-              "True quality is never accidental. It is the result of high intention, sincere effort, and intelligent execution; it represents the wise choice of many alternatives."
-            </p>
-            <cite className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary not-italic">
-              — Chief Grand Sommelier, Kwest
-            </cite>
-          </blockquote>
-        </div>
-      </section>
-
-      {/* The Weekly Journal */}
-      <section className="py-24 px-6 bg-[#0d0d0d] border-y border-white/5">
-        <div className="max-w-lg mx-auto text-center">
-          <h2 className="text-3xl font-serif font-black text-white mb-6 tracking-tight uppercase">
-            The Weekly Journal
-          </h2>
-          <p className="text-foreground/40 text-sm font-medium mb-10">
-            Stay informed on rare arrivals, tasting notes, and exclusive events at Nairobi Reserve.
-          </p>
-          <div className="flex flex-col gap-4">
-            <input 
-              type="email" 
-              placeholder="YOUR EMAIL ADDRESS"
-              className="w-full bg-black border border-white/10 px-8 py-5 text-[10px] font-bold tracking-[0.2em] focus:outline-none focus:border-primary transition-colors text-white uppercase"
-            />
-            <button className="w-full py-5 bg-transparent border border-white/20 text-white font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-white hover:text-black transition-all">
-              Subscribe
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <Footer />
-    </div>
+    </main>
   );
 }
