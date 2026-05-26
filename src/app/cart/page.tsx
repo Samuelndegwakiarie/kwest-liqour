@@ -12,13 +12,12 @@ import {
   ShieldCheck,
   Check,
   MapPin,
-  CreditCard,
-  Tag,
   ChevronLeft,
   Calendar,
-  Sparkles,
   Phone,
   User as UserIcon,
+  Store,
+  Bike,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { ParticleField } from "@/components/ParticleField";
@@ -66,13 +65,7 @@ export default function CartPage() {
     },
   ]);
 
-  const [promoCode, setPromoCode] = useState("");
-  const [appliedDiscount, setAppliedDiscount] = useState(0); // in percent
-  const [promoError, setPromoError] = useState("");
-  const [promoSuccess, setPromoSuccess] = useState("");
-
-  const [giftWrap, setGiftWrap] = useState(false);
-  const [waxSeal, setWaxSeal] = useState(false);
+  const [deliveryMethod, setDeliveryMethod] = useState<"shop" | "rider">("rider");
 
   // Checkout modal states
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -80,7 +73,7 @@ export default function CartPage() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [deliveryTime, setDeliveryTime] = useState("Same-Day Evening");
+  const [deliveryTime, setDeliveryTime] = useState("Immediate");
   const [customNotes, setCustomNotes] = useState("");
 
   const updateQuantity = (id: number, delta: number) => {
@@ -99,29 +92,18 @@ export default function CartPage() {
     setCartItems((items) => items.filter((item) => item.id !== id));
   };
 
-  const applyPromo = () => {
-    setPromoError("");
-    setPromoSuccess("");
-    if (promoCode.trim().toUpperCase() === "KWESTVIP") {
-      setAppliedDiscount(15);
-      setPromoSuccess("VIP 15% Discount applied successfully!");
-    } else if (promoCode.trim() !== "") {
-      setPromoError("Invalid concierge code");
-    }
-  };
-
   // Calculations
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const discountAmount = subtotal * (appliedDiscount / 100);
-  const giftWrapFee = giftWrap ? 1000 : 0;
-  const waxSealFee = waxSeal ? 2500 : 0;
-  const deliveryFee = subtotal > 15000 || subtotal === 0 ? 0 : 1500;
-  const total = subtotal - discountAmount + giftWrapFee + waxSealFee + deliveryFee;
+  const total = subtotal; // delivery is either free (pickup) or paid directly to rider on delivery
 
   const handleCheckoutSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !phone || !address) {
+    if (!fullName || !phone) {
       alert("Please fill in all required fields.");
+      return;
+    }
+    if (deliveryMethod === "rider" && !address) {
+      alert("Please enter a delivery address for the rider.");
       return;
     }
     setCheckoutStep(2);
@@ -134,10 +116,7 @@ export default function CartPage() {
     setFullName("");
     setPhone("");
     setAddress("");
-    setGiftWrap(false);
-    setWaxSeal(false);
-    setAppliedDiscount(0);
-    setPromoCode("");
+    setDeliveryMethod("rider");
   };
 
   return (
@@ -159,7 +138,7 @@ export default function CartPage() {
             Your <span className="gradient-text-static">Cellar</span> Cart
           </h1>
           <p className="text-text-muted caps-label text-[10px] tracking-[0.4em] max-w-md mx-auto">
-            SECURE CONCIERGE DISPATCH PREPARATION
+            SECURE CHECKOUT PREPARATION
           </p>
         </ScrollReveal>
 
@@ -302,11 +281,49 @@ export default function CartPage() {
               <div className="space-y-6">
                 <GlassCard padding="p-6 md:p-8" hover={false} glow={true} className="space-y-6">
                   <h3 className="text-xl font-serif font-bold text-white tracking-tight border-b border-white/[0.06] pb-4">
-                    Concierge Invoice
+                    checkout Invoice
                   </h3>
 
+                  {/* Delivery Selection */}
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] caps-label text-text-muted">Delivery Option</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Pick at Shop */}
+                      <button
+                        onClick={() => setDeliveryMethod("shop")}
+                        className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between h-20 ${
+                          deliveryMethod === "shop"
+                            ? "bg-primary/10 border-primary text-primary shadow-[0_0_15px_rgba(0,240,255,0.08)]"
+                            : "bg-black/20 border-white/[0.06] text-text-muted hover:border-white/20 hover:text-white"
+                        }`}
+                      >
+                        <Store className="w-4 h-4" />
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-wider">Pick at Shop</p>
+                          <p className="text-[8px] text-text-subtle mt-0.5">Complimentary</p>
+                        </div>
+                      </button>
+
+                      {/* Rider */}
+                      <button
+                        onClick={() => setDeliveryMethod("rider")}
+                        className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between h-20 ${
+                          deliveryMethod === "rider"
+                            ? "bg-primary/10 border-primary text-primary shadow-[0_0_15px_rgba(0,240,255,0.08)]"
+                            : "bg-black/20 border-white/[0.06] text-text-muted hover:border-white/20 hover:text-white"
+                        }`}
+                      >
+                        <Bike className="w-4 h-4" />
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-wider">Rider</p>
+                          <p className="text-[8px] text-text-subtle mt-0.5">Pay Rider on Delivery</p>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Pricing Breakdown */}
-                  <div className="space-y-4 text-sm">
+                  <div className="space-y-4 text-sm pt-4 border-t border-white/[0.06]">
                     <div className="flex justify-between text-text-muted">
                       <span>Subtotal</span>
                       <span className="text-white font-medium">
@@ -314,85 +331,21 @@ export default function CartPage() {
                       </span>
                     </div>
 
-                    {appliedDiscount > 0 && (
-                      <div className="flex justify-between text-emerald-400">
-                        <span>VIP Discount ({appliedDiscount}%)</span>
-                        <span>- KES {discountAmount.toLocaleString()}</span>
-                      </div>
-                    )}
-
-                    {/* Premium Options */}
-                    <div className="pt-2 border-t border-white/[0.04] space-y-3">
-                      <label className="flex items-start gap-3 cursor-pointer group">
-                        <div className="pt-0.5">
-                          <input
-                            type="checkbox"
-                            checked={giftWrap}
-                            onChange={(e) => setGiftWrap(e.target.checked)}
-                            className="sr-only"
-                          />
-                          <div
-                            className={`w-4 h-4 rounded border-2 transition-all flex items-center justify-center ${
-                              giftWrap
-                                ? "bg-primary border-primary shadow-[0_0_8px_rgba(0,240,255,0.3)]"
-                                : "border-white/[0.15] group-hover:border-primary/50"
-                            }`}
-                          >
-                            {giftWrap && <Check className="w-2.5 h-2.5 text-background stroke-[3]" />}
-                          </div>
-                        </div>
-                        <div className="flex-1 text-xs">
-                          <div className="text-white font-medium flex items-center gap-1.5">
-                            Premium Box Packaging <Sparkles className="w-3 h-3 text-secondary animate-pulse" />
-                          </div>
-                          <p className="text-text-subtle mt-0.5">Custom velvet lining (+ KES 1,000)</p>
-                        </div>
-                      </label>
-
-                      <label className="flex items-start gap-3 cursor-pointer group">
-                        <div className="pt-0.5">
-                          <input
-                            type="checkbox"
-                            checked={waxSeal}
-                            onChange={(e) => setWaxSeal(e.target.checked)}
-                            className="sr-only"
-                          />
-                          <div
-                            className={`w-4 h-4 rounded border-2 transition-all flex items-center justify-center ${
-                              waxSeal
-                                ? "bg-primary border-primary shadow-[0_0_8px_rgba(0,240,255,0.3)]"
-                                : "border-white/[0.15] group-hover:border-primary/50"
-                            }`}
-                          >
-                            {waxSeal && <Check className="w-2.5 h-2.5 text-background stroke-[3]" />}
-                          </div>
-                        </div>
-                        <div className="flex-1 text-xs">
-                          <div className="text-white font-medium">Custom Engraved Wax Seal</div>
-                          <p className="text-text-subtle mt-0.5">Bespoke monogram sealing (+ KES 2,500)</p>
-                        </div>
-                      </label>
-                    </div>
-
-                    <div className="flex justify-between text-text-muted pt-2 border-t border-white/[0.04]">
+                    <div className="flex justify-between text-text-muted">
                       <span>Delivery Fee</span>
-                      {deliveryFee === 0 ? (
+                      {deliveryMethod === "shop" ? (
                         <span className="text-primary font-bold tracking-widest text-[10px] caps-label">
-                          COMPLIMENTARY
+                          FREE
                         </span>
                       ) : (
-                        <span className="text-white font-medium">
-                          KES {deliveryFee.toLocaleString()}
+                        <span className="text-primary font-bold tracking-widest text-[9px] caps-label text-right leading-tight">
+                          PAY RIDER ON DELIVERY
                         </span>
                       )}
                     </div>
 
-                    <div className="text-[10px] text-text-subtle border-b border-white/[0.06] pb-4">
-                      * Complimentary courier for selections above KES 15,000
-                    </div>
-
                     {/* Total */}
-                    <div className="flex justify-between items-end pt-2">
+                    <div className="flex justify-between items-end pt-4 border-t border-white/[0.06]">
                       <span className="text-white font-medium">Grand Total</span>
                       <div className="text-right">
                         <p className="text-2xl font-bold text-primary text-glow font-serif">
@@ -405,41 +358,12 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  {/* Promo Input */}
-                  <div className="pt-4 border-t border-white/[0.06]">
-                    <h4 className="text-xs font-medium text-white mb-2 flex items-center gap-1.5">
-                      <Tag className="w-3.5 h-3.5 text-primary" /> Concierge Access Code
-                    </h4>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={promoCode}
-                        onChange={(e) => setPromoCode(e.target.value)}
-                        placeholder="Enter VIP / Curator Code"
-                        className="bg-black/30 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-white/20 flex-1 transition-all"
-                      />
-                      <button
-                        onClick={applyPromo}
-                        className="px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.1] hover:border-primary/30 transition-all text-xs font-semibold text-white cursor-pointer"
-                      >
-                        Apply
-                      </button>
-                    </div>
-                    {promoError && (
-                      <p className="text-destructive text-[10px] mt-1.5 font-medium">{promoError}</p>
-                    )}
-                    {promoSuccess && (
-                      <p className="text-emerald-400 text-[10px] mt-1.5 font-medium">{promoSuccess}</p>
-                    )}
-                    <p className="text-text-subtle text-[9px] mt-1">Try the VIP code: <span className="text-primary font-bold font-mono">KWESTVIP</span></p>
-                  </div>
-
                   {/* Checkout Action */}
                   <button
                     onClick={() => setIsCheckoutOpen(true)}
                     className="w-full py-4 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_35px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2 group"
                   >
-                    Proceed to Concierge Dispatch
+                    checkout
                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                   </button>
 
@@ -454,7 +378,7 @@ export default function CartPage() {
         </AnimatePresence>
       </section>
 
-      {/* ═══ Concierge Checkout Modal ═══ */}
+      {/* ═══ Checkout Details Modal ═══ */}
       <AnimatePresence>
         {isCheckoutOpen && (
           <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
@@ -481,7 +405,9 @@ export default function CartPage() {
                   <form onSubmit={handleCheckoutSubmit} className="space-y-6">
                     <div className="flex justify-between items-start border-b border-white/[0.06] pb-4">
                       <div>
-                        <span className="caps-label text-primary text-[9px]">CONCIERGE COURIER</span>
+                        <span className="caps-label text-primary text-[9px]">
+                          {deliveryMethod === "shop" ? "STORE PICKUP" : "RIDER DISPATCH"}
+                        </span>
                         <h3 className="text-2xl font-serif font-bold text-white mt-1">Dispatch Details</h3>
                       </div>
                       <button
@@ -526,30 +452,46 @@ export default function CartPage() {
                         </div>
                       </div>
 
-                      {/* Delivery Address */}
-                      <div className="space-y-1">
-                        <label className="text-[10px] caps-label text-text-muted">Nairobi Delivery Address *</label>
-                        <div className="relative">
-                          <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                          <input
-                            type="text"
-                            required
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            placeholder="Suite 4B, Signature Towers, Westlands"
-                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder:text-white/20 transition-all"
-                          />
+                      {/* Delivery Address (only for rider) */}
+                      {deliveryMethod === "rider" ? (
+                        <div className="space-y-1">
+                          <label className="text-[10px] caps-label text-text-muted">Nairobi Delivery Address *</label>
+                          <div className="relative">
+                            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                            <input
+                              type="text"
+                              required
+                              value={address}
+                              onChange={(e) => setAddress(e.target.value)}
+                              placeholder="Suite 4B, Signature Towers, Westlands"
+                              className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder:text-white/20 transition-all"
+                            />
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-1 text-xs">
+                          <p className="text-white font-semibold flex items-center gap-1.5">
+                            <Store className="w-4 h-4 text-primary" /> Store Pickup Location
+                          </p>
+                          <p className="text-text-muted">
+                            Kwest Flagship Vault, Landmark Plaza, Westlands, Nairobi.
+                          </p>
+                          <p className="text-primary font-medium text-[10px] caps-label tracking-wider pt-1">
+                            Ready in 30 minutes. No extra fees.
+                          </p>
+                        </div>
+                      )}
 
                       {/* Schedule Selection */}
                       <div className="space-y-1">
-                        <label className="text-[10px] caps-label text-text-muted">Dispatch Timing</label>
+                        <label className="text-[10px] caps-label text-text-muted">
+                          {deliveryMethod === "shop" ? "Pickup Timing" : "Rider Dispatch Timing"}
+                        </label>
                         <div className="grid grid-cols-3 gap-3">
                           {[
                             { name: "Immediate", desc: "Under 90 min" },
                             { name: "Same-Day Evening", desc: "6 PM - 9 PM" },
-                            { name: "Scheduled Tasting", desc: "Select Date" },
+                            { name: "Scheduled", desc: "Select Date" },
                           ].map((t) => (
                             <button
                               key={t.name}
@@ -561,20 +503,20 @@ export default function CartPage() {
                                   : "bg-black/20 border-white/[0.06] text-text-muted hover:border-white/20"
                               }`}
                             >
-                              <p className="text-[10px] font-bold uppercase tracking-wider">{t.name.split(" ")[0]}</p>
+                              <p className="text-[10px] font-bold uppercase tracking-wider">{t.name}</p>
                               <p className="text-[8px] text-text-subtle mt-0.5">{t.desc}</p>
                             </button>
                           ))}
                         </div>
                       </div>
 
-                      {/* Custom Curator Notes */}
+                      {/* Custom Notes */}
                       <div className="space-y-1">
-                        <label className="text-[10px] caps-label text-text-muted">Notes for Curated Prep (Optional)</label>
+                        <label className="text-[10px] caps-label text-text-muted">Notes (Optional)</label>
                         <textarea
                           value={customNotes}
                           onChange={(e) => setCustomNotes(e.target.value)}
-                          placeholder="e.g. Leave with reception, wrap as anniversary gift, dial down chill temperature..."
+                          placeholder="e.g. Leave with reception, dial down chill temperature..."
                           rows={2}
                           className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 transition-all resize-none"
                         />
@@ -588,8 +530,12 @@ export default function CartPage() {
                         <p className="text-lg font-bold text-white font-serif mt-0.5">KES {total.toLocaleString()}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-primary font-bold text-[9px] uppercase tracking-wider">CONCIERGE ASSISTANCE</p>
-                        <p className="text-[9px] text-text-subtle">Payment verified upon call/dispatch</p>
+                        <p className="text-primary font-bold text-[9px] uppercase tracking-wider">
+                          {deliveryMethod === "shop" ? "STORE COLLECT" : "RIDER DELIVERY"}
+                        </p>
+                        <p className="text-[9px] text-text-subtle">
+                          {deliveryMethod === "shop" ? "Collect at flagship" : "Pay rider on arrival"}
+                        </p>
                       </div>
                     </div>
 
@@ -598,7 +544,7 @@ export default function CartPage() {
                       type="submit"
                       className="w-full py-4 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_35px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
-                      Confirm Concierge Dispatch
+                      Confirm Order
                       <ShieldCheck className="w-4 h-4" />
                     </button>
                   </form>
@@ -617,11 +563,11 @@ export default function CartPage() {
 
                     <div className="space-y-2">
                       <span className="text-[9px] font-bold text-emerald-400 tracking-[0.3em] uppercase">
-                        Dispatch Confirmed
+                        Order Confirmed
                       </span>
                       <h3 className="text-3xl font-serif font-bold text-white">Cellar Request Received</h3>
                       <p className="text-text-muted text-sm max-w-sm mx-auto leading-relaxed">
-                        Your request has been dispatched to the Kwest Master Cellar. A curator is compiling your bottles now.
+                        Your request has been dispatched to the Kwest Master Cellar. A curator is preparing your selection now.
                       </p>
                     </div>
 
@@ -641,12 +587,21 @@ export default function CartPage() {
                         <span className="text-text-muted">Phone</span>
                         <span className="text-white font-medium">{phone}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-text-muted">Delivery Address</span>
-                        <span className="text-white font-medium text-right truncate max-w-[200px]" title={address}>
-                          {address}
-                        </span>
-                      </div>
+                      {deliveryMethod === "rider" ? (
+                        <div className="flex justify-between">
+                          <span className="text-text-muted">Delivery Address</span>
+                          <span className="text-white font-medium text-right truncate max-w-[200px]" title={address}>
+                            {address}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex justify-between">
+                          <span className="text-text-muted">Pickup Location</span>
+                          <span className="text-primary font-bold uppercase tracking-wider text-[9px]">
+                            Westlands Flagship
+                          </span>
+                        </div>
+                      )}
                       <div className="flex justify-between">
                         <span className="text-text-muted">Dispatch Schedule</span>
                         <span className="text-primary font-bold uppercase tracking-wider text-[9px] flex items-center gap-1">
@@ -660,7 +615,7 @@ export default function CartPage() {
                         <Phone className="w-3.5 h-3.5 text-primary" /> Curatorial Verification
                       </p>
                       <p className="text-text-muted text-[11px] leading-relaxed">
-                        To maintain secure concierge dispatch protocols, a Kwest curator will call or WhatsApp you at <span className="text-white font-bold">{phone}</span> within 10 minutes to verify your order details, discuss payment options (M-Pesa / Card / Bank transfer), and initiate immediate cellar release.
+                        A Kwest representative will call or WhatsApp you at <span className="text-white font-bold">{phone}</span> within 10 minutes to verify your order, guide you through payment (M-Pesa / Card / Bank transfer), and coordinate the pickup or rider release.
                       </p>
                     </div>
 
