@@ -194,7 +194,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="bg-background min-h-screen relative overflow-hidden pb-[var(--bottom-nav-height)] lg:pb-16 pt-[var(--bottom-nav-height)] lg:pt-0">
+    <main className="bg-background min-h-screen relative overflow-hidden pb-[calc(var(--bottom-nav-height)+2rem)] lg:pb-16 pt-24 lg:pt-28">
       {/* Background visual templates */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/45 to-background z-10" />

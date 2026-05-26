@@ -9,17 +9,18 @@ import { useCart } from "@/context/CartContext";
 
 
 const desktopLinks = [
-  { name: "Gallery", href: "/products" },
+  { name: "Drinks", href: "/products" },
   { name: "Heritage", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
 
 const bottomNavLinks = [
   { name: "HOME", href: "/", icon: Home },
-  { name: "RESERVE", href: "/products", icon: LayoutGrid },
+  { name: "DRINKS", href: "/products", icon: LayoutGrid },
   { name: "CONCIERGE", href: "/contact", icon: MessageSquare },
   { name: "CLUB", href: "/about", icon: ShieldCheck },
 ];
+
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
