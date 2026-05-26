@@ -6,7 +6,6 @@ import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/Scroll
 import { GlassCard } from "@/components/GlassCard";
 import { ParticleField } from "@/components/ParticleField";
 import dynamic from "next/dynamic";
-import contactAnimation from "../../../public/contact_animation.json";
 
 const serviceCards = [
   {
@@ -32,7 +31,10 @@ const serviceCards = [
   },
 ];
 
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+const DotLottiePlayer = dynamic(
+  () => import("@dotlottie/react-player").then((mod) => mod.DotLottiePlayer),
+  { ssr: false }
+);
 
 export default function Concierge() {
   return (
@@ -111,10 +113,10 @@ export default function Concierge() {
             {/* Left Column: Lottie Animation */}
             <ScrollReveal direction="left" className="w-full flex items-center justify-center">
               <div className="w-full max-w-md aspect-square relative rounded-2xl overflow-hidden glass-card flex items-center justify-center p-8 border border-white/[0.04] bg-white/[0.01]">
-                <Lottie
-                  animationData={contactAnimation}
-                  loop={true}
-                  autoplay={true}
+                <DotLottiePlayer
+                  src="/dancing.lottie"
+                  loop
+                  autoplay
                   className="w-full h-full opacity-60 hover:opacity-80 transition-opacity duration-500 scale-90"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-transparent pointer-events-none" />

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const bodoni = Bodoni_Moda({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
           <Navbar />
           {children}
           <Footer />
+          <ScrollToTop />
         </CartProvider>
       </body>
     </html>
