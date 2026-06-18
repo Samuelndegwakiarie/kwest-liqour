@@ -264,47 +264,50 @@ export default function CheckoutPage() {
                     <div className="space-y-4">
                       {/* Name */}
                       <div className="space-y-1">
-                        <label className="text-[10px] caps-label text-text-muted">Recipient Name *</label>
+                        <label htmlFor="checkout-fullname" className="text-[10px] caps-label text-text-muted">Recipient Name *</label>
                         <div className="relative">
-                          <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                          <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
                           <input
                             type="text"
+                            id="checkout-fullname"
                             required
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
-                            placeholder="Samuel Ndegwa"
-                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-xs text-white placeholder:text-white/20 transition-all border-b-2"
+                            placeholder="Alex Omondi"
+                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all border-b-2"
                           />
                         </div>
                       </div>
 
                       {/* Email */}
                       <div className="space-y-1">
-                        <label className="text-[10px] caps-label text-text-muted">Email Address (Optional)</label>
+                        <label htmlFor="checkout-email" className="text-[10px] caps-label text-text-muted">Email Address (Optional)</label>
                         <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
                           <input
                             type="email"
+                            id="checkout-email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="samuel@example.com"
-                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-xs text-white placeholder:text-white/20 transition-all border-b-2"
+                            placeholder="your.email@gmail.com"
+                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all border-b-2"
                           />
                         </div>
                       </div>
 
                       {/* Phone */}
                       <div className="space-y-1">
-                        <label className="text-[10px] caps-label text-text-muted">Phone Number *</label>
+                        <label htmlFor="checkout-phone" className="text-[10px] caps-label text-text-muted">Phone Number *</label>
                         <div className="relative">
-                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
                           <input
                             type="tel"
+                            id="checkout-phone"
                             required
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="+254 700 000 000"
-                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-xs text-white placeholder:text-white/20 transition-all border-b-2"
+                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all border-b-2"
                           />
                         </div>
                       </div>
@@ -313,7 +316,7 @@ export default function CheckoutPage() {
                       {deliveryMethod === "rider" && (
                         <div className="pt-2 space-y-4">
                           <div className="flex justify-between items-center">
-                            <label className="text-[10px] caps-label text-text-muted">GPS Coordinates (Precise Delivery)</label>
+                            <label htmlFor="checkout-coords" className="text-[10px] caps-label text-text-muted">GPS Coordinates (Precise Delivery)</label>
                             <button
                               type="button"
                               onClick={handleDetectLocation}
@@ -332,10 +335,11 @@ export default function CheckoutPage() {
                           <div className="relative">
                             <input
                               type="text"
+                              id="checkout-coords"
                               value={coordinates}
                               onChange={(e) => handleCoordinatesChange(e.target.value)}
                               placeholder="e.g. -1.286389, 36.817223"
-                              className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 transition-all border-b-2 font-mono"
+                              className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all border-b-2 font-mono"
                             />
                             {isLoadingAddress && (
                               <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -351,13 +355,13 @@ export default function CheckoutPage() {
 
                       {/* Location & Address Text Field */}
                       <div className="space-y-1">
-                        <label className="text-[10px] caps-label text-text-muted">
+                        <label htmlFor="checkout-address" className="text-[10px] caps-label text-text-muted">
                           {deliveryMethod === "shop" ? "Pickup Location Details" : "Location & Delivery Address *"}
                         </label>
                         {deliveryMethod === "shop" ? (
                           <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl space-y-1.5 text-xs">
                             <p className="text-white font-semibold flex items-center gap-1.5">
-                              <Store className="w-4 h-4 text-primary" /> Store Location Details
+                              <Store className="w-4 h-4 text-primary" aria-hidden="true" /> Store Location Details
                             </p>
                             <p className="text-text-muted">
                               Kwest Flagship Cellar Vault, Landmark Plaza, Westlands Road, Nairobi.
@@ -368,14 +372,15 @@ export default function CheckoutPage() {
                           </div>
                         ) : (
                           <div className="relative">
-                            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
                             <input
                               type="text"
+                              id="checkout-address"
                               required
                               value={address}
                               onChange={(e) => setAddress(e.target.value)}
                               placeholder="Landmark Plaza, Westlands Road, Nairobi"
-                              className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-xs text-white placeholder:text-white/20 transition-all border-b-2"
+                              className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all border-b-2"
                             />
                           </div>
                         )}
@@ -446,14 +451,15 @@ export default function CheckoutPage() {
                             className="overflow-hidden"
                           >
                             <div className="bg-black/30 border border-white/[0.04] rounded-xl p-4 space-y-3">
-                              <label className="text-[9px] caps-label text-text-muted">M-Pesa Mobile Number *</label>
+                              <label htmlFor="checkout-mpesa" className="text-[9px] caps-label text-text-muted">M-Pesa Mobile Number *</label>
                               <input
                                 type="tel"
+                                id="checkout-mpesa"
                                 required={paymentOption === "mpesa"}
                                 value={mpesaPhone}
                                 onChange={(e) => setMpesaPhone(e.target.value)}
                                 placeholder="e.g. 0712345678"
-                                className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-4 py-3 text-xs text-white placeholder:text-white/20 transition-all border-b-2 font-mono"
+                                className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all border-b-2 font-mono"
                               />
                               <p className="text-[9px] text-text-subtle leading-relaxed">
                                 Enter your Safaricom mobile number. When you complete the order, a secure PIN prompt will display on your screen.

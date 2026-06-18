@@ -192,10 +192,10 @@ export default function Gallery() {
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => toggleCategory(cat)}
-                            className="sr-only"
+                            className="sr-only peer"
                           />
                           <div
-                            className={`w-4 h-4 rounded border-2 transition-all duration-300 flex items-center justify-center ${
+                            className={`w-4 h-4 rounded border-2 transition-all duration-300 flex items-center justify-center peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background ${
                               isChecked
                                 ? "bg-primary border-primary shadow-[0_0_8px_rgba(0,240,255,0.3)]"
                                 : "border-white/[0.15] group-hover:border-primary/50"
@@ -223,17 +223,19 @@ export default function Gallery() {
                     <input
                       type="number"
                       placeholder="Min"
+                      aria-label="Minimum price in KES"
                       value={minPrice}
                       onChange={(e) => setMinPrice(e.target.value)}
-                      className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-3 py-2.5 text-xs text-white placeholder:text-white/20 transition-all border-b-2"
+                      className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-3 py-2.5 text-base lg:text-xs text-white placeholder:text-white/20 transition-all border-b-2"
                     />
                     <span className="text-text-subtle text-xs">to</span>
                     <input
                       type="number"
                       placeholder="Max"
+                      aria-label="Maximum price in KES"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(e.target.value)}
-                      className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-3 py-2.5 text-xs text-white placeholder:text-white/20 transition-all border-b-2"
+                      className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-3 py-2.5 text-base lg:text-xs text-white placeholder:text-white/20 transition-all border-b-2"
                     />
                   </div>
                 </div>
@@ -248,7 +250,8 @@ export default function Gallery() {
                         <button
                           key={vol}
                           onClick={() => toggleVolume(vol)}
-                          className={`py-2 px-3 rounded-lg border text-center text-xs transition-all cursor-pointer ${
+                          aria-pressed={isChecked}
+                          className={`py-2 px-3 rounded-lg border text-center text-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer ${
                             isChecked
                               ? "bg-primary/10 border-primary text-primary shadow-[0_0_12px_rgba(0,240,255,0.08)]"
                               : "bg-black/20 border-white/[0.06] text-text-muted hover:border-white/20 hover:text-white"
@@ -268,13 +271,14 @@ export default function Gallery() {
           <div className="flex-1 space-y-8">
             {/* Search Input field */}
             <div className="relative w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
               <input
                 type="text"
                 placeholder="Search by brand, name, or spirit category..."
+                aria-label="Search by brand, name, or spirit category"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3.5 text-xs text-white placeholder:text-white/20 transition-all border-b-2"
+                className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3.5 text-base lg:text-xs text-white placeholder:text-white/20 transition-all border-b-2"
               />
             </div>
             {filteredProducts.length === 0 ? (
@@ -292,72 +296,74 @@ export default function Gallery() {
             ) : (
               <StaggerContainer className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" staggerDelay={0.05}>
                 {filteredProducts.map((product) => (
-                  <StaggerItem key={product.id}>
-                    <Link
-                      href={`/products/${product.id}`}
-                      className="group flex flex-col cursor-pointer bg-white/[0.01] border border-white/[0.04] rounded-2xl p-3 hover:bg-white/[0.03] hover:border-primary/20 hover:shadow-[0_8px_32px_rgba(0,240,255,0.06)] transition-all duration-500"
-                    >
-                      {/* Image Frame */}
-                      <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden mb-4 bg-black/40 border border-white/[0.04] flex items-center justify-center p-4">
-                        {product.tag && (
-                          <div
-                            className={`absolute top-2.5 left-2.5 z-10 text-[8px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase border backdrop-blur-sm ${
-                              tagColors[product.tag] || "bg-white/10 text-white border-white/20"
-                            }`}
-                          >
-                            {product.tag}
+                  <StaggerItem key={product.id} className="h-full">
+                    <div className="relative group flex flex-col justify-between h-full bg-white/[0.01] border border-white/[0.04] rounded-2xl p-3 hover:bg-white/[0.03] hover:border-primary/20 hover:shadow-[0_8px_32px_rgba(0,240,255,0.06)] transition-all duration-500">
+                      <Link
+                        href={`/products/${product.id}`}
+                        className="flex flex-col cursor-pointer w-full"
+                      >
+                        {/* Image Frame */}
+                        <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden mb-4 bg-black/40 border border-white/[0.04] flex items-center justify-center p-4">
+                          {product.tag && (
+                            <div
+                              className={`absolute top-2.5 left-2.5 z-10 text-[8px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase border backdrop-blur-sm ${
+                                tagColors[product.tag] || "bg-white/10 text-white border-white/20"
+                              }`}
+                            >
+                              {product.tag}
+                            </div>
+                          )}
+                          
+                          {/* Quantity label badge on product image */}
+                          <div className="absolute bottom-2.5 right-2.5 z-10 text-[8px] font-bold px-2 py-0.5 rounded bg-black/60 border border-white/[0.1] text-text-muted">
+                            {product.volume}
                           </div>
-                        )}
-                        
-                        {/* Quantity label badge on product image */}
-                        <div className="absolute bottom-2.5 right-2.5 z-10 text-[8px] font-bold px-2 py-0.5 rounded bg-black/60 border border-white/[0.1] text-text-muted">
-                          {product.volume}
-                        </div>
 
-                        {/* Quick Add Button */}
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleQuickAdd(product);
-                          }}
-                          className="absolute right-2.5 top-2.5 z-15 w-8 h-8 rounded-full bg-background/80 hover:bg-primary border border-white/[0.08] hover:border-primary flex items-center justify-center text-white/60 hover:text-background transition-all duration-300 shadow-md cursor-pointer group/btn"
-                          title="Quick Add to Cellar"
-                        >
-                          <Plus className="w-4 h-4 transition-transform group-hover/btn:rotate-90" />
-                        </button>
-
-                        <img
-                          src={product.img}
-                          className="h-[80%] object-contain opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
-                          alt={product.name}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        
-                        {/* Quick View Overlay */}
-                        <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                          <div className="flex items-center justify-center gap-2 text-primary text-[10px] caps-label">
-                            VIEW DETAILS <ArrowRight className="w-3 h-3" />
+                          <img
+                            src={product.img}
+                            className="h-[80%] object-contain opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                            alt={`Bottle of ${product.brand} ${product.name}`}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                          
+                          {/* Quick View Overlay */}
+                          <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                            <div className="flex items-center justify-center gap-2 text-primary text-[10px] caps-label">
+                              VIEW DETAILS <ArrowRight className="w-3 h-3" />
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Info Frame */}
-                      <div className="space-y-1.5 px-1.5 pb-1">
-                        <div className="flex justify-between items-center text-[9px] text-text-subtle tracking-[0.2em] uppercase">
-                          <span>{product.brand}</span>
-                          <span>{product.category}</span>
+                        {/* Info Frame */}
+                        <div className="space-y-1.5 px-1.5 pb-3">
+                          <div className="flex justify-between items-center text-[9px] text-text-subtle tracking-[0.2em] uppercase">
+                            <span>{product.brand}</span>
+                            <span>{product.category}</span>
+                          </div>
+                          <h3 className="text-sm md:text-base font-serif font-bold text-white group-hover:text-primary transition-colors tracking-tight leading-tight truncate">
+                            {product.name}
+                          </h3>
+                          <div className="flex justify-between items-center pt-1">
+                            <p className="text-primary font-bold tracking-wider text-[12px] md:text-sm text-glow">
+                              KES {product.price.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </p>
+                          </div>
                         </div>
-                        <h3 className="text-sm md:text-base font-serif font-bold text-white group-hover:text-primary transition-colors tracking-tight leading-tight truncate">
-                          {product.name}
-                        </h3>
-                        <div className="flex justify-between items-center pt-1">
-                          <p className="text-primary font-bold tracking-wider text-[12px] md:text-sm text-glow">
-                            KES {product.price.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
+                      </Link>
+
+                      {/* Visible Add to Cart Button */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleQuickAdd(product);
+                        }}
+                        className="w-full mt-2 py-2.5 bg-primary/10 hover:bg-primary border border-primary/20 hover:border-primary text-primary hover:text-background font-bold text-[9px] caps-label tracking-widest rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      >
+                        <ShoppingBag className="w-3.5 h-3.5" />
+                        ADD TO CART
+                      </button>
+                    </div>
                   </StaggerItem>
                 ))}
               </StaggerContainer>
@@ -399,10 +405,10 @@ export default function Gallery() {
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => toggleCategory(cat)}
-                        className="sr-only"
+                        className="sr-only peer"
                       />
                       <div
-                        className={`w-4 h-4 rounded border-2 transition-all duration-300 flex items-center justify-center ${
+                        className={`w-4 h-4 rounded border-2 transition-all duration-300 flex items-center justify-center peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background ${
                           isChecked
                             ? "bg-primary border-primary shadow-[0_0_8px_rgba(0,240,255,0.3)]"
                             : "border-white/[0.15] group-hover:border-primary/50"
@@ -430,17 +436,19 @@ export default function Gallery() {
                 <input
                   type="number"
                   placeholder="Min"
+                  aria-label="Minimum price in KES"
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value)}
-                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-3 py-2 text-xs text-white placeholder:text-white/20 transition-all border-b-2"
+                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-3 py-2 text-base text-white placeholder:text-white/20 transition-all border-b-2"
                 />
                 <span className="text-text-subtle text-xs">to</span>
                 <input
                   type="number"
                   placeholder="Max"
+                  aria-label="Maximum price in KES"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
-                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-3 py-2 text-xs text-white placeholder:text-white/20 transition-all border-b-2"
+                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-3 py-2 text-base text-white placeholder:text-white/20 transition-all border-b-2"
                 />
               </div>
             </div>
@@ -455,7 +463,8 @@ export default function Gallery() {
                     <button
                       key={vol}
                       onClick={() => toggleVolume(vol)}
-                      className={`py-2 px-3 rounded-lg border text-center text-xs transition-all cursor-pointer ${
+                      aria-pressed={isChecked}
+                      className={`py-2 px-3 rounded-lg border text-center text-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer ${
                         isChecked
                           ? "bg-primary/10 border-primary text-primary shadow-[0_0_12px_rgba(0,240,255,0.08)]"
                           : "bg-black/20 border-white/[0.06] text-text-muted hover:border-white/20 hover:text-white"

@@ -386,3 +386,74 @@ body {
     @apply font-sans;
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   CARD FAN CAROUSEL — GSAP STYLING
+   ═══════════════════════════════════════════════════════ */
+.fan-layout {
+  height: 38rem;
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 1023px) {
+  .fan-layout {
+    height: 34rem;
+  }
+}
+@media (max-width: 767px) {
+  .fan-layout {
+    height: 28rem;
+  }
+}
+@media (max-width: 639px) {
+  .fan-layout {
+    height: 26rem;
+  }
+}
+@media (max-width: 479px) {
+  .fan-layout {
+    height: 22rem;
+  }
+}
+
+.fan-card {
+  position: absolute;
+  width: 18rem;
+  height: 26rem;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transform-origin: bottom center;
+  will-change: transform, opacity;
+  background: var(--background-elevated);
+}
+
+@media (max-width: 1023px) {
+  .fan-card {
+    width: 16rem;
+    height: 24rem;
+  }
+}
+@media (max-width: 767px) {
+  .fan-card {
+    width: 14rem;
+    height: 20rem;
+  }
+}
+@media (max-width: 639px) {
+  .fan-card {
+    width: 12rem;
+    height: 17rem;
+  }
+}
+@media (max-width: 479px) {
+  .fan-card {
+    width: 10rem;
+    height: 14rem;
+  }
+}

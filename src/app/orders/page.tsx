@@ -301,13 +301,14 @@ export default function TrackOrdersPage() {
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between p-4 bg-white/[0.01] border border-white/[0.04] rounded-2xl backdrop-blur-md">
               {/* Search Bar */}
               <div className="relative w-full md:w-80">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
                 <input
                   type="text"
                   placeholder="Search order ID or item name..."
+                  aria-label="Search orders by ID or item name"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-xs text-white placeholder:text-white/20 transition-all border-b-2"
+                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all border-b-2"
                 />
               </div>
 
@@ -688,9 +689,10 @@ export default function TrackOrdersPage() {
                                                   value={comments[order.id] || ""}
                                                   onChange={(e) => setComments(prev => ({ ...prev, [order.id]: e.target.value }))}
                                                   placeholder="Feedback comment (text-only)..."
+                                                  aria-label="Feedback comment text"
                                                   maxLength={150}
                                                   rows={2}
-                                                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-lg p-2.5 text-[11px] text-white placeholder:text-white/20 resize-none transition-all"
+                                                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-lg p-2.5 text-base md:text-xs text-white placeholder:text-white/20 resize-none transition-all"
                                                 />
                                                 <button
                                                   type="button"

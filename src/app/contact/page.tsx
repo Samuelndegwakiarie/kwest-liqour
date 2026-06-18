@@ -179,30 +179,36 @@ export default function Concierge() {
                     >
                       <div className="space-y-6">
                         <div className="group">
+                          <label htmlFor="contact-fullname" className="sr-only">Full Name</label>
                           <input
                             type="text"
+                            id="contact-fullname"
                             required
                             placeholder="FULL NAME"
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
-                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
+                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-base lg:text-sm lg:caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
                           />
                         </div>
                         <div className="group">
+                          <label htmlFor="contact-email" className="sr-only">Email Address</label>
                           <input
                             type="email"
+                            id="contact-email"
                             required
                             placeholder="EMAIL ADDRESS"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
+                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-base lg:text-sm lg:caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
                           />
                         </div>
                         <div className="relative group">
+                          <label htmlFor="contact-service" className="sr-only">Select Service Type</label>
                           <select
+                            id="contact-service"
                             value={service}
                             onChange={(e) => setService(e.target.value)}
-                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label text-white/40 focus:text-white focus:border-primary outline-none appearance-none cursor-pointer transition-all duration-300"
+                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-base lg:text-sm lg:caps-label text-white/40 focus:text-white focus:border-primary outline-none appearance-none cursor-pointer transition-all duration-300"
                           >
                             <option className="bg-background-elevated">SELECT SERVICE TYPE</option>
                             <option className="bg-background-elevated">PRIVATE TASTING</option>
@@ -212,13 +218,15 @@ export default function Concierge() {
                           <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
                         </div>
                         <div className="group">
+                          <label htmlFor="contact-message" className="sr-only">Message</label>
                           <textarea
+                            id="contact-message"
                             required
                             placeholder="MESSAGE"
                             rows={4}
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
-                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 resize-none transition-all duration-300"
+                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-base lg:text-sm lg:caps-label focus:border-primary outline-none text-white placeholder:text-white/20 resize-none transition-all duration-300"
                           />
                         </div>
                       </div>
@@ -233,6 +241,8 @@ export default function Concierge() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
                       className="text-center py-12 space-y-6"
+                      role="status"
+                      aria-live="polite"
                     >
                       <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(0,240,255,0.2)]">
                         <Sparkles className="w-8 h-8 text-primary" />

@@ -91,18 +91,19 @@ export function Navbar() {
 
         {/* Desktop Actions */}
         <div className="hidden lg:flex items-center gap-8">
-          <form onSubmit={handleSearchSubmit} className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20" />
+          <form onSubmit={handleSearchSubmit} className="relative" role="search">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20" aria-hidden="true" />
             <input
               type="text"
               placeholder="Search collection..."
               value={searchVal}
               onChange={(e) => setSearchVal(e.target.value)}
+              aria-label="Search collection"
               className="bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] rounded-full py-2.5 pl-11 pr-6 text-[10px] caps-label text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 focus:shadow-[0_0_20px_rgba(0,240,255,0.1)] w-56 transition-all duration-300"
             />
           </form>
-          <Link href="/cart" className="relative group cursor-pointer">
-            <ShoppingBag className="w-5 h-5 text-white/40 group-hover:text-primary transition-colors duration-300" />
+          <Link href="/cart" className="relative group cursor-pointer" aria-label="Shopping Cart">
+            <ShoppingBag className="w-5 h-5 text-white/40 group-hover:text-primary transition-colors duration-300" aria-hidden="true" />
             <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-primary text-background text-[8px] font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.4)]">
               {cartCount}
             </span>
@@ -110,15 +111,16 @@ export function Navbar() {
           <Link
             href="/account"
             className="text-white/40 hover:text-primary transition-colors duration-300 cursor-pointer"
+            aria-label="User Account Profile"
           >
-            <User className="w-5 h-5" />
+            <User className="w-5 h-5" aria-hidden="true" />
           </Link>
         </div>
 
         {/* Mobile Actions */}
         <div className="flex lg:hidden items-center gap-5">
-          <Link href="/cart" className="relative group cursor-pointer text-white/60 hover:text-primary transition-colors">
-            <ShoppingBag className="w-5 h-5" />
+          <Link href="/cart" className="relative group cursor-pointer text-white/60 hover:text-primary transition-colors" aria-label="Shopping Cart">
+            <ShoppingBag className="w-5 h-5" aria-hidden="true" />
             <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-primary text-background text-[8px] font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.4)]">
               {cartCount}
             </span>
@@ -126,15 +128,16 @@ export function Navbar() {
           <Link
             href="/account"
             className="text-white/60 hover:text-primary transition-colors duration-300 cursor-pointer"
+            aria-label="User Account Profile"
           >
-            <User className="w-5 h-5" />
+            <User className="w-5 h-5" aria-hidden="true" />
           </Link>
         </div>
       </nav>
 
       {/* Mobile Bottom Navigation (only way to navigate on mobile screens now) */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full z-[100] glass-nav h-[var(--bottom-nav-height)] px-4">
-        <div className="grid grid-cols-4 h-full">
+      <div className="lg:hidden fixed bottom-0 left-0 w-full z-[100] glass-nav h-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] px-4">
+        <div className="grid grid-cols-4 h-[var(--bottom-nav-height)]">
           {bottomNavLinks.map((link) => {
             const active = isActive(link.href);
             return (
@@ -142,12 +145,14 @@ export function Navbar() {
                 key={link.name}
                 href={link.href}
                 className="flex flex-col items-center justify-center gap-1.5 cursor-pointer group"
+                aria-label={`Go to ${link.name}`}
               >
                 <div className="relative">
                   <link.icon
                     className={`w-5 h-5 transition-colors duration-300 ${
                       active ? "text-primary" : "text-white/30 group-hover:text-white/60"
                     }`}
+                    aria-hidden="true"
                   />
                   {active && (
                     <motion.div

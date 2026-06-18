@@ -1,0 +1,617 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "brand": "JOHNNIE WALKER",
+      "name": "Black Label Scotch",
+      "price": 5800,
+      "tag": "BEST SELLER",
+      "img": "/johnnie_walker_black_noir_1778448563770.png",
+      "category": "Whisky",
+      "volume": "750ml",
+      "stock": 48,
+      "visible": true,
+      "description": "A perfectly balanced blend of whiskies from across Scotland, aged for a minimum of 12 years."
+    },
+    {
+      "id": 2,
+      "brand": "GILBEY'S",
+      "name": "Special Dry Gin",
+      "price": 1795,
+      "tag": "POPULAR",
+      "img": "/gilbeys_gin_noir_1778448582122.png",
+      "category": "Gin",
+      "volume": "750ml",
+      "stock": 62,
+      "visible": true,
+      "description": "A classic dry gin with a crisp, clean taste and subtle botanical notes."
+    },
+    {
+      "id": 3,
+      "brand": "HENNESSY",
+      "name": "VS Cognac",
+      "price": 6500,
+      "tag": "LUXURY",
+      "img": "/hennessy_vs_noir_1778448600750.png",
+      "category": "Cognac",
+      "volume": "750ml",
+      "stock": 24,
+      "visible": true,
+      "description": "The world's best-selling Cognac. Very Special, fruit-forward with oak notes."
+    },
+    {
+      "id": 4,
+      "brand": "JAMESON",
+      "name": "Irish Whiskey",
+      "price": 3200,
+      "tag": "TRENDING",
+      "img": "/jameson_whiskey_noir_1778448618517.png",
+      "category": "Whisky",
+      "volume": "750ml",
+      "stock": 36,
+      "visible": true,
+      "description": "Triple-distilled Irish whiskey with a perfectly balanced flavor of spice, pot still sweetness and wood."
+    },
+    {
+      "id": 5,
+      "brand": "DON JULIO",
+      "name": "Blanco Tequila",
+      "price": 12500,
+      "tag": "LIMITED",
+      "img": "/don_julio_blanco_noir_1778448639327.png",
+      "category": "Tequila",
+      "volume": "750ml",
+      "stock": 8,
+      "visible": true,
+      "description": "Pure, clean Highland agave tequila with a crisp, fresh flavor profile."
+    },
+    {
+      "id": 6,
+      "brand": "TANQUERAY",
+      "name": "London Dry Gin",
+      "price": 3500,
+      "tag": null,
+      "img": "/tanqueray_london_dry_noir.png",
+      "category": "Gin",
+      "volume": "1000ml",
+      "stock": 41,
+      "visible": true,
+      "description": "Award-winning London Dry Gin distilled four times for an exceptionally smooth taste."
+    },
+    {
+      "id": 7,
+      "brand": "PENFOLDS",
+      "name": "Koonunga Hill Shiraz",
+      "price": 4200,
+      "tag": "POPULAR",
+      "img": "/vintage_wines_category_noir.png",
+      "category": "Wines",
+      "volume": "750ml",
+      "stock": 19,
+      "visible": true,
+      "description": "Rich, full-bodied Australian red wine with dark berry flavors and a smooth finish."
+    },
+    {
+      "id": 8,
+      "brand": "JOHNNIE WALKER",
+      "name": "Black Label (Pocket)",
+      "price": 2100,
+      "tag": null,
+      "img": "/johnnie_walker_black_noir_1778448563770.png",
+      "category": "Whisky",
+      "volume": "250ml",
+      "stock": 75,
+      "visible": true,
+      "description": "The iconic Black Label in a convenient pocket size. Same great taste."
+    },
+    {
+      "id": 9,
+      "brand": "GILBEY'S",
+      "name": "Special Dry (Medium)",
+      "price": 1100,
+      "tag": null,
+      "img": "/gilbeys_gin_noir_1778448582122.png",
+      "category": "Gin",
+      "volume": "350ml",
+      "stock": 53,
+      "visible": true,
+      "description": "Gilbey's Special Dry Gin in a medium format bottle. Perfect for sharing."
+    },
+    {
+      "id": 10,
+      "brand": "HENNESSY",
+      "name": "VS Cognac (Half)",
+      "price": 3800,
+      "tag": null,
+      "img": "/hennessy_vs_noir_1778448600750.png",
+      "category": "Cognac",
+      "volume": "500ml",
+      "stock": 5,
+      "visible": true,
+      "description": "Hennessy VS in a convenient half-bottle format. Ideal for gifting."
+    }
+  ],
+  "orders": [
+    {
+      "id": "KW-9812-2026",
+      "customer": "Sir Samuel Ndegwa",
+      "email": "samuel.ndegwa@gmail.com",
+      "phone": "+254712345678",
+      "items": [
+        {
+          "productId": 1,
+          "name": "Johnnie Walker Black Label",
+          "brand": "JOHNNIE WALKER",
+          "price": 5800,
+          "quantity": 2,
+          "volume": "750ml"
+        },
+        {
+          "productId": 3,
+          "name": "VS Cognac",
+          "brand": "HENNESSY",
+          "price": 6500,
+          "quantity": 1,
+          "volume": "750ml"
+        }
+      ],
+      "total": 18100,
+      "delivery": "Rider",
+      "address": "Muthaiga Road, Nairobi",
+      "status": "Delivered",
+      "date": "2026-06-18T10:30:00Z",
+      "mpesa": {
+        "phone": "254712345678",
+        "receipt": "QHJ7KL29MN",
+        "amount": 18100,
+        "status": "SUCCESS",
+        "timestamp": "2026-06-18T10:31:44Z"
+      }
+    },
+    {
+      "id": "KW-7291-2026",
+      "customer": "Lady Wanjiku",
+      "email": "wanjiku.m@outlook.com",
+      "phone": "+254722987654",
+      "items": [
+        {
+          "productId": 3,
+          "name": "VS Cognac",
+          "brand": "HENNESSY",
+          "price": 6500,
+          "quantity": 1,
+          "volume": "750ml"
+        }
+      ],
+      "total": 6500,
+      "delivery": "Pick at Shop",
+      "address": null,
+      "status": "Delivered",
+      "date": "2026-06-12T14:15:00Z",
+      "mpesa": {
+        "phone": "254722987654",
+        "receipt": "PGK3XM11LQ",
+        "amount": 6500,
+        "status": "SUCCESS",
+        "timestamp": "2026-06-12T14:16:22Z"
+      }
+    },
+    {
+      "id": "KW-5192-2026",
+      "customer": "Dr. Kiprono",
+      "email": "kiprono.dr@yahoo.com",
+      "phone": "+254733112233",
+      "items": [
+        {
+          "productId": 5,
+          "name": "Blanco Tequila",
+          "brand": "DON JULIO",
+          "price": 12500,
+          "quantity": 1,
+          "volume": "750ml"
+        }
+      ],
+      "total": 12500,
+      "delivery": "Rider",
+      "address": "Karen, Nairobi",
+      "status": "Delivered",
+      "date": "2026-05-25T09:00:00Z",
+      "mpesa": {
+        "phone": "254733112233",
+        "receipt": "RNW9YQ55BX",
+        "amount": 12500,
+        "status": "SUCCESS",
+        "timestamp": "2026-05-25T09:01:59Z"
+      }
+    },
+    {
+      "id": "KW-6421-2026",
+      "customer": "Amina Osei",
+      "email": "amina.osei@gmail.com",
+      "phone": "+254744556677",
+      "items": [
+        {
+          "productId": 6,
+          "name": "London Dry Gin",
+          "brand": "TANQUERAY",
+          "price": 3500,
+          "quantity": 2,
+          "volume": "1000ml"
+        },
+        {
+          "productId": 2,
+          "name": "Special Dry Gin",
+          "brand": "GILBEY'S",
+          "price": 1795,
+          "quantity": 1,
+          "volume": "750ml"
+        }
+      ],
+      "total": 8795,
+      "delivery": "Rider",
+      "address": "Westlands, Nairobi",
+      "status": "En Route",
+      "date": "2026-06-05T11:45:00Z",
+      "mpesa": {
+        "phone": "254744556677",
+        "receipt": "TXP2WD88CZ",
+        "amount": 8795,
+        "status": "SUCCESS",
+        "timestamp": "2026-06-05T11:47:01Z"
+      }
+    },
+    {
+      "id": "KW-4819-2026",
+      "customer": "John Kamau",
+      "email": "jkamau254@gmail.com",
+      "phone": "+254755667788",
+      "items": [
+        {
+          "productId": 4,
+          "name": "Irish Whiskey",
+          "brand": "JAMESON",
+          "price": 3200,
+          "quantity": 1,
+          "volume": "750ml"
+        }
+      ],
+      "total": 3200,
+      "delivery": "Rider",
+      "address": "Kilimani, Nairobi",
+      "status": "Processing",
+      "date": "2026-05-18T16:30:00Z",
+      "mpesa": {
+        "phone": "254755667788",
+        "receipt": "UVF5HN22AW",
+        "amount": 3200,
+        "status": "SUCCESS",
+        "timestamp": "2026-05-18T16:31:33Z"
+      }
+    },
+    {
+      "id": "KW-3307-2026",
+      "customer": "Grace Otieno",
+      "email": "grace.otieno@gmail.com",
+      "phone": "+254766778899",
+      "items": [
+        {
+          "productId": 7,
+          "name": "Koonunga Hill Shiraz",
+          "brand": "PENFOLDS",
+          "price": 4200,
+          "quantity": 2,
+          "volume": "750ml"
+        }
+      ],
+      "total": 8400,
+      "delivery": "Pick at Shop",
+      "address": null,
+      "status": "Pending",
+      "date": "2026-06-18T17:00:00Z",
+      "mpesa": {
+        "phone": "254766778899",
+        "receipt": "VWG6IO33BV",
+        "amount": 8400,
+        "status": "PENDING",
+        "timestamp": "2026-06-18T17:01:00Z"
+      }
+    }
+  ],
+  "analytics": {
+    "totalRevenue": 1847500,
+    "revenueGrowth": 12.4,
+    "activeOrders": 2,
+    "lowStockCount": 3,
+    "monthlyRevenue": [
+      {
+        "month": "Jan",
+        "revenue": 98000
+      },
+      {
+        "month": "Feb",
+        "revenue": 112000
+      },
+      {
+        "month": "Mar",
+        "revenue": 134000
+      },
+      {
+        "month": "Apr",
+        "revenue": 156000
+      },
+      {
+        "month": "May",
+        "revenue": 189000
+      },
+      {
+        "month": "Jun",
+        "revenue": 214000
+      }
+    ],
+    "topProducts": [
+      {
+        "name": "Hennessy VS Cognac",
+        "brand": "HENNESSY",
+        "sold": 142,
+        "revenue": 923000
+      },
+      {
+        "name": "Johnnie Walker Black",
+        "brand": "JOHNNIE WALKER",
+        "sold": 118,
+        "revenue": 684400
+      },
+      {
+        "name": "Don Julio Blanco",
+        "brand": "DON JULIO",
+        "sold": 24,
+        "revenue": 300000
+      },
+      {
+        "name": "Jameson Irish Whiskey",
+        "brand": "JAMESON",
+        "sold": 87,
+        "revenue": 278400
+      },
+      {
+        "name": "Tanqueray London Dry",
+        "brand": "TANQUERAY",
+        "sold": 76,
+        "revenue": 266000
+      }
+    ],
+    "categoryBreakdown": [
+      {
+        "category": "Whisky",
+        "percentage": 34
+      },
+      {
+        "category": "Cognac",
+        "percentage": 28
+      },
+      {
+        "category": "Tequila",
+        "percentage": 16
+      },
+      {
+        "category": "Gin",
+        "percentage": 14
+      },
+      {
+        "category": "Wines",
+        "percentage": 8
+      }
+    ],
+    "demographics": [
+      {
+        "label": "Male",
+        "value": 61,
+        "color": "#d4af37"
+      },
+      {
+        "label": "Female",
+        "value": 31,
+        "color": "#b8860b"
+      },
+      {
+        "label": "Corporate",
+        "value": 8,
+        "color": "#8b6914"
+      }
+    ],
+    "recentSales": [
+      {
+        "id": "KW-9812-2026",
+        "product": "Johnnie Walker Black x2 + Hennessy VS",
+        "customer": "Sir Samuel Ndegwa",
+        "amount": 18100,
+        "date": "2026-06-18",
+        "status": "Delivered"
+      },
+      {
+        "id": "KW-3307-2026",
+        "product": "Penfolds Koonunga Hill Shiraz x2",
+        "customer": "Grace Otieno",
+        "amount": 8400,
+        "date": "2026-06-18",
+        "status": "Pending"
+      },
+      {
+        "id": "KW-6421-2026",
+        "product": "Tanqueray x2 + Gilbey's Special Dry",
+        "customer": "Amina Osei",
+        "amount": 8795,
+        "date": "2026-06-05",
+        "status": "En Route"
+      },
+      {
+        "id": "KW-7291-2026",
+        "product": "Hennessy VS Cognac",
+        "customer": "Lady Wanjiku",
+        "amount": 6500,
+        "date": "2026-06-12",
+        "status": "Delivered"
+      },
+      {
+        "id": "KW-5192-2026",
+        "product": "Don Julio Blanco Tequila",
+        "customer": "Dr. Kiprono",
+        "amount": 12500,
+        "date": "2026-05-25",
+        "status": "Delivered"
+      },
+      {
+        "id": "KW-4819-2026",
+        "product": "Jameson Irish Whiskey",
+        "customer": "John Kamau",
+        "amount": 3200,
+        "date": "2026-05-18",
+        "status": "Processing"
+      }
+    ]
+  },
+  "promoBanners": [
+    {
+      "id": 1,
+      "text": "🥃 FREE DELIVERY on orders above KES 5,000 — Limited Time Offer",
+      "active": true,
+      "color": "#d4af37"
+    },
+    {
+      "id": 2,
+      "text": "✨ New Arrivals: Clase Azul Reposado now in stock. Reserve yours today.",
+      "active": false,
+      "color": "#b8860b"
+    },
+    {
+      "id": 3,
+      "text": "wtwet4wqt",
+      "active": true,
+      "color": "#d4af37"
+    }
+  ],
+  "countdownTimers": [
+    {
+      "id": 1,
+      "label": "Flash Sale — 30% off Gins",
+      "targetDate": "2026-06-30T23:59:59Z",
+      "active": true
+    },
+    {
+      "id": 2,
+      "label": "Macallan Limited Drop",
+      "targetDate": "2026-07-15T12:00:00Z",
+      "active": false
+    }
+  ],
+  "newsletterSubscribers": [
+    {
+      "id": 1,
+      "email": "samuel.ndegwa@gmail.com",
+      "name": "Samuel Ndegwa",
+      "date": "2026-06-01"
+    },
+    {
+      "id": 2,
+      "email": "wanjiku.m@outlook.com",
+      "name": "Wanjiku M.",
+      "date": "2026-06-03"
+    },
+    {
+      "id": 3,
+      "email": "grace.otieno@gmail.com",
+      "name": "Grace Otieno",
+      "date": "2026-06-10"
+    },
+    {
+      "id": 4,
+      "email": "amina.osei@gmail.com",
+      "name": "Amina Osei",
+      "date": "2026-06-12"
+    },
+    {
+      "id": 5,
+      "email": "jkamau254@gmail.com",
+      "name": "John Kamau",
+      "date": "2026-06-15"
+    }
+  ],
+  "settings": {
+    "storeName": "Kwest Liquor",
+    "storeEmail": "concierge@kwestliquor.co.ke",
+    "storePhone": "+254 700 123 456",
+    "storeAddress": "Muthaiga Road, Nairobi, Kenya",
+    "currency": "KES",
+    "mpesaBusinessCode": "522522",
+    "mpesaCallbackUrl": "https://kwestliquor.co.ke/api/mpesa/callback",
+    "lowStockThreshold": 10,
+    "freeDeliveryThreshold": 5000
+  },
+  "heroImages": [
+    {
+      "id": 1,
+      "url": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=2000",
+      "alt": "Premium Spirits Collection",
+      "active": true
+    },
+    {
+      "id": 2,
+      "url": "https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&q=80&w=2000",
+      "alt": "The Reserve Bar",
+      "active": false
+    }
+  ],
+  "calendarEvents": [
+    {
+      "id": 1,
+      "title": "Macallan Restock",
+      "date": "2026-07-05",
+      "type": "Restock",
+      "color": "#d4af37"
+    },
+    {
+      "id": 2,
+      "title": "Gin Flash Sale Start",
+      "date": "2026-06-30",
+      "type": "Event",
+      "color": "#22c55e"
+    },
+    {
+      "id": 3,
+      "title": "Hennessy XO Launch",
+      "date": "2026-07-20",
+      "type": "Launch",
+      "color": "#00f0ff"
+    }
+  ],
+  "notifications": [
+    {
+      "id": 1,
+      "type": "LOW_STOCK",
+      "message": "Hennessy VS Cognac (Half) is critically low — only 5 units remaining.",
+      "date": "2026-06-18T10:00:00Z",
+      "read": false
+    },
+    {
+      "id": 2,
+      "type": "ORDER",
+      "message": "New order KW-3307-2026 placed by Grace Otieno — KES 8,400.",
+      "date": "2026-06-18T17:00:00Z",
+      "read": false
+    },
+    {
+      "id": 3,
+      "type": "LOW_STOCK",
+      "message": "Don Julio Blanco Tequila stock below threshold — 8 units left.",
+      "date": "2026-06-17T09:00:00Z",
+      "read": true
+    },
+    {
+      "id": 4,
+      "type": "SYSTEM",
+      "message": "M-Pesa callback webhook responded successfully for order KW-9812-2026.",
+      "date": "2026-06-18T10:32:00Z",
+      "read": true
+    }
+  ]
+}

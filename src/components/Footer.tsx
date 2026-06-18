@@ -142,14 +142,16 @@ export function Footer() {
                 <Link
                   href="#"
                   className="w-10 h-10 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/40 hover:text-primary hover:border-primary/30 transition-all duration-300 cursor-pointer"
+                  aria-label="Kwest Global Web Portal"
                 >
-                  <Globe className="w-4 h-4" />
+                  <Globe className="w-4 h-4" aria-hidden="true" />
                 </Link>
                 <Link
                   href="#"
                   className="w-10 h-10 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/40 hover:text-primary hover:border-primary/30 transition-all duration-300 cursor-pointer"
+                  aria-label="Share Kwest Collection"
                 >
-                  <Share2 className="w-4 h-4" />
+                  <Share2 className="w-4 h-4" aria-hidden="true" />
                 </Link>
               </div>
 

@@ -48,6 +48,24 @@ const initialMockReviews: Review[] = [
     date: "2026-05-25",
     productNames: ["Don Julio Blanco Tequila"],
   },
+  {
+    id: "REV-004",
+    orderId: "KW-6421-2026",
+    name: "Amina Osei",
+    rating: 5,
+    comment: "The artisanal gin selection is spectacular. Tried the Tanqueray London Dry and Gilbey's Special Dry for our private tasting event. Exquisite packaging and super-fast delivery in Nairobi.",
+    date: "2026-06-05",
+    productNames: ["Tanqueray London Dry Gin", "Gilbey's Special Dry Gin"],
+  },
+  {
+    id: "REV-005",
+    orderId: "KW-4819-2026",
+    name: "John Kamau",
+    rating: 5,
+    comment: "Excellent service! The Jameson Irish Whiskey was delivered within 45 minutes. It came with beautiful luxury coasters. Truly the gold standard for premium liquor delivery.",
+    date: "2026-05-18",
+    productNames: ["Jameson Irish Whiskey"],
+  },
 ];
 
 export function ReviewProvider({ children }: { children: React.ReactNode }) {
@@ -59,7 +77,15 @@ export function ReviewProvider({ children }: { children: React.ReactNode }) {
     try {
       const storedReviews = localStorage.getItem("kwest_reviews");
       if (storedReviews) {
-        setReviews(JSON.parse(storedReviews));
+        const parsed = JSON.parse(storedReviews) as Review[];
+        // Merge stored reviews with initialMockReviews to ensure new mock reviews show up
+        const merged = [...parsed];
+        initialMockReviews.forEach((mock) => {
+          if (!merged.some((r) => r.id === mock.id)) {
+            merged.push(mock);
+          }
+        });
+        setReviews(merged);
       }
     } catch (error) {
       console.error("Error reading reviews from localStorage", error);

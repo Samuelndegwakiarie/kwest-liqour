@@ -198,32 +198,34 @@ export default function AccountPage() {
                     <div className="space-y-4">
                       {formMode === "signup" && (
                         <div className="space-y-1">
-                          <label className="text-[9px] caps-label text-text-muted">Full Name</label>
+                          <label htmlFor="register-fullname" className="text-[9px] caps-label text-text-muted">Full Name</label>
                           <div className="relative">
-                            <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                            <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
                             <input
                               type="text"
+                              id="register-fullname"
                               required
                               value={fullName}
                               onChange={(e) => setFullName(e.target.value)}
                               placeholder="Noble Guest"
-                              className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-xs text-white placeholder:text-white/20 transition-all focus:shadow-[0_0_15px_rgba(0,240,255,0.05)] border-b-2"
+                              className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all focus:shadow-[0_0_15px_rgba(0,240,255,0.05)] border-b-2"
                             />
                           </div>
                         </div>
                       )}
 
                       <div className="space-y-1">
-                        <label className="text-[9px] caps-label text-text-muted">Email Address</label>
+                        <label htmlFor="auth-email" className="text-[9px] caps-label text-text-muted">Email Address</label>
                         <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
                           <input
                             type="email"
+                            id="auth-email"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="guest@kwestcircle.com"
-                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-xs text-white placeholder:text-white/20 transition-all focus:shadow-[0_0_15px_rgba(0,240,255,0.05)] border-b-2"
+                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all focus:shadow-[0_0_15px_rgba(0,240,255,0.05)] border-b-2"
                           />
                         </div>
                       </div>
@@ -231,8 +233,8 @@ export default function AccountPage() {
                       {formMode !== "forgot" && (
                         <div className="space-y-4">
                           <div className="space-y-1">
-                            <label className="text-[9px] caps-label text-text-muted flex justify-between">
-                              <span>Password</span>
+                            <div className="flex justify-between items-center">
+                              <label htmlFor="auth-password" className="text-[9px] caps-label text-text-muted">Password</label>
                               {formMode === "signin" && (
                                 <button
                                   type="button"
@@ -242,21 +244,23 @@ export default function AccountPage() {
                                   Forgot Password?
                                 </button>
                               )}
-                            </label>
+                            </div>
                             <div className="relative">
-                              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
                               <input
                                 type={showPassword ? "text" : "password"}
+                                id="auth-password"
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••••••"
-                                className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-11 py-3 text-xs text-white placeholder:text-white/20 transition-all focus:shadow-[0_0_15px_rgba(0,240,255,0.05)] border-b-2"
+                                className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-11 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all focus:shadow-[0_0_15px_rgba(0,240,255,0.05)] border-b-2"
                               />
                               <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white cursor-pointer"
+                                aria-label={showPassword ? "Hide password" : "Show password"}
                               >
                                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                               </button>
@@ -266,16 +270,17 @@ export default function AccountPage() {
                           {/* Confirm Password (SignUp Only) */}
                           {formMode === "signup" && (
                             <div className="space-y-1">
-                              <label className="text-[9px] caps-label text-text-muted">Confirm Password</label>
+                              <label htmlFor="register-confirmpassword" className="text-[9px] caps-label text-text-muted">Confirm Password</label>
                               <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
                                 <input
                                   type={showPassword ? "text" : "password"}
+                                  id="register-confirmpassword"
                                   required
                                   value={confirmPassword}
                                   onChange={(e) => setConfirmPassword(e.target.value)}
                                   placeholder="••••••••••••"
-                                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-11 py-3 text-xs text-white placeholder:text-white/20 transition-all focus:shadow-[0_0_15px_rgba(0,240,255,0.05)] border-b-2"
+                                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-11 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all focus:shadow-[0_0_15px_rgba(0,240,255,0.05)] border-b-2"
                                 />
                               </div>
                             </div>
