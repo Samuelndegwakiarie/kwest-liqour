@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   User as UserIcon,
   Mail,
@@ -477,6 +478,15 @@ export default function AccountPage() {
                         </span>
                       </div>
                     ))}
+                  </div>
+
+                  <div className="pt-2">
+                    <Link href="/orders" className="block w-full">
+                      <button className="w-full py-4 border border-primary/20 hover:border-primary text-primary hover:bg-primary/5 font-bold text-xs caps-label tracking-widest rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2">
+                        Track My Orders
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </Link>
                   </div>
 
                   <div className="pt-2 text-center text-[10px] text-text-subtle">

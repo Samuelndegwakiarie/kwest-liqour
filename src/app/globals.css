@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 /* ═══════════════════════════════════════════════════════
    KWEST LUXURY SPIRITS — LIQUID GLASS DESIGN SYSTEM
@@ -42,6 +46,36 @@
   --container-max: 1440px;
   --section-gap: 120px;
   --bottom-nav-height: 72px;
+
+  /* shadcn/ui components support */
+  --card: rgba(255, 255, 255, 0.03);
+  --card-foreground: #F1F5F9;
+  --popover: #0D1526;
+  --popover-foreground: #F1F5F9;
+  --primary-foreground: #060B18;
+  --secondary-foreground: #060B18;
+  --muted: rgba(255, 255, 255, 0.05);
+  --muted-foreground: rgba(241, 245, 249, 0.4);
+  --accent: rgba(0, 240, 255, 0.1);
+  --accent-foreground: #00F0FF;
+  --input: rgba(255, 255, 255, 0.05);
+  --ring: #00F0FF;
+  --radius: 0.625rem;
+
+  --chart-1: #00F0FF;
+  --chart-2: #F59E0B;
+  --chart-3: #22C55E;
+  --chart-4: #EF4444;
+  --chart-5: #A855F7;
+
+  --sidebar: #0D1526;
+  --sidebar-foreground: #F1F5F9;
+  --sidebar-primary: #00F0FF;
+  --sidebar-primary-foreground: #060B18;
+  --sidebar-accent: rgba(0, 240, 255, 0.1);
+  --sidebar-accent-foreground: #00F0FF;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #00F0FF;
 }
 
 /* Tailwind v4 Theme Tokens */
@@ -68,6 +102,39 @@
 
   --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-bodoni), ui-serif, Georgia, serif;
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 /* ═══ Base ═══ */
@@ -77,8 +144,6 @@ html {
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -274,4 +339,50 @@ body {
 /* ═══ Futuristic Dark Map Iframe Styling ═══ */
 .dark-map-iframe {
   filter: invert(90%) hue-rotate(180deg) brightness(85%) contrast(90%) saturate(140%) grayscale(20%);
+}
+
+.dark {
+  --background: #060B18;
+  --foreground: #F1F5F9;
+  --card: rgba(255, 255, 255, 0.03);
+  --card-foreground: #F1F5F9;
+  --popover: #0D1526;
+  --popover-foreground: #F1F5F9;
+  --primary: #00F0FF;
+  --primary-foreground: #060B18;
+  --secondary: #F59E0B;
+  --secondary-foreground: #060B18;
+  --muted: rgba(255, 255, 255, 0.05);
+  --muted-foreground: rgba(241, 245, 249, 0.4);
+  --accent: rgba(0, 240, 255, 0.1);
+  --accent-foreground: #00F0FF;
+  --destructive: #EF4444;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.05);
+  --ring: #00F0FF;
+  --chart-1: #00F0FF;
+  --chart-2: #F59E0B;
+  --chart-3: #22C55E;
+  --chart-4: #EF4444;
+  --chart-5: #A855F7;
+  --sidebar: #0D1526;
+  --sidebar-foreground: #F1F5F9;
+  --sidebar-primary: #00F0FF;
+  --sidebar-primary-foreground: #060B18;
+  --sidebar-accent: rgba(0, 240, 255, 0.1);
+  --sidebar-accent-foreground: #00F0FF;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #00F0FF;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }

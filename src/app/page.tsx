@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "motion/react";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { ArrowRight, ChevronDown, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { ParticleField } from "@/components/ParticleField";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
@@ -9,6 +10,15 @@ import { GlassCard } from "@/components/GlassCard";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 
 export default function Home() {
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setSubscribed(true);
+    setEmail("");
+  };
   return (
     <main className="bg-background min-h-screen pb-[var(--bottom-nav-height)] lg:pb-0">
       {/* ═══ Hero Section ═══ */}
@@ -203,9 +213,11 @@ export default function Home() {
                   events across Nairobi. Our members enjoy concierge delivery and
                   exclusive pricing.
                 </p>
-                <button className="w-fit px-10 py-4 border border-primary/30 text-primary hover:bg-primary hover:text-background font-bold uppercase tracking-[0.2em] text-[11px] rounded-lg transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,240,255,0.2)] cursor-pointer">
-                  REQUEST INVITATION
-                </button>
+                <Link href="/account">
+                  <button className="w-fit px-10 py-4 border border-primary/30 text-primary hover:bg-primary hover:text-background font-bold uppercase tracking-[0.2em] text-[11px] rounded-lg transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,240,255,0.2)] cursor-pointer">
+                    REQUEST INVITATION
+                  </button>
+                </Link>
               </GlassCard>
             </StaggerItem>
           </StaggerContainer>
@@ -246,15 +258,42 @@ export default function Home() {
               Subscribe to receive updates on new arrivals, vintage drops, and
               exclusive event invitations.
             </p>
-            <div className="flex flex-col sm:flex-row gap-0 max-w-xl mx-auto overflow-hidden rounded-xl border border-white/[0.08]">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="flex-1 bg-white/[0.03] px-8 py-5 text-sm focus:outline-none focus:bg-white/[0.06] text-white placeholder:text-white/20 transition-all duration-300"
-              />
-              <button className="px-10 py-5 bg-primary text-background font-bold uppercase tracking-[0.2em] text-[11px] hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all duration-500 cursor-pointer">
-                JOIN
-              </button>
+            <div className="max-w-xl mx-auto">
+              <AnimatePresence mode="wait">
+                {!subscribed ? (
+                  <motion.form
+                    key="subscribe-form"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onSubmit={handleSubscribe}
+                    className="flex flex-col sm:flex-row gap-0 overflow-hidden rounded-xl border border-white/[0.08]"
+                  >
+                    <input
+                      type="email"
+                      required
+                      placeholder="Your email address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="flex-1 bg-white/[0.03] px-8 py-5 text-sm focus:outline-none focus:bg-white/[0.06] text-white placeholder:text-white/20 transition-all duration-300"
+                    />
+                    <button type="submit" className="px-10 py-5 bg-primary text-background font-bold uppercase tracking-[0.2em] text-[11px] hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all duration-500 cursor-pointer">
+                      JOIN
+                    </button>
+                  </motion.form>
+                ) : (
+                  <motion.div
+                    key="subscribe-success"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center justify-center gap-3 p-5 rounded-xl border border-primary/20 bg-primary/5 text-primary text-xs font-semibold uppercase tracking-wider text-glow"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    Subscribed successfully!
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </ScrollReveal>

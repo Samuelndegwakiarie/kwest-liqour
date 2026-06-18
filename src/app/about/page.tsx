@@ -1,12 +1,23 @@
 "use client";
 
-import { motion } from "motion/react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { ParticleField } from "@/components/ParticleField";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
 import { GlassCard } from "@/components/GlassCard";
 
 export default function Heritage() {
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setSubscribed(true);
+    setEmail("");
+  };
   return (
     <main className="bg-background min-h-screen pb-[var(--bottom-nav-height)] lg:pb-0">
       {/* ═══ Hero ═══ */}
@@ -175,15 +186,42 @@ export default function Heritage() {
               Receive exclusive invitations to private releases and tasting events
               in Nairobi.
             </p>
-            <div className="flex flex-col gap-4 max-w-xl mx-auto">
-              <input
-                type="email"
-                placeholder="EMAIL ADDRESS"
-                className="bg-white/[0.03] border border-white/[0.08] px-8 py-5 text-sm caps-label focus:border-primary/40 focus:shadow-[0_0_20px_rgba(0,240,255,0.1)] outline-none text-white placeholder:text-white/20 rounded-xl transition-all duration-300"
-              />
-              <button className="px-10 py-5 bg-primary text-background font-bold uppercase tracking-[0.2em] text-[11px] rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all duration-500 cursor-pointer">
-                REQUEST ACCESS
-              </button>
+            <div className="max-w-xl mx-auto">
+              <AnimatePresence mode="wait">
+                {!subscribed ? (
+                  <motion.form
+                    key="about-subscribe-form"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onSubmit={handleSubscribe}
+                    className="flex flex-col gap-4"
+                  >
+                    <input
+                      type="email"
+                      required
+                      placeholder="EMAIL ADDRESS"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="bg-white/[0.03] border border-white/[0.08] px-8 py-5 text-sm caps-label focus:border-primary/40 focus:shadow-[0_0_20px_rgba(0,240,255,0.1)] outline-none text-white placeholder:text-white/20 rounded-xl transition-all duration-300"
+                    />
+                    <button type="submit" className="px-10 py-5 bg-primary text-background font-bold uppercase tracking-[0.2em] text-[11px] rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all duration-500 cursor-pointer">
+                      REQUEST ACCESS
+                    </button>
+                  </motion.form>
+                ) : (
+                  <motion.div
+                    key="about-subscribe-success"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center justify-center gap-3 p-5 rounded-xl border border-primary/20 bg-primary/5 text-primary text-xs font-semibold uppercase tracking-wider text-glow"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    Access Request Dispatched!
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </ScrollReveal>

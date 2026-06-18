@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, ShoppingBag, User, Home, LayoutGrid, MessageSquare, ShieldCheck } from "lucide-react";
 import { motion } from "motion/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 
 
 const desktopLinks = [
   { name: "Drinks", href: "/products" },
   { name: "Heritage", href: "/about" },
+  { name: "Orders", href: "/orders" },
   { name: "Contact", href: "/contact" },
 ];
 
@@ -25,6 +26,8 @@ const bottomNavLinks = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const [searchVal, setSearchVal] = useState("");
   const { cartCount } = useCart();
 
 
@@ -33,6 +36,14 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchVal.trim()) {
+      router.push(`/products?q=${encodeURIComponent(searchVal.trim())}`);
+      setSearchVal("");
+    }
+  };
 
   const isActive = (href: string) => pathname === href;
 
@@ -80,14 +91,16 @@ export function Navbar() {
 
         {/* Desktop Actions */}
         <div className="hidden lg:flex items-center gap-8">
-          <div className="relative">
+          <form onSubmit={handleSearchSubmit} className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20" />
             <input
               type="text"
               placeholder="Search collection..."
+              value={searchVal}
+              onChange={(e) => setSearchVal(e.target.value)}
               className="bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] rounded-full py-2.5 pl-11 pr-6 text-[10px] caps-label text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 focus:shadow-[0_0_20px_rgba(0,240,255,0.1)] w-56 transition-all duration-300"
             />
-          </div>
+          </form>
           <Link href="/cart" className="relative group cursor-pointer">
             <ShoppingBag className="w-5 h-5 text-white/40 group-hover:text-primary transition-colors duration-300" />
             <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-primary text-background text-[8px] font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.4)]">

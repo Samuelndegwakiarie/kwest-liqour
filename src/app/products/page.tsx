@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown, ArrowRight, SlidersHorizontal, X, RotateCcw, Plus, ShoppingBag } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronDown, ArrowRight, SlidersHorizontal, X, RotateCcw, Plus, ShoppingBag, Search } from "lucide-react";
 import Link from "next/link";
 import { ParticleField } from "@/components/ParticleField";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
@@ -34,6 +34,7 @@ const products = [
 
 export default function Gallery() {
   const { addToCart } = useCart();
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -42,6 +43,16 @@ export default function Gallery() {
 
   // Mobile drawer state
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get("q");
+      if (q) {
+        setSearchQuery(q);
+      }
+    }
+  }, []);
 
   const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) =>
@@ -60,6 +71,7 @@ export default function Gallery() {
     setMinPrice("");
     setMaxPrice("");
     setSelectedVolumes([]);
+    setSearchQuery("");
   };
 
   const handleQuickAdd = (product: typeof products[0]) => {
@@ -78,6 +90,15 @@ export default function Gallery() {
   };
 
   const filteredProducts = products.filter((product) => {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const nameMatch = product.name.toLowerCase().includes(q);
+      const brandMatch = product.brand.toLowerCase().includes(q);
+      const categoryMatch = product.category.toLowerCase().includes(q);
+      if (!nameMatch && !brandMatch && !categoryMatch) {
+        return false;
+      }
+    }
     if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) {
       return false;
     }
@@ -125,12 +146,12 @@ export default function Gallery() {
           className="px-5 py-3 glass-card rounded-xl text-[10px] caps-label text-text-muted flex items-center gap-2 cursor-pointer hover:border-primary/30 transition-all"
         >
           <SlidersHorizontal className="w-3.5 h-3.5 text-primary" /> Filters
-          {(selectedCategories.length > 0 || minPrice || maxPrice || selectedVolumes.length > 0) && (
+          {(selectedCategories.length > 0 || minPrice || maxPrice || selectedVolumes.length > 0 || searchQuery) && (
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
           )}
         </button>
 
-        {(selectedCategories.length > 0 || minPrice || maxPrice || selectedVolumes.length > 0) && (
+        {(selectedCategories.length > 0 || minPrice || maxPrice || selectedVolumes.length > 0 || searchQuery) && (
           <button
             onClick={resetFilters}
             className="text-[9px] caps-label text-primary hover:text-white flex items-center gap-1 transition-colors"
@@ -149,7 +170,7 @@ export default function Gallery() {
               <div className="glass-card rounded-2xl p-6 space-y-8 border-white/[0.06] shadow-[0_0_30px_rgba(0,0,0,0.2)]">
                 <div className="flex justify-between items-center pb-4 border-b border-white/[0.06]">
                   <h3 className="text-xs font-bold text-white uppercase tracking-wider">Curation Filters</h3>
-                  {(selectedCategories.length > 0 || minPrice || maxPrice || selectedVolumes.length > 0) && (
+                  {(selectedCategories.length > 0 || minPrice || maxPrice || selectedVolumes.length > 0 || searchQuery) && (
                     <button
                       onClick={resetFilters}
                       className="text-[9px] caps-label text-primary hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
@@ -244,7 +265,18 @@ export default function Gallery() {
           </aside>
 
           {/* Product Grid Panel */}
-          <div className="flex-1 space-y-12">
+          <div className="flex-1 space-y-8">
+            {/* Search Input field */}
+            <div className="relative w-full">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+              <input
+                type="text"
+                placeholder="Search by brand, name, or spirit category..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3.5 text-xs text-white placeholder:text-white/20 transition-all border-b-2"
+              />
+            </div>
             {filteredProducts.length === 0 ? (
               <div className="text-center py-20 bg-white/[0.01] border border-white/[0.04] rounded-2xl p-8">
                 <p className="text-text-muted text-sm leading-relaxed mb-4">

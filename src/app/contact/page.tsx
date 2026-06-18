@@ -1,10 +1,12 @@
 "use client";
 
-import { ChevronDown, MapPin, LayoutGrid, Building2, Map, ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronDown, MapPin, LayoutGrid, Building2, Map, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
 import { GlassCard } from "@/components/GlassCard";
 import { ParticleField } from "@/components/ParticleField";
+import { motion, AnimatePresence } from "motion/react";
 import dynamic from "next/dynamic";
 
 const serviceCards = [
@@ -37,6 +39,36 @@ const DotLottiePlayer = dynamic(
 );
 
 export default function Concierge() {
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [service, setService] = useState("SELECT SERVICE TYPE");
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref) {
+        setMessage(`Inquiry regarding Order ${ref}: `);
+        setService("MEMBERSHIP");
+      }
+    }
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fullName || !email || message === "") {
+      alert("Please fill out all fields.");
+      return;
+    }
+    setFormSubmitted(true);
+  };
+
+  const handleGetDirections = () => {
+    window.open("https://maps.google.com/?q=Muthaiga+Road,+Nairobi", "_blank");
+  };
+
   return (
     <main className="bg-background min-h-screen pb-[var(--bottom-nav-height)] lg:pb-0">
       <section className="relative h-[50vh] flex items-center justify-center pt-20 lg:pt-28 overflow-hidden bg-background px-6 md:px-12">
@@ -67,7 +99,16 @@ export default function Concierge() {
         <StaggerContainer className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6" staggerDelay={0.12}>
           {serviceCards.map((card) => (
             <StaggerItem key={card.title}>
-              <div className="group relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-2xl border border-white/[0.06] cursor-pointer">
+              <div 
+                onClick={() => {
+                  if (card.title === "The Boutique" || card.cta === "VIEW LOCATION") {
+                    handleGetDirections();
+                  } else {
+                    document.getElementById("inquiry-section")?.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+                className="group relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-2xl border border-white/[0.06] cursor-pointer"
+              >
                 <img
                   src={card.img}
                   className="w-full h-full object-cover opacity-35 group-hover:opacity-55 group-hover:scale-105 transition-all duration-[2000ms]"
@@ -101,7 +142,7 @@ export default function Concierge() {
       </section>
 
       {/* ═══ Inquiry Form ═══ */}
-      <section className="py-16 md:py-24 px-6 md:px-12 bg-background border-t border-white/[0.04]">
+      <section id="inquiry-section" className="py-16 md:py-24 px-6 md:px-12 bg-background border-t border-white/[0.04]">
         <div className="max-w-[1280px] mx-auto">
           <ScrollReveal>
             <h2 className="text-4xl md:text-6xl font-serif font-bold text-white mb-12 tracking-tighter">
@@ -126,43 +167,97 @@ export default function Concierge() {
             {/* Right Column: Contact Form */}
             <ScrollReveal direction="right" delay={0.1}>
               <GlassCard hover={false} padding="p-8 md:p-12" className="rounded-2xl w-full">
-                <form className="space-y-8">
-                  <div className="space-y-6">
-                    <div className="group">
-                      <input
-                        type="text"
-                        placeholder="FULL NAME"
-                        className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
-                      />
-                    </div>
-                    <div className="group">
-                      <input
-                        type="email"
-                        placeholder="EMAIL ADDRESS"
-                        className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
-                      />
-                    </div>
-                    <div className="relative group">
-                      <select className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label text-white/40 focus:text-white focus:border-primary outline-none appearance-none cursor-pointer transition-all duration-300">
-                        <option className="bg-background-elevated">SELECT SERVICE TYPE</option>
-                        <option className="bg-background-elevated">PRIVATE TASTING</option>
-                        <option className="bg-background-elevated">WHOLESALE</option>
-                        <option className="bg-background-elevated">MEMBERSHIP</option>
-                      </select>
-                      <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
-                    </div>
-                    <div className="group">
-                      <textarea
-                        placeholder="MESSAGE"
-                        rows={4}
-                        className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 resize-none transition-all duration-300"
-                      />
-                    </div>
-                  </div>
-                  <button className="w-full py-5 bg-primary text-background font-bold uppercase tracking-[0.2em] text-[11px] rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all duration-500 cursor-pointer">
-                    SEND MESSAGE
-                  </button>
-                </form>
+                <AnimatePresence mode="wait">
+                  {!formSubmitted ? (
+                    <motion.form
+                      key="contact-form"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onSubmit={handleSubmit}
+                      className="space-y-8"
+                    >
+                      <div className="space-y-6">
+                        <div className="group">
+                          <input
+                            type="text"
+                            required
+                            placeholder="FULL NAME"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
+                          />
+                        </div>
+                        <div className="group">
+                          <input
+                            type="email"
+                            required
+                            placeholder="EMAIL ADDRESS"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 transition-all duration-300"
+                          />
+                        </div>
+                        <div className="relative group">
+                          <select
+                            value={service}
+                            onChange={(e) => setService(e.target.value)}
+                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label text-white/40 focus:text-white focus:border-primary outline-none appearance-none cursor-pointer transition-all duration-300"
+                          >
+                            <option className="bg-background-elevated">SELECT SERVICE TYPE</option>
+                            <option className="bg-background-elevated">PRIVATE TASTING</option>
+                            <option className="bg-background-elevated">WHOLESALE</option>
+                            <option className="bg-background-elevated">MEMBERSHIP</option>
+                          </select>
+                          <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
+                        </div>
+                        <div className="group">
+                          <textarea
+                            required
+                            placeholder="MESSAGE"
+                            rows={4}
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            className="w-full bg-transparent border-b-2 border-white/[0.08] py-4 text-sm caps-label focus:border-primary outline-none text-white placeholder:text-white/20 resize-none transition-all duration-300"
+                          />
+                        </div>
+                      </div>
+                      <button type="submit" className="w-full py-5 bg-primary text-background font-bold uppercase tracking-[0.2em] text-[11px] rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all duration-500 cursor-pointer">
+                        SEND MESSAGE
+                      </button>
+                    </motion.form>
+                  ) : (
+                    <motion.div
+                      key="success-message"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="text-center py-12 space-y-6"
+                    >
+                      <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(0,240,255,0.2)]">
+                        <Sparkles className="w-8 h-8 text-primary" />
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="text-2xl font-serif font-bold text-white">Inquiry Dispatched</h3>
+                        <p className="text-text-muted text-xs leading-relaxed max-w-xs mx-auto">
+                          Thank you for reaching out, {fullName}. A Kwest Concierge sommelier will review your inquiry and connect via {email} shortly.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setFormSubmitted(false);
+                          setFullName("");
+                          setEmail("");
+                          setService("SELECT SERVICE TYPE");
+                          setMessage("");
+                        }}
+                        className="px-8 py-3.5 bg-white/[0.04] border border-white/[0.08] text-xs font-semibold text-primary hover:text-white hover:border-primary/30 rounded-xl transition-all cursor-pointer"
+                      >
+                        Send Another Inquiry
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </GlassCard>
             </ScrollReveal>
           </div>
@@ -199,7 +294,10 @@ export default function Concierge() {
                   OPEN MON-SAT: 10AM - 9PM
                 </p>
               </div>
-              <button className="px-8 py-4 bg-white/[0.04] border border-white/[0.08] text-white font-bold uppercase tracking-[0.2em] text-[10px] rounded-xl hover:border-primary/30 hover:bg-white/[0.06] transition-all duration-300 flex items-center gap-3 cursor-pointer">
+              <button 
+                onClick={handleGetDirections}
+                className="px-8 py-4 bg-white/[0.04] border border-white/[0.08] text-white font-bold uppercase tracking-[0.2em] text-[10px] rounded-xl hover:border-primary/30 hover:bg-white/[0.06] transition-all duration-300 flex items-center gap-3 cursor-pointer"
+              >
                 <Map className="w-4 h-4 text-primary" />
                 GET DIRECTIONS
               </button>
