@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
+import { ReviewProvider } from "@/context/ReviewContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { cn } from "@/lib/utils";
 
@@ -40,10 +41,12 @@ export default function RootLayout({
         className={`${bodoni.variable} ${jost.variable} font-sans antialiased bg-background text-foreground`}
       >
         <CartProvider>
-          <Navbar />
-          {children}
-          <Footer />
-          <ScrollToTop />
+          <ReviewProvider>
+            <Navbar />
+            {children}
+            <Footer />
+            <ScrollToTop />
+          </ReviewProvider>
         </CartProvider>
       </body>
     </html>

@@ -19,16 +19,26 @@ import {
   Loader2,
   Bike,
   Store,
+  Star,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useCart } from "@/context/CartContext";
+import { useReviews } from "@/context/ReviewContext";
 import { ParticleField } from "@/components/ParticleField";
 import { GlassCard } from "@/components/GlassCard";
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
+  const { addReview } = useReviews();
   const [deliveryMethod, setDeliveryMethod] = useState<"shop" | "rider">("rider");
   const [isClient, setIsClient] = useState(false);
+
+  // Review states
+  const [rating, setRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [purchasedItems, setPurchasedItems] = useState<string[]>([]);
 
   // Form Fields
   const [fullName, setFullName] = useState("");
@@ -151,6 +161,7 @@ export default function CheckoutPage() {
     // Start checkout processing animation flow
     setIsSubmitting(true);
     setOrderRef(`KW-${Math.floor(1000 + Math.random() * 9000)}-2026`);
+    setPurchasedItems(cart.map((item) => `${item.brand} ${item.name}`));
 
     if (paymentOption === "mpesa") {
       setSubmitStep("stk");
@@ -179,6 +190,22 @@ export default function CheckoutPage() {
   const handleSuccessFinished = () => {
     clearCart();
     localStorage.removeItem("kwest_delivery_method");
+  };
+
+  const handleReviewSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!comment.trim()) {
+      alert("Please enter a short review message.");
+      return;
+    }
+    addReview({
+      orderId: orderRef,
+      name: fullName || "Guest Member",
+      rating,
+      comment: comment.trim(),
+      productNames: purchasedItems,
+    });
+    setReviewSubmitted(true);
   };
 
   // Pricing calculations
@@ -630,12 +657,98 @@ export default function CheckoutPage() {
                   </p>
                 </div>
 
-                <div className="pt-4">
-                  <Link href="/products" onClick={handleSuccessFinished}>
-                    <button className="px-8 py-4 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all cursor-pointer">
-                      Return to Gallery
-                    </button>
-                  </Link>
+                {/* Customer Review Prompt */}
+                <div className="pt-6 border-t border-white/[0.04] max-w-md mx-auto space-y-4">
+                  <AnimatePresence mode="wait">
+                    {!reviewSubmitted ? (
+                      <motion.div
+                        key="review-prompt"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="space-y-4"
+                      >
+                        <div className="space-y-1">
+                          <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+                            Rate Your Experience
+                          </h4>
+                          <p className="text-[10px] text-text-subtle">
+                            Help us maintain our premium concierge standards
+                          </p>
+                        </div>
+
+                        {/* Interactive Star Selector */}
+                        <div className="flex gap-2 justify-center py-1">
+                          {[1, 2, 3, 4, 5].map((starVal) => (
+                            <button
+                              key={starVal}
+                              type="button"
+                              onClick={() => setRating(starVal)}
+                              onMouseEnter={() => setHoverRating(starVal)}
+                              onMouseLeave={() => setHoverRating(0)}
+                              className="focus:outline-none transition-transform hover:scale-110 cursor-pointer"
+                            >
+                              <Star
+                                className={`w-6 h-6 transition-all ${
+                                  starVal <= (hoverRating || rating)
+                                    ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]"
+                                    : "text-white/20"
+                                }`}
+                              />
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Text input */}
+                        <textarea
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                          placeholder="Express your thoughts succinctly (text-only)..."
+                          maxLength={200}
+                          rows={3}
+                          className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl p-3.5 text-xs text-white placeholder:text-white/20 resize-none transition-all border-b-2"
+                        />
+
+                        <div className="flex flex-col gap-2">
+                          <button
+                            type="button"
+                            onClick={handleReviewSubmit}
+                            className="w-full py-3.5 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] transition-all cursor-pointer"
+                          >
+                            Submit Feedback
+                          </button>
+                          <Link href="/products" onClick={handleSuccessFinished} className="text-center text-[10px] caps-label text-text-muted hover:text-white transition-colors cursor-pointer mt-1">
+                            Skip & Go to Gallery
+                          </Link>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="review-thanks"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="space-y-4 py-4"
+                      >
+                        <span className="text-[10px] font-bold text-primary tracking-[0.3em] uppercase block">
+                          Feedback Logged
+                        </span>
+                        <h4 className="text-lg font-serif font-bold text-white">
+                          Thank you for your review!
+                        </h4>
+                        <p className="text-text-muted text-xs leading-relaxed max-w-xs mx-auto">
+                          Your connoisseur insight has been published to the circle vault database.
+                        </p>
+                        <div className="pt-2">
+                          <Link href="/products" onClick={handleSuccessFinished}>
+                            <button className="px-8 py-3.5 bg-white/[0.04] border border-white/[0.08] text-primary hover:text-white hover:border-primary/30 text-xs font-semibold caps-label tracking-widest rounded-xl transition-all cursor-pointer">
+                              Return to Gallery
+                            </button>
+                          </Link>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </GlassCard>
             </motion.div>

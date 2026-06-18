@@ -17,11 +17,13 @@ import {
   Clock,
   ExternalLink,
   SlidersHorizontal,
+  Star,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { ParticleField } from "@/components/ParticleField";
 import { GlassCard } from "@/components/GlassCard";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
+import { useReviews } from "@/context/ReviewContext";
 
 interface OrderItem {
   name: string;
@@ -72,6 +74,27 @@ const mockOrders: Order[] = [
     deliveryMethod: "rider",
     eta: "June 18, 2026 by 7:30 PM (Today)",
     address: "Signature Towers, Suite 4B, Westlands Road, Nairobi",
+    paymentMode: "M-Pesa Verified",
+  },
+  {
+    id: "KW-9412-2026",
+    date: "2026-06-18",
+    status: "delivered",
+    items: [
+      {
+        name: "Irish Whiskey",
+        brand: "JAMESON",
+        price: 3200,
+        qty: 1,
+        volume: "750ml",
+        img: "/jameson_whiskey_noir_1778448618517.png",
+      },
+    ],
+    trackingNo: "TRK-MPESA-990815",
+    deliveryMethod: "rider",
+    eta: "Delivered",
+    actualDeliveryDate: "June 18, 2026 at 2:30 PM",
+    address: "Westlands, Nairobi",
     paymentMode: "M-Pesa Verified",
   },
   {
@@ -147,6 +170,12 @@ const mockOrders: Order[] = [
 ];
 
 export default function TrackOrdersPage() {
+  const { reviews, addReview, hasReviewedOrder } = useReviews();
+  const [ratings, setRatings] = useState<Record<string, number>>({});
+  const [hoverRatings, setHoverRatings] = useState<Record<string, number>>({});
+  const [comments, setComments] = useState<Record<string, string>>({});
+  const [localReviewed, setLocalReviewed] = useState<Record<string, boolean>>({});
+
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("all");
@@ -154,6 +183,37 @@ export default function TrackOrdersPage() {
     "KW-9812-2026": true, // Expand the most recent by default
   });
   const [copyStates, setCopyStates] = useState<Record<string, boolean>>({});
+
+  const checkIsWithin24Hours = (dateStr?: string) => {
+    if (!dateStr) return false;
+    try {
+      const parsedDate = new Date(dateStr.replace(" at ", " "));
+      const now = new Date();
+      const refTime = now.getFullYear() === 2026 ? now.getTime() : new Date("2026-06-18T18:18:24").getTime();
+      const diffMs = refTime - parsedDate.getTime();
+      const diffHours = diffMs / (1000 * 60 * 60);
+      return diffHours >= 0 && diffHours <= 24;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const handleOrderReviewSubmit = (orderId: string, productNames: string[]) => {
+    const rating = ratings[orderId] || 5;
+    const comment = comments[orderId] || "";
+    if (!comment.trim()) {
+      alert("Please enter a short review message.");
+      return;
+    }
+    addReview({
+      orderId,
+      name: "Sir Samuel Ndegwa",
+      rating,
+      comment: comment.trim(),
+      productNames,
+    });
+    setLocalReviewed((prev) => ({ ...prev, [orderId]: true }));
+  };
 
   const toggleExpand = (id: string) => {
     setExpandedOrders((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -562,6 +622,95 @@ export default function TrackOrdersPage() {
                                               <span className="text-[9px] text-text-subtle uppercase block">Delivered Date</span>
                                               <p className="text-emerald-400 font-bold mt-0.5">{order.actualDeliveryDate}</p>
                                             </div>
+                                          </div>
+                                        )}
+
+                                        {/* Inline Feedback / Review System */}
+                                        {order.status === "delivered" && (
+                                          <div className="border-t border-white/[0.04] pt-4 mt-2">
+                                            {hasReviewedOrder(order.id) || localReviewed[order.id] ? (
+                                              /* Feedback Submitted */
+                                              (() => {
+                                                const rev = reviews.find((r) => r.orderId === order.id) || {
+                                                  rating: ratings[order.id] || 5,
+                                                  comment: comments[order.id] || "",
+                                                };
+                                                return (
+                                                  <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-3.5 space-y-2">
+                                                    <span className="text-[8px] font-bold text-emerald-400 tracking-wider uppercase block">
+                                                      Feedback Logged
+                                                    </span>
+                                                    <div className="flex gap-1">
+                                                      {Array.from({ length: 5 }).map((_, i) => (
+                                                        <Star
+                                                          key={i}
+                                                          className={`w-3 h-3 ${
+                                                            i < rev.rating
+                                                              ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_6px_rgba(245,158,11,0.5)]"
+                                                              : "text-white/10"
+                                                          }`}
+                                                        />
+                                                      ))}
+                                                    </div>
+                                                    <p className="text-white/80 text-[11px] italic leading-relaxed">
+                                                      &ldquo;{rev.comment}&rdquo;
+                                                    </p>
+                                                  </div>
+                                                );
+                                              })()
+                                            ) : checkIsWithin24Hours(order.actualDeliveryDate) ? (
+                                              /* Review prompt form (within 24h) */
+                                              <div className="space-y-3">
+                                                <span className="text-[9px] font-bold text-primary tracking-wider uppercase block">
+                                                  Share Your Feedback
+                                                </span>
+                                                <div className="flex gap-1.5 py-1">
+                                                  {[1, 2, 3, 4, 5].map((starVal) => (
+                                                    <button
+                                                      key={starVal}
+                                                      type="button"
+                                                      onClick={() => setRatings(prev => ({ ...prev, [order.id]: starVal }))}
+                                                      onMouseEnter={() => setHoverRatings(prev => ({ ...prev, [order.id]: starVal }))}
+                                                      onMouseLeave={() => setHoverRatings(prev => ({ ...prev, [order.id]: 0 }))}
+                                                      className="focus:outline-none transition-transform hover:scale-110 cursor-pointer"
+                                                    >
+                                                      <Star
+                                                        className={`w-4 h-4 transition-all ${
+                                                          starVal <= (hoverRatings[order.id] || ratings[order.id] || 5)
+                                                            ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_6px_rgba(245,158,11,0.5)]"
+                                                            : "text-white/20"
+                                                        }`}
+                                                      />
+                                                    </button>
+                                                  ))}
+                                                </div>
+                                                <textarea
+                                                  value={comments[order.id] || ""}
+                                                  onChange={(e) => setComments(prev => ({ ...prev, [order.id]: e.target.value }))}
+                                                  placeholder="Feedback comment (text-only)..."
+                                                  maxLength={150}
+                                                  rows={2}
+                                                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-lg p-2.5 text-[11px] text-white placeholder:text-white/20 resize-none transition-all"
+                                                />
+                                                <button
+                                                  type="button"
+                                                  onClick={() =>
+                                                    handleOrderReviewSubmit(
+                                                      order.id,
+                                                      order.items.map((i) => `${i.brand} ${i.name}`)
+                                                    )
+                                                  }
+                                                  className="w-full py-2 bg-primary text-background font-bold text-[9px] caps-label tracking-widest rounded-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.2)] transition-all cursor-pointer"
+                                                >
+                                                  Submit Review
+                                                </button>
+                                              </div>
+                                            ) : (
+                                              /* Exceeded 24 hours */
+                                              <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-3 text-center text-text-subtle text-[10px]">
+                                                Review period has expired (24h limit)
+                                              </div>
+                                            )}
                                           </div>
                                         )}
                                       </div>

@@ -8,6 +8,7 @@ import { ParticleField } from "@/components/ParticleField";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
 import { GlassCard } from "@/components/GlassCard";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
+import { RotatingReviews } from "@/components/RotatingReviews";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -246,6 +247,9 @@ export default function Home() {
           </div>
         </ScrollReveal>
       </section>
+
+      {/* ═══ Reviews Section ═══ */}
+      <RotatingReviews />
 
       {/* ═══ Newsletter ═══ */}
       <section className="py-16 md:py-32 px-6 md:px-12 bg-background">
