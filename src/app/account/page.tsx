@@ -32,8 +32,8 @@ export default function AccountPage() {
   // Form Fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [preferredSpirit, setPreferredSpirit] = useState("Whisky");
 
   // Signup Password Strength checklist
   const hasMinLength = password.length >= 8;
@@ -61,9 +61,15 @@ export default function AccountPage() {
 
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formMode === "signup" && !isPasswordValid) {
-      alert("Please ensure your password meets all security criteria.");
-      return;
+    if (formMode === "signup") {
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+      if (!isPasswordValid) {
+        alert("Please ensure your password meets all security criteria.");
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -94,6 +100,7 @@ export default function AccountPage() {
     setIsLoggedIn(false);
     setEmail("");
     setPassword("");
+    setConfirmPassword("");
     setFullName("");
   };
 
@@ -222,56 +229,57 @@ export default function AccountPage() {
                       </div>
 
                       {formMode !== "forgot" && (
-                        <div className="space-y-1">
-                          <label className="text-[9px] caps-label text-text-muted flex justify-between">
-                            <span>Password</span>
-                            {formMode === "signin" && (
+                        <div className="space-y-4">
+                          <div className="space-y-1">
+                            <label className="text-[9px] caps-label text-text-muted flex justify-between">
+                              <span>Password</span>
+                              {formMode === "signin" && (
+                                <button
+                                  type="button"
+                                  onClick={() => setFormMode("forgot")}
+                                  className="text-[9px] text-primary hover:text-white lowercase transition-colors cursor-pointer"
+                                >
+                                  Forgot Password?
+                                </button>
+                              )}
+                            </label>
+                            <div className="relative">
+                              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                              <input
+                                type={showPassword ? "text" : "password"}
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="••••••••••••"
+                                className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-11 py-3 text-xs text-white placeholder:text-white/20 transition-all focus:shadow-[0_0_15px_rgba(0,240,255,0.05)] border-b-2"
+                              />
                               <button
                                 type="button"
-                                onClick={() => setFormMode("forgot")}
-                                className="text-[9px] text-primary hover:text-white lowercase transition-colors cursor-pointer"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white cursor-pointer"
                               >
-                                Forgot Code?
+                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                               </button>
-                            )}
-                          </label>
-                          <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                            <input
-                              type={showPassword ? "text" : "password"}
-                              required
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              placeholder="••••••••••••"
-                              className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-11 py-3 text-xs text-white placeholder:text-white/20 transition-all focus:shadow-[0_0_15px_rgba(0,240,255,0.05)] border-b-2"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white cursor-pointer"
-                            >
-                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            </button>
+                            </div>
                           </div>
-                        </div>
-                      )}
 
-                      {/* Preferred Spirit (SignUp Only) */}
-                      {formMode === "signup" && (
-                        <div className="space-y-1">
-                          <label className="text-[9px] caps-label text-text-muted">Preferred Curation Area</label>
-                          <select
-                            value={preferredSpirit}
-                            onChange={(e) => setPreferredSpirit(e.target.value)}
-                            className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-4 py-3 text-xs text-white transition-all cursor-pointer border-b-2"
-                          >
-                            <option value="Whisky" className="bg-background text-white">Rare Malts & Whisky</option>
-                            <option value="Gin" className="bg-background text-white">Artisanal Gins</option>
-                            <option value="Wine" className="bg-background text-white">Vintage Fine Wines</option>
-                            <option value="Cognac" className="bg-background text-white">Cognac & Brandy</option>
-                            <option value="Tequila" className="bg-background text-white">Agave & Tequila</option>
-                            <option value="All" className="bg-background text-white">All Cellar Releases</option>
-                          </select>
+                          {/* Confirm Password (SignUp Only) */}
+                          {formMode === "signup" && (
+                            <div className="space-y-1">
+                              <label className="text-[9px] caps-label text-text-muted">Confirm Password</label>
+                              <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                                <input
+                                  type={showPassword ? "text" : "password"}
+                                  required
+                                  value={confirmPassword}
+                                  onChange={(e) => setConfirmPassword(e.target.value)}
+                                  placeholder="••••••••••••"
+                                  className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-11 py-3 text-xs text-white placeholder:text-white/20 transition-all focus:shadow-[0_0_15px_rgba(0,240,255,0.05)] border-b-2"
+                                />
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -327,8 +335,8 @@ export default function AccountPage() {
                         <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
                       ) : (
                         <>
-                          {formMode === "signin" && "Unlock Cellar Profile"}
-                          {formMode === "signup" && "Register Curation Profile"}
+                          {formMode === "signin" && "login"}
+                          {formMode === "signup" && "register"}
                           {formMode === "forgot" && "Request Reset Link"}
                           <ArrowRight className="w-3.5 h-3.5" />
                         </>
@@ -345,7 +353,7 @@ export default function AccountPage() {
                             onClick={() => setFormMode("signup")}
                             className="text-primary hover:text-white font-bold cursor-pointer"
                           >
-                            Apply for Membership
+                            register
                           </button>
                         </p>
                       )}

@@ -28,7 +28,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background z-10" />
           <img
-            src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=2000"
+            src="/hero-homepage.jpg"
             className="w-full h-full object-cover scale-105"
             alt="Luxury Spirits Pour"
           />

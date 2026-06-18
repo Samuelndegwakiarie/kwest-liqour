@@ -23,10 +23,10 @@ export function RotatingReviews() {
               Client Testimonials
             </span>
             <h2 className="text-4xl md:text-6xl font-serif font-bold text-white tracking-tighter">
-              Connoisseur <span className="gradient-text-static">Insights</span>
+              Customers <span className="gradient-text-static">Insights</span>
             </h2>
             <p className="text-text-muted text-xs tracking-widest max-w-md mx-auto">
-              REVIEWS FROM THE EXCLUSIVE MEMBERSHIP CIRCLE
+              REVIEWS FROM THE CUSTOMERS
             </p>
           </div>
         </ScrollReveal>
