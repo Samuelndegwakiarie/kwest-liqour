@@ -99,7 +99,7 @@ export function Navbar() {
       {/* Top Navbar */}
       <nav
         className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 px-6 md:px-12 py-4 flex items-center justify-between ${
-          isScrolled || isMobileMenuOpen
+          isScrolled && !isMobileMenuOpen
             ? "glass-nav shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
             : "bg-transparent"
         }`}
