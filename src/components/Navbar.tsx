@@ -120,11 +120,12 @@ export function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className={`text-xl md:text-2xl font-serif font-bold text-primary tracking-[0.3em] uppercase text-glow cursor-pointer z-[110] transition-all duration-300 ${
+          className={`flex items-center gap-3 text-xl md:text-2xl font-serif font-bold text-primary tracking-[0.3em] uppercase text-glow cursor-pointer z-[110] transition-all duration-300 ${
             isMobileMenuOpen ? "opacity-0 pointer-events-none" : "opacity-100"
           }`}
         >
-          KWEST
+          <img src="/kwest_logo.png" alt="Kwest Logo" className="w-8 h-8 object-contain rounded-lg border border-primary/20 shadow-[0_0_10px_rgba(0,240,255,0.2)]" />
+          <span>KWEST</span>
         </Link>
 
         {/* Desktop Links */}
@@ -257,9 +258,10 @@ export function Navbar() {
                   <Link
                     href="/"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-xl font-serif font-bold text-primary tracking-[0.3em] uppercase text-glow"
+                    className="flex items-center gap-3 text-xl font-serif font-bold text-primary tracking-[0.3em] uppercase text-glow"
                   >
-                    KWEST
+                    <img src="/kwest_logo.png" alt="Kwest Logo" className="w-7 h-7 object-contain rounded-lg border border-primary/20 shadow-[0_0_8px_rgba(0,240,255,0.2)]" />
+                    <span>KWEST</span>
                   </Link>
                   {/* Cart and Account icons below KWEST logo */}
                   <div className="grid grid-cols-2 gap-3 mt-4">
