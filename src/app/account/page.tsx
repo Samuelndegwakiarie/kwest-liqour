@@ -171,7 +171,7 @@ export default function AccountPage() {
 
   // ────────────────────────────────────────────────────────────────────────
   return (
-    <main className="bg-background min-h-screen flex items-center justify-center relative overflow-hidden pb-[var(--bottom-nav-height)] lg:pb-0">
+    <main className="bg-background min-h-screen relative overflow-x-hidden pb-[calc(var(--bottom-nav-height)+2rem)] lg:pb-16">
       {/* Background */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/40 to-background z-10" />
@@ -183,10 +183,13 @@ export default function AccountPage() {
       </div>
       <ParticleField count={25} className="z-[5]" />
 
-      <div className="relative z-20 w-full max-w-[1280px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center h-[calc(100vh-var(--bottom-nav-height))] lg:h-screen pt-[var(--bottom-nav-height)] lg:pt-0">
+      {/* ── Page grid — top padding accounts for fixed navbar on all screen sizes ── */}
+      <div className="relative z-20 w-full max-w-[1280px] mx-auto px-4 sm:px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+           style={{ paddingTop: "calc(var(--navbar-height, 72px) + 2rem)" }}
+      >
 
         {/* ── Left branding (desktop only) ── */}
-        <div className="hidden lg:flex lg:col-span-5 flex-col justify-center space-y-8 pr-12">
+        <div className="hidden lg:flex lg:col-span-5 flex-col justify-center space-y-8 pr-12 lg:sticky lg:top-24 lg:self-start">
           <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="space-y-4">
             <div className="flex items-center gap-3">
               <span className="h-[1px] w-8 bg-primary/60" />
@@ -219,7 +222,7 @@ export default function AccountPage() {
         </div>
 
         {/* ── Right: form or profile ── */}
-        <div className="lg:col-span-7 flex justify-center w-full max-h-[85vh] overflow-y-auto no-scrollbar">
+        <div className="lg:col-span-7 flex justify-center w-full pb-10 lg:pb-16">
           <AnimatePresence mode="wait">
             {!isLoggedIn ? (
               /* ══ AUTH FORMS ══ */
@@ -231,11 +234,12 @@ export default function AccountPage() {
                 transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
                 className="w-full max-w-[480px]"
               >
-                <GlassCard padding="p-6 sm:p-8" hover={false} glow={true} className="border-primary/10">
+                <GlassCard padding="p-5 sm:p-8" hover={false} glow={true} className="border-primary/10">
+
                   <form onSubmit={handleAuthSubmit} className="space-y-6">
                     {/* Header */}
-                    <div className="text-center">
-                      <h2 className="text-3xl font-serif font-bold text-white tracking-tight">
+                    <div className="text-center mb-2">
+                      <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight">
                         {formMode === "signin" && "Sign In"}
                         {formMode === "signup" && "Join The Circle"}
                         {formMode === "forgot" && "Recover Access"}
@@ -317,7 +321,7 @@ export default function AccountPage() {
                       )}
                     </div>
 
-                    <button type="submit" disabled={isLoading} className="w-full py-4 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2">
+                    <button type="submit" disabled={isLoading} className="w-full py-3.5 sm:py-4 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[48px]">
                       {isLoading ? (
                         <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
                       ) : (
@@ -353,7 +357,7 @@ export default function AccountPage() {
                 exit={{ opacity: 0, y: -35, scale: 0.95 }}
                 className="w-full max-w-[480px]"
               >
-                <GlassCard padding="p-6 sm:p-8" hover={false} glow={true} className="border-primary/15 space-y-6">
+                <GlassCard padding="p-5 sm:p-8" hover={false} glow={true} className="border-primary/15 space-y-5 sm:space-y-6">
 
                   {/* ── Avatar ── */}
                   <div className="flex flex-col items-center gap-3 pb-2">
@@ -395,7 +399,7 @@ export default function AccountPage() {
                         onChange={(e) => setEditName(e.target.value)}
                         disabled={!isEditing}
                         placeholder="Your full name"
-                        className={`w-full rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-all border ${
+                        className={`w-full rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-all border min-h-[48px] ${
                           isEditing
                             ? "bg-black/40 border-primary/30 focus:border-primary/60 focus:shadow-[0_0_12px_rgba(0,240,255,0.08)]"
                             : "bg-white/[0.03] border-white/[0.06] cursor-default"
@@ -414,7 +418,7 @@ export default function AccountPage() {
                         onChange={(e) => setEditEmail(e.target.value)}
                         disabled={!isEditing}
                         placeholder="your@email.com"
-                        className={`w-full rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-all border ${
+                        className={`w-full rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-all border min-h-[48px] ${
                           isEditing
                             ? "bg-black/40 border-primary/30 focus:border-primary/60 focus:shadow-[0_0_12px_rgba(0,240,255,0.08)]"
                             : "bg-white/[0.03] border-white/[0.06] cursor-default"
@@ -433,7 +437,7 @@ export default function AccountPage() {
                         onChange={(e) => setEditPhone(e.target.value)}
                         disabled={!isEditing}
                         placeholder="+254 7XX XXX XXX"
-                        className={`w-full rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-all border ${
+                        className={`w-full rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-all border min-h-[48px] ${
                           isEditing
                             ? "bg-black/40 border-primary/30 focus:border-primary/60 focus:shadow-[0_0_12px_rgba(0,240,255,0.08)]"
                             : "bg-white/[0.03] border-white/[0.06] cursor-default"
@@ -443,12 +447,12 @@ export default function AccountPage() {
                   </div>
 
                   {/* ── Action buttons ── */}
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     {isEditing ? (
                       <>
                         <button
                           onClick={handleSaveProfile}
-                          className="flex-1 py-3 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_25px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2"
+                          className="flex-1 py-3.5 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_25px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[48px]"
                         >
                           <Save className="w-3.5 h-3.5" /> Save Changes
                         </button>
@@ -460,7 +464,7 @@ export default function AccountPage() {
                             setEditPhone(currentUser.phone || "");
                             setEditAvatar(currentUser.avatar || null);
                           }}
-                          className="px-4 py-3 border border-white/[0.08] hover:border-white/20 text-white/40 hover:text-white text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center"
+                          className="sm:w-auto py-3.5 px-5 border border-white/[0.08] hover:border-white/20 text-white/40 hover:text-white text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center min-h-[48px]"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -468,14 +472,14 @@ export default function AccountPage() {
                     ) : (
                       <button
                         onClick={() => setIsEditing(true)}
-                        className="flex-1 py-3 border border-primary/20 hover:border-primary text-primary hover:bg-primary/5 font-bold text-xs caps-label tracking-widest rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+                        className="flex-1 py-3.5 border border-primary/20 hover:border-primary text-primary hover:bg-primary/5 font-bold text-xs caps-label tracking-widest rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[48px]"
                       >
                         <Pencil className="w-3.5 h-3.5" /> Edit Profile
                       </button>
                     )}
                     <button
                       onClick={handleLogout}
-                      className="px-4 py-3 border border-white/[0.08] hover:border-red-500/30 hover:text-red-400 text-white/40 text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                      className="sm:w-auto py-3.5 px-5 border border-white/[0.08] hover:border-red-500/30 hover:text-red-400 text-white/40 text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[48px] whitespace-nowrap"
                     >
                       <LogOut className="w-3.5 h-3.5" /> Sign Out
                     </button>

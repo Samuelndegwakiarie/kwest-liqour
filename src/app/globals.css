@@ -46,6 +46,7 @@
   --container-max: 1440px;
   --section-gap: 120px;
   --bottom-nav-height: 72px;
+  --navbar-height: 72px;
 
   /* shadcn/ui components support */
   --card: rgba(255, 255, 255, 0.03);
