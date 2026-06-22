@@ -214,15 +214,26 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.3 }}
-              className="fixed top-0 right-0 h-full w-[60vw] min-w-[240px] max-w-[320px] bg-[#060b18]/95 border-l border-white/[0.08] backdrop-blur-xl z-[95] pt-24 px-6 pb-8 flex flex-col justify-between lg:hidden shadow-[-10px_0_30px_rgba(0,0,0,0.5)]"
+              className="fixed top-0 right-0 h-full w-[60vw] min-w-[240px] max-w-[320px] bg-[#060b18]/95 border-l border-white/[0.08] backdrop-blur-xl z-[95] pt-6 px-6 pb-8 flex flex-col justify-between lg:hidden shadow-[-10px_0_30px_rgba(0,0,0,0.5)]"
             >
-              <div className="space-y-8">
+              <div className="space-y-6">
+                {/* KWEST logo at top of drawer */}
+                <div className="pb-4 border-b border-white/[0.06]">
+                  <Link
+                    href="/"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-xl font-serif font-bold text-primary tracking-[0.3em] uppercase text-glow"
+                  >
+                    KWEST
+                  </Link>
+                </div>
+
                 {/* Search Bar for Mobile */}
                 <form onSubmit={handleSearchSubmit} className="relative w-full" role="search">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
                   <input
                     type="text"
-                    placeholder="Search collection..."
+                    placeholder="Search"
                     value={searchVal}
                     onChange={(e) => setSearchVal(e.target.value)}
                     aria-label="Search collection"
