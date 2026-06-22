@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { ParticleField } from "@/components/ParticleField";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
 import { GlassCard } from "@/components/GlassCard";
@@ -38,10 +39,14 @@ export default function Heritage() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background z-10" />
-          <img
-            src="https://images.unsplash.com/photo-1541447271487-09612b3f49f7?auto=format&fit=crop&q=80&w=2000"
-            className="w-full h-full object-cover"
+          <Image
+            src="https://images.unsplash.com/photo-1541447271487-09612b3f49f7?auto=format&fit=crop&q=80"
+            fill
+            priority
+            className="object-cover"
             alt="Nairobi Skyline"
+            sizes="100vw"
+            quality={80}
           />
         </div>
         <ParticleField count={35} className="z-[5]" />
@@ -96,9 +101,11 @@ export default function Heritage() {
 
           <ScrollReveal direction="scale">
             <div className="aspect-[4/5] relative overflow-hidden rounded-2xl border border-white/[0.06] flex items-center justify-center p-4 bg-black/20">
-              <img
+              <Image
                 src={getImageUrl("story_bottle", "/story_bottle_noir.png")}
-                className="h-[90%] object-contain"
+                fill
+                sizes="(max-width: 768px) 100vw, 500px"
+                className="object-contain p-4"
                 alt="Story Bottle"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent" />
@@ -128,9 +135,11 @@ export default function Heritage() {
 
           <ScrollReveal direction="scale">
             <div className="aspect-video relative overflow-hidden rounded-2xl border border-white/[0.06]">
-              <img
-                src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=1200"
-                className="w-full h-full object-cover"
+              <Image
+                src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80"
+                fill
+                sizes="(max-width: 768px) 100vw, 800px"
+                className="object-cover"
                 alt="Curation Lounge"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent" />
@@ -169,9 +178,11 @@ export default function Heritage() {
               <StaggerItem key={item.title}>
                 <GlassCard hover padding="p-0" className="rounded-2xl overflow-hidden group">
                   <div className="aspect-[3/4] overflow-hidden relative">
-                    <img
+                    <Image
                       src={item.img}
-                      className="w-full h-full object-cover opacity-60 group-hover:opacity-90 group-hover:scale-105 transition-all duration-700"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover opacity-60 group-hover:opacity-90 group-hover:scale-105 transition-all duration-700"
                       alt={item.title}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ChevronDown, ArrowRight, SlidersHorizontal, X, RotateCcw, Plus, ShoppingBag, Search, Check } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { ParticleField } from "@/components/ParticleField";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
 import { useCart } from "@/context/CartContext";
@@ -149,10 +150,14 @@ export default function Gallery() {
       <section className="relative h-[45vh] lg:h-[60vh] flex items-center justify-center pt-16 lg:pt-24 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/60 to-background z-10" />
-          <img
-            src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&q=80&w=2000"
-            className="w-full h-full object-cover opacity-35 select-none pointer-events-none"
+          <Image
+            src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&q=80"
+            fill
+            priority
+            className="object-cover opacity-35 select-none pointer-events-none"
             alt="Bottles Background"
+            sizes="100vw"
+            quality={75}
           />
         </div>
         <ParticleField count={20} className="z-[5]" />
@@ -354,9 +359,12 @@ export default function Gallery() {
                             {product.volume}
                           </div>
 
-                          <img
+                          <Image
                             src={product.img}
-                            className="h-[80%] object-contain opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                            width={300}
+                            height={400}
+                            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                            className="h-[80%] w-auto object-contain opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                             alt={`Bottle of ${product.brand} ${product.name}`}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

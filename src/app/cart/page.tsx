@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ShoppingBag,
   Trash2,
@@ -56,10 +57,14 @@ export default function CartPage() {
       <section className="relative h-[50vh] flex items-center justify-center pt-20 lg:pt-28 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/40 to-background z-10" />
-          <img
-            src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&q=80&w=2000"
-            className="w-full h-full object-cover opacity-30 select-none pointer-events-none"
+          <Image
+            src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&q=80"
+            fill
+            priority
+            className="object-cover opacity-30 select-none pointer-events-none"
             alt="Bar Spirits Background"
+            sizes="100vw"
+            quality={70}
           />
         </div>
         <ParticleField count={30} className="z-[5]" />
@@ -115,10 +120,12 @@ export default function CartPage() {
                         <div className="flex flex-col sm:flex-row items-center gap-6">
                           {/* Image container */}
                           <div className="w-24 h-24 shrink-0 rounded-xl bg-black/40 border border-white/[0.06] flex items-center justify-center p-2 relative overflow-hidden group">
-                            <img
+                            <Image
                               src={item.img}
+                              fill
+                              sizes="96px"
+                              className="object-contain p-2 transition-transform duration-500 group-hover:scale-110"
                               alt={item.name}
-                              className="h-full object-contain transition-transform duration-500 group-hover:scale-110"
                             />
                           </div>
 

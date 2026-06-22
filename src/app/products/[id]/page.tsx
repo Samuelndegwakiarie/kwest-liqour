@@ -2,6 +2,7 @@
 
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronLeft, Plus, Minus, ShoppingBag, ShieldCheck, ArrowRight, Sparkles, Check } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useCart } from "@/context/CartContext";
@@ -110,10 +111,13 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
       {/* Background elements */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/45 to-background z-10" />
-        <img
-          src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=2000"
-          className="w-full h-full object-cover opacity-15 select-none pointer-events-none"
+        <Image
+          src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80"
+          fill
+          className="object-cover opacity-15 select-none pointer-events-none"
           alt="Product details background"
+          sizes="100vw"
+          quality={60}
         />
       </div>
       <ParticleField count={20} className="z-[5]" />
@@ -147,10 +151,14 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
                 {product.volume}
               </span>
 
-              <img
+              <Image
                 src={product.img}
+                width={400}
+                height={500}
+                priority
+                sizes="(max-width: 768px) 100vw, 400px"
+                className="h-[85%] w-auto object-contain transition-transform duration-700 group-hover:scale-105"
                 alt={product.name}
-                className="h-[85%] object-contain transition-transform duration-700 group-hover:scale-105"
               />
             </div>
           </div>

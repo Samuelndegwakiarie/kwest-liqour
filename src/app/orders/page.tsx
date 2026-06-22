@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Search,
   ChevronDown,
@@ -272,10 +273,14 @@ export default function TrackOrdersPage() {
       <section className="relative h-[45vh] lg:h-[50vh] flex items-center justify-center pt-20 lg:pt-28 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/45 to-background z-10" />
-          <img
-            src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=2000"
-            className="w-full h-full object-cover opacity-15 select-none pointer-events-none"
+          <Image
+            src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80"
+            fill
+            priority
+            className="object-cover opacity-15 select-none pointer-events-none"
             alt="Cellar Vault"
+            sizes="100vw"
+            quality={60}
           />
         </div>
         <ParticleField count={25} className="z-[5]" />
@@ -560,8 +565,8 @@ export default function TrackOrdersPage() {
                                       <div className="space-y-4">
                                         {order.items.map((item, idx) => (
                                           <div key={idx} className="flex gap-4 items-center">
-                                            <div className="w-14 h-14 bg-black/40 border border-white/[0.06] rounded-xl flex items-center justify-center p-1.5 shrink-0">
-                                              <img src={item.img} alt={item.name} className="h-full object-contain" />
+                                            <div className="w-14 h-14 bg-black/40 border border-white/[0.06] rounded-xl flex items-center justify-center p-1.5 shrink-0 relative overflow-hidden">
+                                              <Image src={item.img} alt={item.name} fill sizes="56px" className="object-contain p-1.5" />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                               <span className="text-[9px] font-bold text-primary tracking-widest uppercase">

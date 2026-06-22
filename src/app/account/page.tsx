@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   User as UserIcon,
@@ -175,10 +176,13 @@ export default function AccountPage() {
       {/* Background */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/40 to-background z-10" />
-        <img
-          src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=2000"
-          className="w-full h-full object-cover opacity-20 select-none pointer-events-none"
+        <Image
+          src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80"
+          fill
+          className="object-cover opacity-20 select-none pointer-events-none"
           alt="Luxury Cellar"
+          sizes="100vw"
+          quality={60}
         />
       </div>
       <ParticleField count={25} className="z-[5]" />

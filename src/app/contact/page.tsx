@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ChevronDown, MapPin, LayoutGrid, Building2, ArrowRight, Sparkles, Map } from "lucide-react";
+import Image from "next/image";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
 import { GlassCard } from "@/components/GlassCard";
 import { ParticleField } from "@/components/ParticleField";
@@ -120,10 +121,11 @@ export default function Concierge() {
                 }}
                 className="group relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-2xl border border-white/[0.06] cursor-pointer"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={card.img}
-                  className="w-full h-full object-cover opacity-35 group-hover:opacity-55 group-hover:scale-105 transition-all duration-[2000ms]"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover opacity-35 group-hover:opacity-55 group-hover:scale-105 transition-all duration-[2000ms]"
                   alt={card.title}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />

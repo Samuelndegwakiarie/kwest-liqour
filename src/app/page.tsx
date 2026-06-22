@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight, ChevronDown, CheckCircle2, ShoppingBag, Gift, Check } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { ParticleField } from "@/components/ParticleField";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
 import { GlassCard } from "@/components/GlassCard";
@@ -189,10 +190,14 @@ export default function Home() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background z-10" />
-          <img
+          <Image
             src="/hero-homepage.jpg"
-            className="w-full h-full object-cover scale-105"
+            fill
+            priority
+            className="object-cover scale-105"
             alt="Luxury Spirits Pour"
+            sizes="100vw"
+            quality={85}
           />
         </div>
 
@@ -294,9 +299,11 @@ export default function Home() {
             {/* Rare Malts */}
             <StaggerItem>
               <Link href="/products?category=whisky" className="group relative aspect-[3/4] overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
-                <img
+                <Image
                   src="/rare_malts_category_noir.png"
-                  className="w-full h-full object-cover opacity-90 contrast-[1.15] group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1200ms]"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover opacity-90 contrast-[1.15] group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1200ms]"
                   alt="Rare Malts"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
@@ -319,9 +326,11 @@ export default function Home() {
             {/* Vintage Wines */}
             <StaggerItem>
               <Link href="/products?category=wine" className="group relative aspect-[3/4] overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
-                <img
+                <Image
                   src="/vintage_wines_category_noir.png"
-                  className="w-full h-full object-cover opacity-90 contrast-[1.15] group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1200ms]"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover opacity-90 contrast-[1.15] group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1200ms]"
                   alt="Vintage Wines"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
@@ -342,9 +351,11 @@ export default function Home() {
             {/* Artisanal Gins */}
             <StaggerItem>
               <Link href="/products?category=gin" className="group relative aspect-[3/4] overflow-hidden rounded-2xl block cursor-pointer border border-white/[0.06]">
-                <img
+                <Image
                   src="/artisanal_gins_category_noir.png"
-                  className="w-full h-full object-cover opacity-90 contrast-[1.15] group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1200ms]"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover opacity-90 contrast-[1.15] group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1200ms]"
                   alt="Artisanal Gins"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
@@ -402,9 +413,12 @@ export default function Home() {
                             {product.volume}
                           </div>
 
-                          <img
+                          <Image
                             src={product.img}
-                            className="h-[80%] object-contain opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                            width={300}
+                            height={400}
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                            className="h-[80%] w-auto object-contain opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                             alt={`Bottle of ${product.brand} ${product.name}`}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -529,10 +543,13 @@ export default function Home() {
                           KES {banner.price.toLocaleString()}
                         </span>
                       </div>
-                      <img
+                      <Image
                         src={banner.img}
+                        width={300}
+                        height={300}
+                        sizes="(max-width: 768px) 100vw, 300px"
+                        className="h-[80%] max-h-[260px] w-auto object-contain group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-700 mt-6 z-10"
                         alt={banner.title}
-                        className="h-[80%] max-h-[260px] object-contain group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-700 mt-6 z-10"
                       />
                     </div>
                   </div>
