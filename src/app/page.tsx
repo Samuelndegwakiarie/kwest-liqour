@@ -70,6 +70,14 @@ function PromoTimer({ endsAt }: { endsAt?: string | null }) {
   );
 }
 
+const tagColors: Record<string, string> = {
+  "BEST SELLER": "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+  "POPULAR": "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  "LUXURY": "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  "TRENDING": "bg-violet-500/10 text-violet-400 border-violet-500/20",
+  "LIMITED": "bg-rose-500/10 text-rose-400 border-rose-500/20",
+};
+
 export default function Home() {
   const { addToCart } = useCart();
   const [email, setEmail] = useState("");
@@ -77,15 +85,71 @@ export default function Home() {
   const [banners, setBanners] = useState<any[]>([]);
   const [toastMessage, setToastMessage] = useState("");
   const [addedBannerIds, setAddedBannerIds] = useState<Set<number>>(new Set());
+  const [popularProducts, setPopularProducts] = useState<any[]>([]);
 
   useEffect(() => {
+    // Fetch banners
     fetch("/api/admin/promo-banners")
       .then((res) => res.json())
       .then((data) => {
         setBanners(data.filter((b: any) => b.active));
       })
       .catch((err) => console.error("Error loading banners:", err));
+
+    // Fetch products and orders for popular drinks calculation
+    Promise.all([
+      fetch("/api/admin/products").then((res) => res.json()),
+      fetch("/api/admin/orders").then((res) => res.json()),
+    ])
+      .then(([productsData, ordersData]) => {
+        if (!Array.isArray(productsData)) return;
+
+        // Calculate sales count per product
+        const salesMap: Record<number, number> = {};
+        if (Array.isArray(ordersData)) {
+          ordersData.forEach((order: any) => {
+            if (Array.isArray(order.items)) {
+              order.items.forEach((item: any) => {
+                salesMap[item.productId] = (salesMap[item.productId] || 0) + item.quantity;
+              });
+            }
+          });
+        }
+
+        // Attach sales counts and filter visible products
+        const productsWithSales = productsData.map((p: any) => ({
+          ...p,
+          salesCount: salesMap[p.id] || 0,
+        }));
+        
+        const visibleSorted = productsWithSales
+          .filter((p: any) => p.visible !== false)
+          .sort((a, b) => b.salesCount - a.salesCount);
+
+        // Find the top 3 with actual sales first
+        const top3WithSales = visibleSorted.filter((p: any) => p.salesCount > 0).slice(0, 3);
+        let final3 = [...top3WithSales];
+
+        // Fill remaining spaces with random visible products if we have less than 3 sold
+        if (final3.length < 3) {
+          const remainingProducts = visibleSorted.filter(
+            (p: any) => !final3.some((selected) => selected.id === p.id)
+          );
+          // Shuffle remaining
+          const shuffled = remainingProducts.sort(() => 0.5 - Math.random());
+          final3 = [...final3, ...shuffled.slice(0, 3 - final3.length)];
+        }
+
+        setPopularProducts(final3.slice(0, 3));
+      })
+      .catch((err) => console.error("Error calculating popular products:", err));
   }, []);
+
+  const handleAddToCartClick = (product: any) => {
+    addToCart(product, 1);
+    setToastMessage(`Added ${product.brand} ${product.name} to Cart!`);
+    setTimeout(() => setToastMessage(""), 2500);
+  };
 
   const handleBannerAddToCart = (banner: any) => {
     addToCart({
@@ -298,27 +362,101 @@ export default function Home() {
               </Link>
             </StaggerItem>
 
-            {/* Membership CTA */}
-            <StaggerItem className="md:col-span-3">
-              <GlassCard glow padding="p-10 md:p-16" className="h-full flex flex-col justify-center rounded-2xl">
-                <span className="caps-label text-secondary text-[9px] mb-6 block tracking-[0.5em] text-glow-amber">
-                  MEMBER EXCLUSIVE
-                </span>
-                <h3 className="text-4xl md:text-5xl font-serif font-bold text-white mb-8 tracking-tighter leading-none">
-                  Join The Kwest Circle
-                </h3>
-                <p className="text-text-muted text-sm md:text-base max-w-2xl mb-10 leading-relaxed text-left">
-                  Gain early access to limited edition releases and private tasting
-                  events across Nairobi. Our members enjoy concierge delivery and
-                  exclusive pricing.
-                </p>
-                <Link href="/account">
-                  <button className="w-fit px-10 py-4 border border-primary/30 text-primary hover:bg-primary hover:text-background font-bold uppercase tracking-[0.2em] text-[11px] rounded-lg transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,240,255,0.2)] cursor-pointer">
-                    REQUEST INVITATION
-                  </button>
-                </Link>
-              </GlassCard>
-            </StaggerItem>
+            {/* Membership CTA replaced by Popular Drinks */}
+            {popularProducts.length > 0 && (
+              <>
+                <StaggerItem className="md:col-span-3 mt-12 mb-4">
+                  <div className="flex flex-col space-y-2 border-t border-white/[0.04] pt-12 text-left">
+                    <span className="caps-label text-primary text-[9px] tracking-[0.4em]">MOST BOUGHT</span>
+                    <h3 className="text-3xl font-serif font-bold text-white tracking-tight">Popular Drinks</h3>
+                  </div>
+                </StaggerItem>
+
+                {popularProducts.map((product) => (
+                  <StaggerItem key={product.id}>
+                    <div className="relative group flex flex-col justify-between h-full bg-white/[0.01] border border-white/[0.04] rounded-2xl p-4 hover:bg-white/[0.03] hover:border-primary/20 hover:shadow-[0_8px_32px_rgba(0,240,255,0.06)] transition-all duration-500 text-left">
+                      <Link
+                        href={`/products/${product.id}`}
+                        className="flex flex-col cursor-pointer w-full"
+                      >
+                        {/* Image Frame */}
+                        <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden mb-4 bg-black/40 border border-white/[0.04] flex items-center justify-center p-4">
+                          <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1">
+                            {product.discountPrice && (
+                              <div className="text-[8px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase border backdrop-blur-sm bg-rose-500/20 text-rose-400 border-rose-500/30">
+                                SALE
+                              </div>
+                            )}
+                            {product.tag && (
+                              <div
+                                className={`text-[8px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase border backdrop-blur-sm ${
+                                  tagColors[product.tag] || "bg-white/10 text-white border-white/20"
+                                }`}
+                              >
+                                {product.tag}
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="absolute bottom-2.5 right-2.5 z-10 text-[8px] font-bold px-2 py-0.5 rounded bg-black/60 border border-white/[0.1] text-text-muted">
+                            {product.volume}
+                          </div>
+
+                          <img
+                            src={product.img}
+                            className="h-[80%] object-contain opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                            alt={`Bottle of ${product.brand} ${product.name}`}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                          
+                          {/* Quick View Overlay */}
+                          <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                            <div className="flex items-center justify-center gap-2 text-primary text-[10px] caps-label">
+                              VIEW DETAILS <ArrowRight className="w-3 h-3" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Info Frame */}
+                        <div className="space-y-1.5 px-1.5 pb-2">
+                          <div className="flex justify-between items-center text-[9px] text-text-subtle tracking-[0.2em] uppercase">
+                            <span>{product.brand}</span>
+                            <span>{product.category}</span>
+                          </div>
+                          <h4 className="text-base font-serif font-bold text-white group-hover:text-primary transition-colors tracking-tight leading-tight truncate">
+                            {product.name}
+                          </h4>
+                          <div className="flex items-baseline gap-2 pt-0.5">
+                            {product.discountPrice ? (
+                              <>
+                                <span className="text-sm font-bold text-primary text-glow-cyan">
+                                  KES {product.discountPrice.toLocaleString()}
+                                </span>
+                                <span className="text-[10px] text-white/30 line-through">
+                                  KES {product.price.toLocaleString()}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-sm font-bold text-white group-hover:text-primary transition-colors">
+                                  KES {product.price.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+
+                      {/* Add To Cart Button */}
+                      <button
+                        onClick={() => handleAddToCartClick(product)}
+                        className="w-full mt-3 py-2.5 bg-primary text-background font-bold text-[9px] caps-label tracking-widest rounded-xl hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <ShoppingBag className="w-3.5 h-3.5" /> ADD TO CART
+                      </button>
+                    </div>
+                  </StaggerItem>
+                ))}
+              </>
+            )}
           </StaggerContainer>
         </div>
       </section>
