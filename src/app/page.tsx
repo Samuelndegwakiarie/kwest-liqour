@@ -1,18 +1,115 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowRight, ChevronDown, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ChevronDown, CheckCircle2, ShoppingBag, Gift, Check } from "lucide-react";
 import Link from "next/link";
 import { ParticleField } from "@/components/ParticleField";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
 import { GlassCard } from "@/components/GlassCard";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { RotatingReviews } from "@/components/RotatingReviews";
+import { useCart } from "@/context/CartContext";
+
+function PromoTimer({ endsAt }: { endsAt?: string | null }) {
+  const [timeLeft, setTimeLeft] = useState<{ days: number, hours: number, minutes: number, seconds: number } | null>(null);
+
+  useEffect(() => {
+    // Fallback: if endsAt is missing or invalid, default to 2 days in the future
+    const target = endsAt ? new Date(endsAt).getTime() : (Date.now() + 2 * 24 * 60 * 60 * 1000);
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const difference = target - now;
+      if (difference <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+      setTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [endsAt]);
+
+  if (!timeLeft) return null;
+
+  return (
+    <div className="space-y-2">
+      <span className="text-[9px] uppercase tracking-widest text-[#d4af37] font-bold animate-pulse">OFFER ENDS IN:</span>
+      <div className="flex items-center gap-3">
+        {[
+          { label: "Days", value: timeLeft.days },
+          { label: "Hrs", value: timeLeft.hours },
+          { label: "Mins", value: timeLeft.minutes },
+          { label: "Secs", value: timeLeft.seconds },
+        ].map((item, idx) => (
+          <div key={item.label} className="flex items-center">
+            <div className="flex flex-col items-center">
+              <div className="min-w-[48px] bg-white/[0.03] border border-white/[0.08] rounded-lg py-2 px-3 text-center shadow-[0_0_15px_rgba(0,0,0,0.3)]">
+                <span className="font-mono text-lg font-bold text-white tracking-tight">
+                  {String(item.value).padStart(2, "0")}
+                </span>
+              </div>
+              <span className="text-[8px] uppercase tracking-wider text-white/40 mt-1 font-semibold">
+                {item.label}
+              </span>
+            </div>
+            {idx < 3 && (
+              <span className="font-mono text-lg font-bold text-white/30 ml-3 shrink-0 animate-pulse">:</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
+  const { addToCart } = useCart();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [banners, setBanners] = useState<any[]>([]);
+  const [toastMessage, setToastMessage] = useState("");
+  const [addedBannerIds, setAddedBannerIds] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    fetch("/api/admin/promo-banners")
+      .then((res) => res.json())
+      .then((data) => {
+        setBanners(data.filter((b: any) => b.active));
+      })
+      .catch((err) => console.error("Error loading banners:", err));
+  }, []);
+
+  const handleBannerAddToCart = (banner: any) => {
+    addToCart({
+      id: 10000 + banner.id,
+      brand: "EXCLUSIVE",
+      name: banner.title,
+      price: banner.price,
+      img: banner.img,
+      category: "Promo",
+      volume: "Offer Pack",
+      tag: "OFFER",
+    }, 1);
+    setToastMessage(`Added "${banner.title}" to Cart!`);
+    setTimeout(() => setToastMessage(""), 2500);
+    // Mark this banner button as added for 2 seconds
+    setAddedBannerIds((prev) => new Set(prev).add(banner.id));
+    setTimeout(() => {
+      setAddedBannerIds((prev) => {
+        const next = new Set(prev);
+        next.delete(banner.id);
+        return next;
+      });
+    }, 2000);
+  };
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,8 +117,9 @@ export default function Home() {
     setSubscribed(true);
     setEmail("");
   };
+
   return (
-    <main className="bg-background min-h-screen pb-[var(--bottom-nav-height)] lg:pb-0">
+    <main className="bg-background min-h-screen pb-16 lg:pb-0">
       {/* ═══ Hero Section ═══ */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image */}
@@ -225,6 +323,88 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══ Promo Banners ═══ */}
+      {banners.length > 0 && (
+        <section className="py-16 md:py-24 px-6 md:px-12 bg-background border-t border-white/[0.04]">
+          <div className="max-w-[1440px] mx-auto">
+            <ScrollReveal>
+              <div className="mb-12 space-y-3">
+                <span className="caps-label text-primary text-[10px] tracking-[0.4em]">VAULT EXCLUSIVES</span>
+                <h2 className="text-4xl md:text-5xl font-serif font-bold text-white tracking-tight">
+                  Limited Offers & Drops
+                </h2>
+              </div>
+            </ScrollReveal>
+
+            <div className="flex flex-col gap-8">
+              {banners.map((banner) => (
+                <ScrollReveal key={banner.id} direction="up">
+                  <div
+                    className="w-full flex flex-col-reverse md:flex-row items-stretch rounded-2xl text-left group overflow-hidden relative bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] hover:border-primary/25 cursor-pointer hover:bg-white/[0.05] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85),0_0_40px_rgba(0,240,255,0.03)] hover:shadow-[0_35px_80px_-10px_rgba(0,0,0,0.95),0_0_55px_rgba(0,240,255,0.15)] transition-all duration-500 hover:-translate-y-1.5"
+                  >
+                    {/* Subtle top edge gradient line */}
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none z-20" />
+
+                    {/* Left Column: Text Content */}
+                    <div className="flex-1 p-8 md:p-16 flex flex-col justify-center space-y-6 relative z-10">
+                      <div className="space-y-4">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase border bg-[#d4af37]/20 text-[#d4af37] border-[#d4af37]/30 w-fit shadow-[0_2px_10px_rgba(212,175,55,0.05)] group-hover:border-[#d4af37]/45 transition-all duration-500">
+                          <Gift className="w-3.5 h-3.5" /> SAVE KES {banner.discountAmount}
+                        </div>
+                        <h3 className="text-3xl md:text-4xl font-serif font-bold text-white tracking-tight leading-none transition-all duration-500">
+                          {banner.title}
+                        </h3>
+                        <p className="text-text-muted text-sm md:text-base max-w-2xl leading-relaxed">
+                          {banner.description}
+                        </p>
+                      </div>
+
+                      {/* Countdown Timer */}
+                      <PromoTimer endsAt={banner.endsAt} />
+
+                      <button
+                        onClick={() => handleBannerAddToCart(banner)}
+                        disabled={addedBannerIds.has(banner.id)}
+                        className={`w-full sm:w-fit px-10 py-4 font-bold text-[11px] caps-label tracking-widest rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 ${
+                          addedBannerIds.has(banner.id)
+                            ? "bg-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.35)] scale-[1.01]"
+                            : "bg-[#d4af37] hover:bg-[#b8960c] text-[#080808] shadow-[0_4px_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_30px_rgba(212,175,55,0.35)] hover:scale-[1.02] active:scale-[0.98]"
+                        }`}
+                      >
+                        {addedBannerIds.has(banner.id) ? (
+                          <><Check className="w-4 h-4" /> ADDED TO CART</>
+                        ) : (
+                          <><ShoppingBag className="w-4 h-4" /> ADD TO CART</>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Right Column: Product Image Card */}
+                    <div className="w-full md:w-[45%] bg-black/30 border-t md:border-t-0 md:border-l border-white/[0.08] flex flex-col items-center justify-center p-8 shrink-0 relative overflow-hidden">
+                      {/* Ambient background light glows */}
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,240,255,0.04)_0%,transparent_70%)] pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/20 transition-colors duration-700" />
+
+                      {/* Price Badge Above Image */}
+                      <div className="absolute top-4 right-4 bg-[#060B18]/90 border border-primary/20 backdrop-blur-md rounded-xl px-4 py-2 shadow-[0_0_20px_rgba(0,240,255,0.15)] group-hover:shadow-[0_0_25px_rgba(0,240,255,0.25)] group-hover:border-primary/40 transition-all duration-500 z-10">
+                        <span className="font-serif font-bold text-base text-primary text-glow">
+                          KES {banner.price.toLocaleString()}
+                        </span>
+                      </div>
+                      <img
+                        src={banner.img}
+                        alt={banner.title}
+                        className="h-[80%] max-h-[260px] object-contain group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-700 mt-6 z-10"
+                      />
+                    </div>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ═══ Stats Section ═══ */}
       <section className="py-12 md:py-20 px-6 md:px-12 bg-background border-y border-white/[0.04]">
         <ScrollReveal>
@@ -302,6 +482,20 @@ export default function Home() {
           </div>
         </ScrollReveal>
       </section>
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed bottom-8 right-6 z-[120] bg-[#060b18]/90 border border-primary/20 backdrop-blur-md rounded-2xl px-6 py-4 flex items-center gap-3 shadow-[0_0_30px_rgba(0,240,255,0.15)]"
+          >
+            <CheckCircle2 className="w-5 h-5 text-primary" />
+            <span className="text-sm font-semibold text-white tracking-wide">{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

@@ -1,37 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronDown, MapPin, LayoutGrid, Building2, Map, ArrowRight, Sparkles } from "lucide-react";
-import Link from "next/link";
+import { ChevronDown, MapPin, LayoutGrid, Building2, ArrowRight, Sparkles, Map } from "lucide-react";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
 import { GlassCard } from "@/components/GlassCard";
 import { ParticleField } from "@/components/ParticleField";
 import { motion, AnimatePresence } from "motion/react";
 import dynamic from "next/dynamic";
-
-const serviceCards = [
-  {
-    title: "Private Tastings",
-    desc: "Guided sensory journeys through our rarest reserves, led by certified master distillers.",
-    cta: "INQUIRE NOW",
-    icon: LayoutGrid,
-    img: "/private_tasting_noir.png",
-  },
-  {
-    title: "Wholesale & Trade",
-    desc: "Strategic inventory solutions and exclusive allocation for Nairobi's premier hospitality venues.",
-    cta: "PARTNERSHIP TERMS",
-    icon: Building2,
-    img: "/wholesale_trade_noir.png",
-  },
-  {
-    title: "The Boutique",
-    desc: "Visit our flagship location for a personalized curation session with our house sommeliers.",
-    cta: "VIEW LOCATION",
-    icon: MapPin,
-    img: "/boutique_flagship_noir.png",
-  },
-];
 
 const DotLottiePlayer = dynamic(
   () => import("@dotlottie/react-player").then((mod) => mod.DotLottiePlayer),
@@ -44,6 +19,43 @@ export default function Concierge() {
   const [email, setEmail] = useState("");
   const [service, setService] = useState("SELECT SERVICE TYPE");
   const [message, setMessage] = useState("");
+  const [images, setImages] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/admin/hero-images")
+      .then(r => r.json())
+      .then(data => setImages(data))
+      .catch(err => console.error("Error loading contact images:", err));
+  }, []);
+
+  const getImageUrl = (key: string, fallback: string) => {
+    const match = images.find(x => x.page === "contact" && x.key === key);
+    return match ? match.url : fallback;
+  };
+
+  const serviceCards = [
+    {
+      title: "Private Tastings",
+      desc: "Guided sensory journeys through our rarest reserves, led by certified master distillers.",
+      cta: "INQUIRE NOW",
+      icon: LayoutGrid,
+      img: getImageUrl("private_tastings", "/private_tasting_noir.png"),
+    },
+    {
+      title: "Wholesale & Trade",
+      desc: "Strategic inventory solutions and exclusive allocation for Nairobi's premier hospitality venues.",
+      cta: "PARTNERSHIP TERMS",
+      icon: Building2,
+      img: getImageUrl("wholesale_trade", "/wholesale_trade_noir.png"),
+    },
+    {
+      title: "The Boutique",
+      desc: "Visit our flagship location for a personalized curation session with our house sommeliers.",
+      cta: "VIEW LOCATION",
+      icon: MapPin,
+      img: getImageUrl("boutique_flagship", "/boutique_flagship_noir.png"),
+    },
+  ];
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -81,8 +93,7 @@ export default function Concierge() {
           </ScrollReveal>
           <ScrollReveal delay={0.1}>
             <h1 className="text-5xl md:text-8xl font-serif font-bold text-white tracking-tighter mb-6 leading-none">
-              Talk to{" "}
-              <span className="gradient-text-static">Us</span>
+              Talk to <span className="gradient-text-static">Us</span>
             </h1>
           </ScrollReveal>
           <ScrollReveal delay={0.2}>
@@ -109,6 +120,7 @@ export default function Concierge() {
                 }}
                 className="group relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-2xl border border-white/[0.06] cursor-pointer"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={card.img}
                   className="w-full h-full object-cover opacity-35 group-hover:opacity-55 group-hover:scale-105 transition-all duration-[2000ms]"
@@ -145,7 +157,7 @@ export default function Concierge() {
       <section id="inquiry-section" className="py-16 md:py-24 px-6 md:px-12 bg-background border-t border-white/[0.04]">
         <div className="max-w-[1280px] mx-auto">
           <ScrollReveal>
-            <h2 className="text-4xl md:text-6xl font-serif font-bold text-white mb-12 tracking-tighter">
+            <h2 className="text-4xl md:text-6xl font-serif font-bold text-white mb-12 tracking-tighter text-left">
               Send an Inquiry
             </h2>
           </ScrollReveal>
@@ -261,7 +273,7 @@ export default function Concierge() {
                           setService("SELECT SERVICE TYPE");
                           setMessage("");
                         }}
-                        className="px-8 py-3.5 bg-white/[0.04] border border-white/[0.08] text-xs font-semibold text-primary hover:text-white hover:border-primary/30 rounded-xl transition-all cursor-pointer"
+                        className="px-8 py-3.5 bg-white/[0.04] border border-white/[0.08] text-xs font-semibold text-[#d4af37] hover:text-white hover:border-primary/30 rounded-xl transition-all cursor-pointer"
                       >
                         Send Another Inquiry
                       </button>
@@ -293,7 +305,7 @@ export default function Concierge() {
 
           <ScrollReveal delay={0.1}>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-              <div className="space-y-3">
+              <div className="space-y-3 text-left">
                 <h2 className="text-3xl md:text-5xl font-serif font-bold text-white tracking-tight">
                   Nairobi Flagship
                 </h2>

@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, ShoppingBag, User, Home, LayoutGrid, MessageSquare, ShieldCheck } from "lucide-react";
-import { motion } from "motion/react";
+import { Search, ShoppingBag, User, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-
 
 const desktopLinks = [
   { name: "Drinks", href: "/products" },
@@ -15,34 +14,82 @@ const desktopLinks = [
   { name: "Contact", href: "/contact" },
 ];
 
-const bottomNavLinks = [
-  { name: "HOME", href: "/", icon: Home },
-  { name: "DRINKS", href: "/products", icon: LayoutGrid },
-  { name: "CONTACT", href: "/contact", icon: MessageSquare },
-  { name: "CLUB", href: "/about", icon: ShieldCheck },
+const mobileLinks = [
+  { name: "HOME", href: "/" },
+  { name: "DRINKS", href: "/products" },
+  { name: "ORDERS", href: "/orders" },
+  { name: "CONTACT", href: "/contact" },
+  { name: "ABOUT", href: "/about" },
 ];
-
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const [searchVal, setSearchVal] = useState("");
   const { cartCount } = useCart();
 
+  const currentDesktopLinks = isAdmin
+    ? [...desktopLinks, { name: "Dashboard", href: "/dashboard" }]
+    : desktopLinks;
+
+  const currentMobileLinks = isAdmin
+    ? [...mobileLinks, { name: "DASHBOARD", href: "/dashboard" }]
+    : mobileLinks;
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 0);
+    // Fire immediately in case the page was already scrolled on mount
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Check auth status regularly or on path changes
+  useEffect(() => {
+    const checkAuth = () => {
+      const adminAuth = sessionStorage.getItem("kwest_admin") === "authenticated";
+      const userAuth = localStorage.getItem("kwest_user") !== null;
+      setIsLoggedIn(adminAuth || userAuth);
+      setIsAdmin(adminAuth);
+    };
+    checkAuth();
+
+    const interval = setInterval(checkAuth, 1000);
+    return () => clearInterval(interval);
+  }, [pathname]);
+
+  // Lock scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchVal.trim()) {
       router.push(`/products?q=${encodeURIComponent(searchVal.trim())}`);
       setSearchVal("");
+      setIsMobileMenuOpen(false);
     }
+  };
+
+  const handleLogoutClick = () => {
+    sessionStorage.removeItem("kwest_admin");
+    localStorage.removeItem("kwest_user");
+    setIsLoggedIn(false);
+    setIsMobileMenuOpen(false);
+    router.push("/");
+    router.refresh();
   };
 
   const isActive = (href: string) => pathname === href;
@@ -52,7 +99,7 @@ export function Navbar() {
       {/* Top Navbar */}
       <nav
         className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 px-6 md:px-12 py-4 flex items-center justify-between ${
-          isScrolled
+          isScrolled || isMobileMenuOpen
             ? "glass-nav shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
             : "bg-transparent"
         }`}
@@ -60,14 +107,14 @@ export function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl md:text-2xl font-serif font-bold text-primary tracking-[0.3em] uppercase text-glow cursor-pointer"
+          className="text-xl md:text-2xl font-serif font-bold text-primary tracking-[0.3em] uppercase text-glow cursor-pointer z-[110]"
         >
           KWEST
         </Link>
 
         {/* Desktop Links */}
         <div className="hidden lg:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
-          {desktopLinks.map((link) => (
+          {currentDesktopLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
@@ -118,8 +165,13 @@ export function Navbar() {
         </div>
 
         {/* Mobile Actions */}
-        <div className="flex lg:hidden items-center gap-5">
-          <Link href="/cart" className="relative group cursor-pointer text-white/60 hover:text-primary transition-colors" aria-label="Shopping Cart">
+        <div className="flex lg:hidden items-center gap-5 z-[110]">
+          <Link
+            href="/cart"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="relative group cursor-pointer text-white/60 hover:text-primary transition-colors"
+            aria-label="Shopping Cart"
+          >
             <ShoppingBag className="w-5 h-5" aria-hidden="true" />
             <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-primary text-background text-[8px] font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.4)]">
               {cartCount}
@@ -127,53 +179,98 @@ export function Navbar() {
           </Link>
           <Link
             href="/account"
+            onClick={() => setIsMobileMenuOpen(false)}
             className="text-white/60 hover:text-primary transition-colors duration-300 cursor-pointer"
             aria-label="User Account Profile"
           >
             <User className="w-5 h-5" aria-hidden="true" />
           </Link>
+          {/* Hamburger Menu Toggle */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="text-white/60 hover:text-primary transition-colors cursor-pointer"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </nav>
 
-      {/* Mobile Bottom Navigation (only way to navigate on mobile screens now) */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full z-[100] glass-nav h-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] px-4">
-        <div className="grid grid-cols-4 h-[var(--bottom-nav-height)]">
-          {bottomNavLinks.map((link) => {
-            const active = isActive(link.href);
-            return (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="flex flex-col items-center justify-center gap-1.5 cursor-pointer group"
-                aria-label={`Go to ${link.name}`}
-              >
-                <div className="relative">
-                  <link.icon
-                    className={`w-5 h-5 transition-colors duration-300 ${
-                      active ? "text-primary" : "text-white/30 group-hover:text-white/60"
-                    }`}
-                    aria-hidden="true"
+      {/* Mobile Side Drawer Menu (60% width, full height) */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden"
+            />
+            {/* Side Drawer */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "tween", duration: 0.3 }}
+              className="fixed top-0 right-0 h-full w-[60vw] min-w-[240px] max-w-[320px] bg-[#060b18]/95 border-l border-white/[0.08] backdrop-blur-xl z-[95] pt-24 px-6 pb-8 flex flex-col justify-between lg:hidden shadow-[-10px_0_30px_rgba(0,0,0,0.5)]"
+            >
+              <div className="space-y-8">
+                {/* Search Bar for Mobile */}
+                <form onSubmit={handleSearchSubmit} className="relative w-full" role="search">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" aria-hidden="true" />
+                  <input
+                    type="text"
+                    placeholder="Search collection..."
+                    value={searchVal}
+                    onChange={(e) => setSearchVal(e.target.value)}
+                    aria-label="Search collection"
+                    className="w-full bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] rounded-full py-3 pl-11 pr-6 text-sm caps-label text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40"
                   />
-                  {active && (
-                    <motion.div
-                      layoutId="bottom-nav-glow"
-                      className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary shadow-[0_0_8px_rgba(0,240,255,0.8)]"
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                    />
-                  )}
-                </div>
-                <span
-                  className={`text-[8px] font-semibold tracking-widest transition-colors duration-300 ${
-                    active ? "text-primary" : "text-white/30 group-hover:text-white/60"
-                  }`}
-                >
-                  {link.name}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+                </form>
+
+                {/* Navigation Links */}
+                <nav className="flex flex-col gap-5">
+                  {currentMobileLinks.map((link) => {
+                    const active = isActive(link.href);
+                    return (
+                      <Link
+                        key={link.name}
+                        href={link.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`text-xs caps-label tracking-[0.2em] font-semibold py-2 transition-colors duration-300 ${
+                          active ? "text-primary text-glow font-bold" : "text-white/60 hover:text-white"
+                        }`}
+                      >
+                        {link.name}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              {/* Bottom Login/Logout Section */}
+              <div className="pt-6 border-t border-white/[0.06] space-y-4">
+                {isLoggedIn ? (
+                  <button
+                    onClick={handleLogoutClick}
+                    className="w-full py-3.5 bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 font-bold text-[10px] caps-label tracking-widest rounded-xl transition-all duration-300 cursor-pointer"
+                  >
+                    Log Out
+                  </button>
+                ) : (
+                  <Link href="/account" onClick={() => setIsMobileMenuOpen(false)} className="block w-full">
+                    <button className="w-full py-3.5 bg-primary text-background font-bold text-[10px] caps-label tracking-widest rounded-xl hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] transition-all duration-300 cursor-pointer">
+                      Sign In
+                    </button>
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronDown, ArrowRight, SlidersHorizontal, X, RotateCcw, Plus, ShoppingBag, Search } from "lucide-react";
+import { ChevronDown, ArrowRight, SlidersHorizontal, X, RotateCcw, Plus, ShoppingBag, Search, Check } from "lucide-react";
 import Link from "next/link";
 import { ParticleField } from "@/components/ParticleField";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/ScrollReveal";
@@ -19,7 +19,7 @@ const tagColors: Record<string, string> = {
   "LIMITED": "bg-rose-500/20 text-rose-400 border-rose-500/30",
 };
 
-const products = [
+const DEFAULT_PRODUCTS = [
   { id: 1, brand: "JOHNNIE WALKER", name: "Black Label Scotch", price: 5800, tag: "BEST SELLER", img: "/johnnie_walker_black_noir_1778448563770.png", category: "Whisky", volume: "750ml" },
   { id: 2, brand: "GILBEY'S", name: "Special Dry Gin", price: 1795, tag: "POPULAR", img: "/gilbeys_gin_noir_1778448582122.png", category: "Gin", volume: "750ml" },
   { id: 3, brand: "HENNESSY", name: "VS Cognac", price: 6500, tag: "LUXURY", img: "/hennessy_vs_noir_1778448600750.png", category: "Cognac", volume: "750ml" },
@@ -34,12 +34,15 @@ const products = [
 
 export default function Gallery() {
   const { addToCart } = useCart();
+  const [productsList, setProductsList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [selectedVolumes, setSelectedVolumes] = useState<string[]>([]);
   const [toastMessage, setToastMessage] = useState("");
+  const [addedProductIds, setAddedProductIds] = useState<Set<number>>(new Set());
 
   // Mobile drawer state
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
@@ -52,6 +55,22 @@ export default function Gallery() {
         setSearchQuery(q);
       }
     }
+
+    // Fetch products dynamically
+    fetch("/api/admin/products")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch products");
+        return res.json();
+      })
+      .then((data) => {
+        setProductsList(data.filter((p: any) => p.visible));
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load products from API, using defaults:", err);
+        setProductsList(DEFAULT_PRODUCTS);
+        setIsLoading(false);
+      });
   }, []);
 
   const toggleCategory = (cat: string) => {
@@ -74,12 +93,12 @@ export default function Gallery() {
     setSearchQuery("");
   };
 
-  const handleQuickAdd = (product: typeof products[0]) => {
+  const handleQuickAdd = (product: any) => {
     addToCart({
       id: product.id,
       brand: product.brand,
       name: product.name,
-      price: product.price,
+      price: product.discountPrice ? product.discountPrice : product.price,
       img: product.img,
       category: product.category,
       volume: product.volume,
@@ -87,9 +106,18 @@ export default function Gallery() {
     });
     setToastMessage(`Added ${product.name} to Cart`);
     setTimeout(() => setToastMessage(""), 2000);
+    // Mark this product's button green for 2 seconds
+    setAddedProductIds((prev) => new Set(prev).add(product.id));
+    setTimeout(() => {
+      setAddedProductIds((prev) => {
+        const next = new Set(prev);
+        next.delete(product.id);
+        return next;
+      });
+    }, 2000);
   };
 
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = productsList.filter((product) => {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const nameMatch = product.name.toLowerCase().includes(q);
@@ -304,15 +332,22 @@ export default function Gallery() {
                       >
                         {/* Image Frame */}
                         <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden mb-4 bg-black/40 border border-white/[0.04] flex items-center justify-center p-4">
-                          {product.tag && (
-                            <div
-                              className={`absolute top-2.5 left-2.5 z-10 text-[8px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase border backdrop-blur-sm ${
-                                tagColors[product.tag] || "bg-white/10 text-white border-white/20"
-                              }`}
-                            >
-                              {product.tag}
-                            </div>
-                          )}
+                          <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1">
+                            {product.discountPrice && (
+                              <div className="text-[8px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase border backdrop-blur-sm bg-rose-500/20 text-rose-400 border-rose-500/30">
+                                SALE
+                              </div>
+                            )}
+                            {product.tag && (
+                              <div
+                                className={`text-[8px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase border backdrop-blur-sm ${
+                                  tagColors[product.tag] || "bg-white/10 text-white border-white/20"
+                                }`}
+                              >
+                                {product.tag}
+                              </div>
+                            )}
+                          </div>
                           
                           {/* Quantity label badge on product image */}
                           <div className="absolute bottom-2.5 right-2.5 z-10 text-[8px] font-bold px-2 py-0.5 rounded bg-black/60 border border-white/[0.1] text-text-muted">
@@ -343,10 +378,21 @@ export default function Gallery() {
                           <h3 className="text-sm md:text-base font-serif font-bold text-white group-hover:text-primary transition-colors tracking-tight leading-tight truncate">
                             {product.name}
                           </h3>
-                          <div className="flex justify-between items-center pt-1">
-                            <p className="text-primary font-bold tracking-wider text-[12px] md:text-sm text-glow">
-                              KES {product.price.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </p>
+                          <div className="flex flex-wrap items-baseline gap-2 pt-1">
+                            {product.discountPrice ? (
+                              <>
+                                <span className="text-primary font-bold tracking-wider text-[12px] md:text-sm text-glow">
+                                  KES {product.discountPrice.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </span>
+                                <span className="text-white/30 line-through text-[10px] md:text-[11px] font-medium ml-1">
+                                  KES {product.price.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-primary font-bold tracking-wider text-[12px] md:text-sm text-glow">
+                                KES {product.price.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </Link>
@@ -358,10 +404,18 @@ export default function Gallery() {
                           e.stopPropagation();
                           handleQuickAdd(product);
                         }}
-                        className="w-full mt-2 py-2.5 bg-primary/10 hover:bg-primary border border-primary/20 hover:border-primary text-primary hover:text-background font-bold text-[9px] caps-label tracking-widest rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        disabled={addedProductIds.has(product.id)}
+                        className={`w-full mt-2 py-3 font-bold text-[9px] caps-label tracking-widest rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-[44px] ${
+                          addedProductIds.has(product.id)
+                            ? "bg-emerald-600 border border-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                            : "bg-primary/10 hover:bg-primary border border-primary/20 hover:border-primary text-primary hover:text-background"
+                        }`}
                       >
-                        <ShoppingBag className="w-3.5 h-3.5" />
-                        ADD TO CART
+                        {addedProductIds.has(product.id) ? (
+                          <><Check className="w-3.5 h-3.5" /> ADDED TO CART</>
+                        ) : (
+                          <><ShoppingBag className="w-3.5 h-3.5" /> ADD TO CART</>
+                        )}
                       </button>
                     </div>
                   </StaggerItem>

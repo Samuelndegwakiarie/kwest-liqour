@@ -1,14 +1,14 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronLeft, Plus, Minus, ShoppingBag, ShieldCheck, ArrowRight, Sparkles } from "lucide-react";
+import { ChevronLeft, Plus, Minus, ShoppingBag, ShieldCheck, ArrowRight, Sparkles, Check } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useCart } from "@/context/CartContext";
 import { ParticleField } from "@/components/ParticleField";
 import { GlassCard } from "@/components/GlassCard";
 
-const products = [
+const DEFAULT_PRODUCTS = [
   { id: 1, brand: "JOHNNIE WALKER", name: "Black Label Scotch", price: 5800, tag: "BEST SELLER", img: "/johnnie_walker_black_noir_1778448563770.png", category: "Whisky", volume: "750ml", desc: "A classic blended Scotch whisky, aged for 12 years. Johnnie Walker Black Label is renowned for its smooth, deep, and complex character, featuring hints of dark fruits, sweet vanilla, and signature smoky undertones. Excellent neat, on the rocks, or in a highball." },
   { id: 2, brand: "GILBEY'S", name: "Special Dry Gin", price: 1795, tag: "POPULAR", img: "/gilbeys_gin_noir_1778448582122.png", category: "Gin", volume: "750ml", desc: "Gilbey's Special Dry Gin is a traditional London Dry style gin. It features a clean, juniper-forward profile with crisp citrus notes and a subtle botanical spice finish. Perfect for classic gin and tonics or refreshing summer cocktails." },
   { id: 3, brand: "HENNESSY", name: "VS Cognac", price: 6500, tag: "LUXURY", img: "/hennessy_vs_noir_1778448600750.png", category: "Cognac", volume: "750ml", desc: "Hennessy Very Special (V.S) is one of the most popular cognacs in the world. Matured in new oak casks, Hennessy V.S is bold and fragrant. Its signature character is a dry fruit sweetness blended with toasted almond, oak wood, and delicate grape notes." },
@@ -36,11 +36,38 @@ interface Params {
 export default function ProductDetailPage({ params }: { params: Promise<Params> }) {
   const resolvedParams = use(params);
   const productId = parseInt(resolvedParams.id);
-  const product = products.find((p) => p.id === productId);
-
+  const [product, setProduct] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [toastMessage, setToastMessage] = useState("");
+  const [isAdded, setIsAdded] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/admin/products/${productId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Product not found");
+        return res.json();
+      })
+      .then((data) => {
+        setProduct(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("API loading product error:", err);
+        const fallback = DEFAULT_PRODUCTS.find((p) => p.id === productId);
+        setProduct(fallback || null);
+        setLoading(false);
+      });
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <main className="bg-background min-h-screen flex items-center justify-center p-6">
+        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </main>
+    );
+  }
 
   if (!product) {
     return (
@@ -65,7 +92,7 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
       id: product.id,
       brand: product.brand,
       name: product.name,
-      price: product.price,
+      price: product.discountPrice ? product.discountPrice : product.price,
       img: product.img,
       category: product.category,
       volume: product.volume,
@@ -73,6 +100,9 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
     }, quantity);
     setToastMessage(`Added ${quantity}x ${product.name} to Cart`);
     setTimeout(() => setToastMessage(""), 2000);
+    // Green feedback for 2 seconds
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 2000);
   };
 
   return (
@@ -136,15 +166,28 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
               <h1 className="text-4xl lg:text-5xl font-serif font-bold text-white tracking-tight leading-tight">
                 {product.name}
               </h1>
-              <p className="text-2xl font-bold text-primary font-serif text-glow mt-2">
-                KES {product.price.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
+              <div className="flex flex-wrap items-baseline gap-3 mt-2">
+                {product.discountPrice ? (
+                  <>
+                    <span className="text-2xl font-bold text-primary font-serif text-glow">
+                      KES {product.discountPrice.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-white/30 line-through text-sm font-medium">
+                      KES {product.price.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </>
+                ) : (
+                  <p className="text-2xl font-bold text-primary font-serif text-glow">
+                    KES {product.price.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-4">
               <h3 className="text-[9px] caps-label text-text-muted tracking-widest">Bottle Description</h3>
               <p className="text-text-muted text-sm leading-relaxed max-w-lg">
-                {product.desc}
+                {product.description || product.desc}
               </p>
             </div>
 
@@ -175,10 +218,18 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
                 {/* Add Button */}
                 <button
                   onClick={handleAdd}
-                  className="flex-1 w-full py-4 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_35px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2 group"
+                  disabled={isAdded}
+                  className={`flex-1 w-full py-4 font-bold text-xs caps-label tracking-widest rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 group min-h-[44px] ${
+                    isAdded
+                      ? "bg-emerald-600 text-white shadow-[0_0_35px_rgba(16,185,129,0.4)]"
+                      : "bg-primary text-background hover:shadow-[0_0_35px_rgba(0,240,255,0.4)]"
+                  }`}
                 >
-                  Add To Cellar
-                  <ShoppingBag className="w-4 h-4" />
+                  {isAdded ? (
+                    <><Check className="w-4 h-4" /> ADDED TO CART</>
+                  ) : (
+                    <>Add To Cellar <ShoppingBag className="w-4 h-4" /></>
+                  )}
                 </button>
               </div>
 

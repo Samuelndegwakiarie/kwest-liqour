@@ -574,25 +574,25 @@ export default function CommandCenterPage() {
     <div className="space-y-8 pb-10">
       {/* ── PAGE HEADER ──────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
+      <div>
           <div className="flex items-center gap-2 mb-1">
             <Activity className="w-4 h-4 text-[#d4af37]" />
             <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">
               Admin Dashboard
             </span>
           </div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight">
             Command Center
           </h1>
-          <div className="flex items-center gap-2 mt-1.5">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1.5">
             <Calendar className="w-3 h-3 text-white/30" />
             <span className="text-xs text-white/35">{formattedDate}</span>
-            <span className="text-white/20">·</span>
+            <span className="text-white/20 hidden sm:inline">·</span>
             <span className="text-xs text-[#d4af37]/60 font-mono">{formattedTime}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => fetchData(true)}
             disabled={refreshing}
@@ -892,76 +892,113 @@ export default function CommandCenterPage() {
             <p className="text-white/20 text-sm">No sales for this period</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px]">
-              <thead>
-                <tr className="border-b border-white/[0.04]">
-                  {[
-                    "Order ID",
-                    "Product",
-                    "Customer",
-                    "Amount",
-                    "Date",
-                    "Status",
-                  ].map((col) => (
-                    <th
-                      key={col}
-                      className="px-6 py-3 text-left text-[9px] uppercase tracking-widest text-white/25 font-semibold"
-                    >
-                      {col}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredSales.map((sale, i) => (
-                  <tr
-                    key={sale.id}
-                    className={`border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors ${
-                      i % 2 !== 0 ? "bg-white/[0.01]" : ""
-                    }`}
-                  >
-                    <td className="px-6 py-4">
-                      <span className="font-mono text-[#d4af37] text-xs font-bold tracking-wider">
-                        {sale.id}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-white/80 font-medium">
-                        {sale.product}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-white/50">{sale.customer}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-white font-semibold">
-                        {formatKES(sale.amount)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-xs text-white/35">
-                        {new Date(sale.date).toLocaleDateString("en-KE", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold border ${getStatusStyle(
-                          sale.status
-                        )}`}
+          <>
+            {/* ── Desktop Table (sm and above) ── */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full min-w-[640px]">
+                <thead>
+                  <tr className="border-b border-white/[0.04]">
+                    {[
+                      "Order ID",
+                      "Product",
+                      "Customer",
+                      "Amount",
+                      "Date",
+                      "Status",
+                    ].map((col) => (
+                      <th
+                        key={col}
+                        className="px-6 py-3 text-left text-[9px] uppercase tracking-widest text-white/25 font-semibold"
                       >
-                        {sale.status}
-                      </span>
-                    </td>
+                        {col}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filteredSales.map((sale, i) => (
+                    <tr
+                      key={sale.id}
+                      className={`border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors ${
+                        i % 2 !== 0 ? "bg-white/[0.01]" : ""
+                      }`}
+                    >
+                      <td className="px-6 py-4">
+                        <span className="font-mono text-[#d4af37] text-xs font-bold tracking-wider">
+                          {sale.id}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-white/80 font-medium">
+                          {sale.product}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-white/50">{sale.customer}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-white font-semibold">
+                          {formatKES(sale.amount)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-xs text-white/35">
+                          {new Date(sale.date).toLocaleDateString("en-KE", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold border ${getStatusStyle(
+                            sale.status
+                          )}`}
+                        >
+                          {sale.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ── Mobile Card List (below sm) ── */}
+            <div className="sm:hidden divide-y divide-white/[0.04]">
+              {filteredSales.map((sale) => (
+                <div key={sale.id} className="p-4 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-[#d4af37] text-xs font-bold tracking-wider">
+                      {sale.id}
+                    </span>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold border ${getStatusStyle(
+                        sale.status
+                      )}`}
+                    >
+                      {sale.status}
+                    </span>
+                  </div>
+                  <div className="text-sm text-white/80 font-medium">{sale.product}</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-white/45">{sale.customer}</span>
+                    <span className="text-sm text-white font-semibold">
+                      {formatKES(sale.amount)}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-white/30">
+                    {new Date(sale.date).toLocaleDateString("en-KE", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
 
         {/* Table Footer */}

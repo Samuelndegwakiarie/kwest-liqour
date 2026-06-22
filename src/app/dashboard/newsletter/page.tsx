@@ -36,12 +36,12 @@ export default function NewsletterPage() {
 
   return (
     <div className="space-y-8 max-w-4xl">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Newsletter</h1>
           <p className="text-white/40 text-xs uppercase tracking-widest mt-1">{subscribers.length} subscribers</p>
         </div>
-        <button onClick={handleExport} className="flex items-center gap-2 border border-white/[0.08] text-white/60 hover:text-white hover:border-white/20 text-sm px-4 py-2.5 rounded-xl transition-all cursor-pointer">
+        <button onClick={handleExport} className="w-full sm:w-auto flex items-center justify-center gap-2 border border-white/[0.08] text-white/60 hover:text-white hover:border-white/20 text-sm px-4 py-2.5 rounded-xl transition-all cursor-pointer">
           <Download className="w-4 h-4" /> Export CSV
         </button>
       </div>
@@ -54,36 +54,64 @@ export default function NewsletterPage() {
           </div>
         </div>
 
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-white/[0.06]">
-              {["Name", "Email", "Subscribed", ""].map(h => (
-                <th key={h} className="px-6 py-3 text-left text-[9px] uppercase tracking-widest text-white/30 font-semibold">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/[0.04]">
-            {filtered.map(s => (
-              <tr key={s.id} className="hover:bg-white/[0.02] transition-colors">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center">
-                      <Mail className="w-3.5 h-3.5 text-[#d4af37]" />
-                    </div>
-                    <span className="text-white text-sm font-medium">{s.name}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-white/60 text-sm">{s.email}</td>
-                <td className="px-6 py-4 text-white/40 text-xs">{s.date}</td>
-                <td className="px-6 py-4 text-right">
-                  <button onClick={() => handleDelete(s.id)} className="text-white/20 hover:text-red-400 transition-colors cursor-pointer">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </td>
+        {/* Desktop Table View */}
+        <div className="hidden md:block">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/[0.06]">
+                {["Name", "Email", "Subscribed", ""].map(h => (
+                  <th key={h} className="px-6 py-3 text-left text-[9px] uppercase tracking-widest text-white/30 font-semibold">{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-white/[0.04]">
+              {filtered.map(s => (
+                <tr key={s.id} className="hover:bg-white/[0.02] transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center">
+                        <Mail className="w-3.5 h-3.5 text-[#d4af37]" />
+                      </div>
+                      <span className="text-white text-sm font-medium">{s.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-white/60 text-sm">{s.email}</td>
+                  <td className="px-6 py-4 text-white/40 text-xs">{s.date}</td>
+                  <td className="px-6 py-4 text-right">
+                    <button onClick={() => handleDelete(s.id)} className="text-white/20 hover:text-red-400 transition-colors cursor-pointer">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Cards View */}
+        <div className="md:hidden divide-y divide-white/[0.04]">
+          {filtered.map(s => (
+            <div key={s.id} className="p-4 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center shrink-0">
+                    <Mail className="w-3.5 h-3.5 text-[#d4af37]" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-white text-sm font-medium block truncate">{s.name}</span>
+                    <span className="text-white/40 text-xs block">{s.date}</span>
+                  </div>
+                </div>
+                <button onClick={() => handleDelete(s.id)} className="text-white/20 hover:text-red-400 transition-colors cursor-pointer p-1 shrink-0">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="text-white/60 text-sm break-all pl-11">
+                {s.email}
+              </div>
+            </div>
+          ))}
+        </div>
 
         {filtered.length === 0 && (
           <div className="text-center py-12 text-white/20">

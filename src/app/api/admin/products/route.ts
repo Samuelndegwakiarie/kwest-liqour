@@ -13,12 +13,14 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { brand, name, price, tag, img, category, volume, stock, visible, description } = body;
+    const { brand, name, price, discountPrice, tag, img, category, volume, stock, visible, description } = body;
     if (!brand || !name || !price || !category || !volume) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
     const product = await createProduct({
-      brand, name, price: Number(price), tag: tag || null,
+      brand, name, price: Number(price),
+      discountPrice: discountPrice ? Number(discountPrice) : null,
+      tag: tag || null,
       img: img || "/placeholder.png", category, volume,
       stock: Number(stock) || 0, visible: visible !== false,
       description: description || "",

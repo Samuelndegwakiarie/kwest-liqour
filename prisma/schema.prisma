@@ -1,0 +1,109 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Product {
+  id            Int          @id @default(autoincrement())
+  brand         String
+  name          String
+  price         Float
+  discountPrice Float?
+  tag           String?
+  img           String
+  category      String
+  volume        String
+  stock         Int
+  visible       Boolean      @default(true)
+  description   String
+  createdAt     DateTime     @default(now())
+}
+
+model Order {
+  id            String       @id
+  customer      String
+  email         String
+  phone         String
+  total         Float
+  delivery      String
+  address       String?
+  status        String       @default("Pending")
+  date          DateTime     @default(now())
+  mpesaPhone    String?
+  mpesaReceipt  String?
+  mpesaAmount   Float?
+  mpesaStatus   String?
+  mpesaTimestamp String?
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  name      String
+  brand     String
+  price     Float
+  quantity  Int
+  volume    String
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model PromoBanner {
+  id             Int      @id @default(autoincrement())
+  title          String
+  description    String
+  img            String
+  discountAmount Float
+  price          Float
+  active         Boolean  @default(true)
+  color          String   @default("#d4af37")
+  endsAt         String?
+  createdAt      DateTime @default(now())
+}
+
+model HeroImage {
+  id        Int      @id @default(autoincrement())
+  page      String
+  key       String
+  url       String
+  alt       String
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  count     Int      @default(0)
+  visible   Boolean  @default(true)
+}
+
+model NewsletterSubscriber {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  date      DateTime @default(now())
+}
+
+model SystemSetting {
+  key       String   @id
+  value     String
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  type      String
+  message   String
+  date      DateTime @default(now())
+  read      Boolean  @default(false)
+}
+
+model CalendarEvent {
+  id        Int      @id @default(autoincrement())
+  title     String
+  date      String
+  type      String
+}

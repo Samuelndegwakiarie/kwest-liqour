@@ -356,7 +356,8 @@ export default function OrdersPage() {
 
       {/* Table */}
       <div className="bg-[#0d0d0d] border border-white/[0.06] rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* ── Desktop Table (sm and above) ── */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full min-w-[940px]">
             <thead>
               <tr className="border-b border-white/[0.06]">
@@ -535,6 +536,119 @@ export default function OrdersPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* ── Mobile Card List (below sm) ── */}
+        <div className="sm:hidden">
+          {loading ? (
+            <div className="divide-y divide-white/[0.04]">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="p-4 space-y-3">
+                  <div className="h-4 bg-white/[0.06] rounded-lg animate-pulse w-2/5" />
+                  <div className="h-3 bg-white/[0.06] rounded-lg animate-pulse w-3/4" />
+                  <div className="h-3 bg-white/[0.06] rounded-lg animate-pulse w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="py-20 flex flex-col items-center gap-4 text-center px-6">
+              <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
+                <Package className="w-7 h-7 text-white/20" />
+              </div>
+              <p className="text-white/50 font-semibold">No orders found</p>
+              <p className="text-white/25 text-xs">
+                {search.trim() !== "" || statusFilter !== "all"
+                  ? "Try adjusting your search or filter criteria"
+                  : "Orders will appear here once customers place them"}
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-white/[0.04]">
+              {filtered.map((order) => {
+                const itemsSummary =
+                  order.items.length === 1
+                    ? `${order.items[0].name} ×${order.items[0].quantity}`
+                    : `${order.items[0].name} +${order.items.length - 1} more`;
+                const isUpdating = updatingId === order.id;
+
+                return (
+                  <div key={order.id} className="p-4 space-y-3">
+                    {/* Row 1: ID + Status */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-[#d4af37] text-sm font-bold tracking-wider">
+                        #{order.id.slice(0, 8).toUpperCase()}
+                      </span>
+                      <StatusBadge status={order.status} />
+                    </div>
+
+                    {/* Row 2: Customer */}
+                    <div>
+                      <div className="text-white text-sm font-medium">{order.customer}</div>
+                      <div className="text-white/35 text-xs mt-0.5">{order.phone}</div>
+                    </div>
+
+                    {/* Row 3: Items + Total */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-white/60 text-xs truncate flex-1">{itemsSummary}</span>
+                      <span className="text-white font-semibold text-sm whitespace-nowrap">
+                        KES {order.total.toLocaleString()}
+                      </span>
+                    </div>
+
+                    {/* Row 4: Delivery + Date */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className={`text-xs font-medium px-2 py-0.5 rounded-lg border ${
+                          order.delivery === "pickup"
+                            ? "text-purple-400 bg-purple-400/10 border-purple-400/20"
+                            : "text-sky-400 bg-sky-400/10 border-sky-400/20"
+                        }`}
+                      >
+                        {order.delivery === "pickup" ? "Pickup" : "Delivery"}
+                      </span>
+                      <span className="text-white/35 text-xs">
+                        {new Date(order.date).toLocaleDateString("en-KE", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+
+                    {/* Row 5: Actions */}
+                    <div className="flex items-center gap-2 pt-1">
+                      <div className="relative flex-1">
+                        <select
+                          value={order.status}
+                          disabled={isUpdating}
+                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                          className="w-full appearance-none bg-white/[0.04] border border-white/[0.08] rounded-lg pl-3 pr-8 py-2 text-white/60 text-xs focus:outline-none focus:border-[#d4af37]/50 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          {ORDER_STATUSES.map((s) => (
+                            <option key={s} value={s} className="bg-[#0d0d0d] text-white">{s}</option>
+                          ))}
+                        </select>
+                        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                          {isUpdating ? (
+                            <RefreshCw className="w-3 h-3 text-[#d4af37] animate-spin" />
+                          ) : (
+                            <ChevronDown className="w-3 h-3 text-white/30" />
+                          )}
+                        </div>
+                      </div>
+                      <Link
+                        href={`/dashboard/orders/${order.id}`}
+                        className="flex items-center gap-1.5 text-[#d4af37]/60 hover:text-[#d4af37] border border-[#d4af37]/20 hover:border-[#d4af37]/50 bg-[#d4af37]/[0.03] hover:bg-[#d4af37]/[0.08] rounded-lg px-3 py-2 text-xs transition-all duration-200 whitespace-nowrap min-h-[36px]"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        View
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Table Footer */}

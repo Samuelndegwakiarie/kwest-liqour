@@ -156,7 +156,7 @@ export default function CategoriesPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-[#0d0d0d] border border-white/[0.06] rounded-2xl p-5">
           <p className="text-white/30 text-[10px] uppercase tracking-widest mb-2">
             Total Categories

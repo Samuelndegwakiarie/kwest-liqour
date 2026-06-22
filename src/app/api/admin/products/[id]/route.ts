@@ -1,5 +1,16 @@
 import { NextResponse } from "next/server";
-import { updateProduct, deleteProduct } from "@/lib/db";
+import { getProductById, updateProduct, deleteProduct } from "@/lib/db";
+
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const product = await getProductById(Number(id));
+    if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    return NextResponse.json(product);
+  } catch {
+    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
+  }
+}
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

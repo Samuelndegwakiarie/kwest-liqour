@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +11,19 @@ import { GlassCard } from "@/components/GlassCard";
 export default function Heritage() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [images, setImages] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/admin/hero-images")
+      .then(r => r.json())
+      .then(data => setImages(data))
+      .catch(err => console.error("Error loading card images:", err));
+  }, []);
+
+  const getImageUrl = (key: string, fallback: string) => {
+    const match = images.find(x => x.page === "about" && x.key === key);
+    return match ? match.url : fallback;
+  };
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,6 +31,7 @@ export default function Heritage() {
     setSubscribed(true);
     setEmail("");
   };
+
   return (
     <main className="bg-background min-h-screen pb-[var(--bottom-nav-height)] lg:pb-0">
       {/* ═══ Hero ═══ */}
@@ -81,10 +95,10 @@ export default function Heritage() {
           </ScrollReveal>
 
           <ScrollReveal direction="scale">
-            <div className="aspect-[4/5] relative overflow-hidden rounded-2xl border border-white/[0.06]">
+            <div className="aspect-[4/5] relative overflow-hidden rounded-2xl border border-white/[0.06] flex items-center justify-center p-4 bg-black/20">
               <img
-                src="/story_bottle_noir.png"
-                className="w-full h-full object-cover"
+                src={getImageUrl("story_bottle", "/story_bottle_noir.png")}
+                className="h-[90%] object-contain"
                 alt="Story Bottle"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent" />
@@ -139,17 +153,17 @@ export default function Heritage() {
               {
                 title: "Cultural Anchor",
                 desc: "Defining Nairobi's new standard for luxury spirits.",
-                img: "/nairobi_culture_noir_vision_1778448735584.png",
+                img: getImageUrl("cultural_anchor", "/nairobi_culture_noir_vision_1778448735584.png"),
               },
               {
                 title: "Unrivaled Access",
                 desc: "Allocations reserved for the discerning few.",
-                img: "/private_vault_noir_vision_1778448756948.png",
+                img: getImageUrl("unrivaled_access", "/private_vault_noir_vision_1778448756948.png"),
               },
               {
                 title: "Education & Legacy",
                 desc: "Tasting masterclasses and heritage experiences.",
-                img: "/education_legacy_noir_vision.png",
+                img: getImageUrl("education_legacy", "/education_legacy_noir_vision.png"),
               },
             ].map((item) => (
               <StaggerItem key={item.title}>
@@ -162,10 +176,10 @@ export default function Heritage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
                     <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                      <h3 className="text-2xl font-serif font-bold text-primary mb-2 tracking-tight">
+                      <h3 className="text-2xl font-serif font-bold text-primary mb-2 tracking-tight text-left">
                         {item.title}
                       </h3>
-                      <p className="text-text-muted text-sm">{item.desc}</p>
+                      <p className="text-text-muted text-sm text-left">{item.desc}</p>
                     </div>
                   </div>
                 </GlassCard>
@@ -190,12 +204,12 @@ export default function Heritage() {
               <AnimatePresence mode="wait">
                 {!subscribed ? (
                   <motion.form
-                    key="about-subscribe-form"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    onSubmit={handleSubscribe}
-                    className="flex flex-col gap-4"
+                     key="about-subscribe-form"
+                     initial={{ opacity: 0 }}
+                     animate={{ opacity: 1 }}
+                     exit={{ opacity: 0 }}
+                     onSubmit={handleSubscribe}
+                     className="flex flex-col gap-4"
                   >
                     <input
                       type="email"

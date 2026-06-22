@@ -160,8 +160,33 @@ export default function CheckoutPage() {
 
     // Start checkout processing animation flow
     setIsSubmitting(true);
-    setOrderRef(`KW-${Math.floor(1000 + Math.random() * 9000)}-2026`);
+    const mockId = `KW-${Math.floor(1000 + Math.random() * 9000)}-2026`;
+    setOrderRef(mockId);
     setPurchasedItems(cart.map((item) => `${item.brand} ${item.name}`));
+
+    const orderData = {
+      id: mockId,
+      customer: fullName,
+      email: email || "customer@kwest.com",
+      phone: phone,
+      total: total,
+      delivery: deliveryMethod === "shop" ? "Pick at Shop" : "Rider",
+      address: deliveryMethod === "shop" ? null : address,
+      status: "Pending",
+      mpesaPhone: mpesaPhone || null,
+      mpesaReceipt: `MP-${Math.floor(100000 + Math.random() * 900000)}`,
+      mpesaAmount: total,
+      mpesaStatus: "SUCCESS",
+      mpesaTimestamp: new Date().toISOString(),
+      items: cart.map((item) => ({
+        productId: item.id,
+        name: item.name,
+        brand: item.brand,
+        price: item.price,
+        quantity: item.quantity,
+        volume: item.volume || "750ml"
+      }))
+    };
 
     if (paymentOption === "mpesa") {
       setSubmitStep("stk");
@@ -172,7 +197,20 @@ export default function CheckoutPage() {
         setTimeout(() => {
           setSubmitStep("verify");
           // Simulate verification (takes 1.5s)
-          setTimeout(() => {
+          setTimeout(async () => {
+            try {
+              const res = await fetch("/api/admin/orders", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(orderData),
+              });
+              if (res.ok) {
+                const created = await res.json();
+                setOrderRef(created.id);
+              }
+            } catch (err) {
+              console.error("Order creation failed:", err);
+            }
             setSubmitStep("success");
             setIsSubmitting(false);
           }, 1500);
@@ -180,7 +218,20 @@ export default function CheckoutPage() {
       }, 2000);
     } else {
       // Direct success if payment is bypass/mock
-      setTimeout(() => {
+      setTimeout(async () => {
+        try {
+          const res = await fetch("/api/admin/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(orderData),
+          });
+          if (res.ok) {
+            const created = await res.json();
+            setOrderRef(created.id);
+          }
+        } catch (err) {
+          console.error("Order creation failed:", err);
+        }
         setSubmitStep("success");
         setIsSubmitting(false);
       }, 2000);

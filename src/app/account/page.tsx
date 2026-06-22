@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   User as UserIcon,
   Mail,
@@ -25,6 +26,7 @@ import { ParticleField } from "@/components/ParticleField";
 import { GlassCard } from "@/components/GlassCard";
 
 export default function AccountPage() {
+  const router = useRouter();
   const [formMode, setFormMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,6 +61,31 @@ export default function AccountPage() {
     ],
   });
 
+  useEffect(() => {
+    const adminSession = sessionStorage.getItem("kwest_admin") === "authenticated";
+    const userSession = localStorage.getItem("kwest_user");
+    if (adminSession) {
+      setIsLoggedIn(true);
+      setCurrentUser({
+        name: "Vault Manager",
+        email: "admin@kwestliquor.co.ke",
+        tier: "Grand Cellar Administrator",
+        memberNo: "ADMIN-0001",
+        joinedDate: "January 2026",
+        allocations: [],
+        invitations: []
+      });
+    } else if (userSession) {
+      try {
+        const parsed = JSON.parse(userSession);
+        setCurrentUser(parsed);
+        setIsLoggedIn(true);
+      } catch {
+        setIsLoggedIn(true);
+      }
+    }
+  }, []);
+
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formMode === "signup") {
@@ -77,17 +104,43 @@ export default function AccountPage() {
     // Simulate Network Request
     setTimeout(() => {
       setIsLoading(false);
-      if (formMode === "signin" || formMode === "signup") {
-        if (formMode === "signup") {
-          setCurrentUser((prev) => ({
-            ...prev,
-            name: fullName || "Noble Guest",
-            email: email || "guest@kwestcircle.com",
-            tier: "Amber Private Reserve",
-            memberNo: `KWC-2026-${Math.floor(1000 + Math.random() * 9000)}`,
-            joinedDate: "May 2026",
-          }));
+      if (formMode === "signin") {
+        if (email === "admin@kwestliquor.co.ke" && password === "kwest2026") {
+          sessionStorage.setItem("kwest_admin", "authenticated");
+          setIsLoggedIn(true);
+          router.push("/dashboard");
+          return;
         }
+
+        const loggedUser = {
+          name: "Sir Samuel Ndegwa",
+          email: email || "samuel.ndegwa@kwestcircle.com",
+          tier: "Platinum Curation Circle",
+          memberNo: "KWC-2026-9812",
+          joinedDate: "October 2025",
+          allocations: [
+            { name: "Macallan Sherry Oak 18 Years", status: "Allocated", qty: 1 },
+            { name: "Clase Azul Reposado Tequila", status: "Cellar Dispatch", qty: 2 },
+          ],
+          invitations: [
+            { event: "Private Tasting: Rare Islay Malts", date: "June 15, 2026", location: "Nairobi Flagship Vault" },
+          ],
+        };
+        localStorage.setItem("kwest_user", JSON.stringify(loggedUser));
+        setCurrentUser(loggedUser);
+        setIsLoggedIn(true);
+      } else if (formMode === "signup") {
+        const newUser = {
+          name: fullName || "Noble Guest",
+          email: email || "guest@kwestcircle.com",
+          tier: "Amber Private Reserve",
+          memberNo: `KWC-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+          joinedDate: "May 2026",
+          allocations: [],
+          invitations: []
+        };
+        localStorage.setItem("kwest_user", JSON.stringify(newUser));
+        setCurrentUser(newUser);
         setIsLoggedIn(true);
       } else if (formMode === "forgot") {
         alert("A luxury reset link has been dispatched to your email address.");
@@ -97,11 +150,14 @@ export default function AccountPage() {
   };
 
   const handleLogout = () => {
+    sessionStorage.removeItem("kwest_admin");
+    localStorage.removeItem("kwest_user");
     setIsLoggedIn(false);
     setEmail("");
     setPassword("");
     setConfirmPassword("");
     setFullName("");
+    router.push("/");
   };
 
   return (

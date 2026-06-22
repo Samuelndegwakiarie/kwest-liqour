@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Tag, Settings,
-  Megaphone, Image, Timer, Mail, Calendar, Bell,
+  Megaphone, Image, Mail, Calendar, Bell,
   LogOut, Menu, X, ChevronRight, Shield, AlertTriangle,
 } from "lucide-react";
 
@@ -16,7 +16,6 @@ const NAV_ITEMS = [
   { label: "Categories", href: "/dashboard/categories", icon: Tag },
   { label: "Promo Banners", href: "/dashboard/promo-banners", icon: Megaphone },
   { label: "Hero Images", href: "/dashboard/hero-images", icon: Image },
-  { label: "Countdown Timers", href: "/dashboard/countdown-timers", icon: Timer },
   { label: "Newsletter", href: "/dashboard/newsletter", icon: Mail },
   { label: "Calendar", href: "/dashboard/calendar", icon: Calendar },
   { label: "Alerts", href: "/dashboard/notifications", icon: Bell },
@@ -41,6 +40,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
     setIsChecking(false);
   }, []);
+
+  // Lock scroll when mobile menu is open
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sidebarOpen]);
 
   const handleLogin = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,7 +166,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 h-full w-64 bg-[#0d0d0d] border-r border-white/[0.06] z-50 flex flex-col transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside className={`fixed top-0 left-0 h-full w-[60vw] min-w-[240px] max-w-[300px] lg:w-64 bg-[#0d0d0d] border-r border-white/[0.06] z-50 flex flex-col transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         {/* Sidebar Header */}
         <div className="p-6 border-b border-white/[0.06] flex items-center justify-between">
           <div>
@@ -195,14 +206,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Sidebar Footer */}
         <div className="p-4 border-t border-white/[0.06] space-y-3">
-          <Link href="/products" target="_blank" className="flex items-center gap-2 px-3 py-2 text-white/30 hover:text-white/60 text-xs transition-colors rounded-lg hover:bg-white/[0.03]">
-            <span>View Store →</span>
+          <Link
+            href="/"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#d4af37] hover:bg-[#b8960c] text-[#080808] font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all duration-300 cursor-pointer shadow-[0_0_15px_rgba(212,175,55,0.1)] hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+          >
+            <span>View Store</span>
           </Link>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all duration-300 cursor-pointer"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
             <span>Log Out</span>
           </button>
         </div>
