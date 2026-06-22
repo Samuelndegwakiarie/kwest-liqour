@@ -517,9 +517,9 @@ export default function TrackOrdersPage() {
                                       {/* Steps */}
                                       <div className="absolute inset-0 flex justify-between items-center -top-2">
                                         {[
-                                          { label: "Cellar Release", icon: Clock },
-                                          { label: "Rider Dispatch", icon: Bike },
-                                          { label: "Vault Secured", icon: ShieldCheck },
+                                          { label: "Processing", icon: Clock },
+                                          { label: "En Route", icon: Bike },
+                                          { label: "Delivered", icon: ShieldCheck },
                                         ].map((step, idx) => {
                                           const reached = idx <= activeStep;
                                           const active = idx === activeStep;
@@ -537,7 +537,7 @@ export default function TrackOrdersPage() {
                                                 <step.icon className="w-3.5 h-3.5 stroke-[2.5]" />
                                               </div>
                                               <span
-                                                className={`text-[9px] font-bold caps-label tracking-widest mt-2 transition-colors ${
+                                                className={`text-[9px] font-bold caps-label tracking-widest mt-3 transition-colors ${
                                                   reached ? "text-white" : "text-text-subtle"
                                                 }`}
                                               >
