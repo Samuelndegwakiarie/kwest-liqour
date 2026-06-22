@@ -168,25 +168,29 @@ export function Navbar() {
 
         {/* Mobile Actions */}
         <div className="flex lg:hidden items-center gap-5 z-[110]">
-          <Link
-            href="/cart"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="relative group cursor-pointer text-white/60 hover:text-primary transition-colors"
-            aria-label="Shopping Cart"
-          >
-            <ShoppingBag className="w-5 h-5" aria-hidden="true" />
-            <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-primary text-background text-[8px] font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.4)]">
-              {cartCount}
-            </span>
-          </Link>
-          <Link
-            href="/account"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="text-white/60 hover:text-primary transition-colors duration-300 cursor-pointer"
-            aria-label="User Account Profile"
-          >
-            <User className="w-5 h-5" aria-hidden="true" />
-          </Link>
+          {!isMobileMenuOpen && (
+            <>
+              <Link
+                href="/cart"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="relative group cursor-pointer text-white/60 hover:text-primary transition-colors"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingBag className="w-5 h-5" aria-hidden="true" />
+                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-primary text-background text-[8px] font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.4)]">
+                  {cartCount}
+                </span>
+              </Link>
+              <Link
+                href="/account"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-white/60 hover:text-primary transition-colors duration-300 cursor-pointer"
+                aria-label="User Account Profile"
+              >
+                <User className="w-5 h-5" aria-hidden="true" />
+              </Link>
+            </>
+          )}
           {/* Hamburger Menu Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -220,7 +224,7 @@ export function Navbar() {
             >
               <div className="space-y-6">
                 {/* KWEST logo at top of drawer */}
-                <div className="pb-4 border-b border-white/[0.06]">
+                <div className="pb-4 border-b border-white/[0.06] flex flex-col gap-4">
                   <Link
                     href="/"
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -228,6 +232,30 @@ export function Navbar() {
                   >
                     KWEST
                   </Link>
+                  {/* Cart and Account icons below KWEST logo */}
+                  <div className="flex items-center gap-6 mt-1">
+                    <Link
+                      href="/cart"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="relative group cursor-pointer text-white/60 hover:text-primary transition-colors flex items-center gap-2"
+                      aria-label="Shopping Cart"
+                    >
+                      <ShoppingBag className="w-4 h-4" aria-hidden="true" />
+                      <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-primary text-background text-[7px] font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.4)]">
+                        {cartCount}
+                      </span>
+                      <span className="text-[10px] caps-label tracking-widest text-white/40 group-hover:text-primary transition-colors">Cart</span>
+                    </Link>
+                    <Link
+                      href="/account"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-white/60 hover:text-primary transition-colors duration-300 cursor-pointer flex items-center gap-2 group"
+                      aria-label="User Account Profile"
+                    >
+                      <User className="w-4 h-4" aria-hidden="true" />
+                      <span className="text-[10px] caps-label tracking-widest text-white/40 group-hover:text-primary transition-colors">Account</span>
+                    </Link>
+                  </div>
                 </div>
 
                 {/* Search Bar for Mobile */}
