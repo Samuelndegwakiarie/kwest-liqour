@@ -233,27 +233,29 @@ export function Navbar() {
                     KWEST
                   </Link>
                   {/* Cart and Account icons below KWEST logo */}
-                  <div className="flex items-center gap-6 mt-1">
+                  <div className="grid grid-cols-2 gap-3 mt-4">
                     <Link
                       href="/cart"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="relative group cursor-pointer text-white/60 hover:text-primary transition-colors flex items-center gap-2"
+                      className="relative group flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-white/[0.03] border border-primary/20 hover:border-primary/50 shadow-[0_0_15px_rgba(0,240,255,0.05)] hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] hover:bg-primary/[0.04] transition-all duration-300 text-white/70 hover:text-primary cursor-pointer"
                       aria-label="Shopping Cart"
                     >
-                      <ShoppingBag className="w-4 h-4" aria-hidden="true" />
-                      <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-primary text-background text-[7px] font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.4)]">
-                        {cartCount}
-                      </span>
-                      <span className="text-[10px] caps-label tracking-widest text-white/40 group-hover:text-primary transition-colors">Cart</span>
+                      <ShoppingBag className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-300" aria-hidden="true" />
+                      <span className="text-[10px] font-bold caps-label tracking-widest">Cart</span>
+                      {cartCount > 0 && (
+                        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-primary text-background text-[8px] font-extrabold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.6)] animate-pulse">
+                          {cartCount}
+                        </span>
+                      )}
                     </Link>
                     <Link
                       href="/account"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-white/60 hover:text-primary transition-colors duration-300 cursor-pointer flex items-center gap-2 group"
+                      className="relative group flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-white/[0.03] border border-primary/20 hover:border-primary/50 shadow-[0_0_15px_rgba(0,240,255,0.05)] hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] hover:bg-primary/[0.04] transition-all duration-300 text-white/70 hover:text-primary cursor-pointer"
                       aria-label="User Account Profile"
                     >
-                      <User className="w-4 h-4" aria-hidden="true" />
-                      <span className="text-[10px] caps-label tracking-widest text-white/40 group-hover:text-primary transition-colors">Account</span>
+                      <User className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-300" aria-hidden="true" />
+                      <span className="text-[10px] font-bold caps-label tracking-widest">Account</span>
                     </Link>
                   </div>
                 </div>
