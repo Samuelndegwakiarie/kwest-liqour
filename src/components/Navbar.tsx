@@ -264,17 +264,17 @@ export function Navbar() {
                     <span>KWEST</span>
                   </Link>
                   {/* Cart and Account icons below KWEST logo */}
-                  <div className="grid grid-cols-2 gap-3 mt-4">
+                  <div className="flex flex-col gap-3 mt-4 w-full">
                     <Link
                       href="/cart"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="relative group flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-white/[0.03] border border-primary/20 hover:border-primary/50 shadow-[0_0_15px_rgba(0,240,255,0.05)] hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] hover:bg-primary/[0.04] transition-all duration-300 text-white/70 hover:text-primary cursor-pointer"
+                      className="relative group flex items-center justify-center gap-2.5 py-3 px-4 w-full rounded-xl bg-white/[0.03] border border-primary/20 hover:border-primary/50 shadow-[0_0_15px_rgba(0,240,255,0.05)] hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] hover:bg-primary/[0.04] transition-all duration-300 text-white/70 hover:text-primary cursor-pointer"
                       aria-label="Shopping Cart"
                     >
                       <ShoppingBag className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-300" aria-hidden="true" />
                       <span className="text-[10px] font-bold caps-label tracking-widest">Cart</span>
                       {cartCount > 0 && (
-                        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-primary text-background text-[8px] font-extrabold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.6)] animate-pulse">
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 min-w-[18px] h-[18px] px-1 bg-primary text-background text-[8px] font-extrabold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.6)] animate-pulse">
                           {cartCount}
                         </span>
                       )}
@@ -282,7 +282,7 @@ export function Navbar() {
                     <Link
                       href="/account"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="relative group flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-white/[0.03] border border-primary/20 hover:border-primary/50 shadow-[0_0_15px_rgba(0,240,255,0.05)] hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] hover:bg-primary/[0.04] transition-all duration-300 text-white/70 hover:text-primary cursor-pointer"
+                      className="relative group flex items-center justify-center gap-2.5 py-3 px-4 w-full rounded-xl bg-white/[0.03] border border-primary/20 hover:border-primary/50 shadow-[0_0_15px_rgba(0,240,255,0.05)] hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] hover:bg-primary/[0.04] transition-all duration-300 text-white/70 hover:text-primary cursor-pointer"
                       aria-label="User Account Profile"
                     >
                       {userAvatar ? (
