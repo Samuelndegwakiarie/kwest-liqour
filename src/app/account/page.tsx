@@ -447,7 +447,7 @@ export default function AccountPage() {
                   </div>
 
                   {/* ── Action buttons ── */}
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3 mt-2">
                     {isEditing ? (
                       <>
                         <button
