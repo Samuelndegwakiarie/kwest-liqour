@@ -31,6 +31,7 @@ export function Navbar() {
   const router = useRouter();
   const [searchVal, setSearchVal] = useState("");
   const { cartCount } = useCart();
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
 
   const currentDesktopLinks = isAdmin
     ? [...desktopLinks, { name: "Dashboard", href: "/dashboard" }]
@@ -52,9 +53,21 @@ export function Navbar() {
   useEffect(() => {
     const checkAuth = () => {
       const adminAuth = sessionStorage.getItem("kwest_admin") === "authenticated";
-      const userAuth = localStorage.getItem("kwest_user") !== null;
+      const userRaw = localStorage.getItem("kwest_user");
+      const userAuth = userRaw !== null;
       setIsLoggedIn(adminAuth || userAuth);
       setIsAdmin(adminAuth);
+
+      if (userRaw) {
+        try {
+          const parsed = JSON.parse(userRaw);
+          setUserAvatar(parsed.avatar || null);
+        } catch {
+          setUserAvatar(null);
+        }
+      } else {
+        setUserAvatar(null);
+      }
     };
     checkAuth();
 
@@ -159,10 +172,18 @@ export function Navbar() {
           </Link>
           <Link
             href="/account"
-            className="text-white/40 hover:text-primary transition-colors duration-300 cursor-pointer"
+            className="text-white/40 hover:text-primary transition-colors duration-300 cursor-pointer flex items-center"
             aria-label="User Account Profile"
           >
-            <User className="w-5 h-5" aria-hidden="true" />
+            {userAvatar ? (
+              <img
+                src={userAvatar}
+                alt="User Profile"
+                className="w-5 h-5 rounded-full object-cover border border-primary/30 hover:border-primary/60 transition-all duration-300"
+              />
+            ) : (
+              <User className="w-5 h-5" aria-hidden="true" />
+            )}
           </Link>
         </div>
 
@@ -184,10 +205,18 @@ export function Navbar() {
               <Link
                 href="/account"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-white/60 hover:text-primary transition-colors duration-300 cursor-pointer"
+                className="text-white/60 hover:text-primary transition-colors duration-300 cursor-pointer flex items-center"
                 aria-label="User Account Profile"
               >
-                <User className="w-5 h-5" aria-hidden="true" />
+                {userAvatar ? (
+                  <img
+                    src={userAvatar}
+                    alt="User Profile"
+                    className="w-5 h-5 rounded-full object-cover border border-primary/30"
+                  />
+                ) : (
+                  <User className="w-5 h-5" aria-hidden="true" />
+                )}
               </Link>
             </>
           )}
@@ -254,7 +283,15 @@ export function Navbar() {
                       className="relative group flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-white/[0.03] border border-primary/20 hover:border-primary/50 shadow-[0_0_15px_rgba(0,240,255,0.05)] hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] hover:bg-primary/[0.04] transition-all duration-300 text-white/70 hover:text-primary cursor-pointer"
                       aria-label="User Account Profile"
                     >
-                      <User className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-300" aria-hidden="true" />
+                      {userAvatar ? (
+                        <img
+                          src={userAvatar}
+                          alt="User Profile"
+                          className="w-4 h-4 rounded-full object-cover border border-primary/30 group-hover:scale-110 transition-transform duration-300"
+                        />
+                      ) : (
+                        <User className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-300" aria-hidden="true" />
+                      )}
                       <span className="text-[10px] font-bold caps-label tracking-widest">Account</span>
                     </Link>
                   </div>
