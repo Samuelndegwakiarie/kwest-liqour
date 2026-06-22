@@ -107,7 +107,9 @@ export function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl md:text-2xl font-serif font-bold text-primary tracking-[0.3em] uppercase text-glow cursor-pointer z-[110]"
+          className={`text-xl md:text-2xl font-serif font-bold text-primary tracking-[0.3em] uppercase text-glow cursor-pointer z-[110] transition-all duration-300 ${
+            isMobileMenuOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
         >
           KWEST
         </Link>
@@ -214,7 +216,7 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.3 }}
-              className="fixed top-0 right-0 h-full w-[60vw] min-w-[240px] max-w-[320px] bg-[#060b18]/95 border-l border-white/[0.08] backdrop-blur-xl z-[95] pt-6 px-6 pb-8 flex flex-col justify-between lg:hidden shadow-[-10px_0_30px_rgba(0,0,0,0.5)]"
+              className="fixed top-0 right-0 h-full w-[60vw] min-w-[240px] max-w-[320px] bg-[#060b18]/95 border-l border-white/[0.08] backdrop-blur-xl z-[95] pt-[72px] px-6 pb-8 flex flex-col justify-between lg:hidden shadow-[-10px_0_30px_rgba(0,0,0,0.5)]"
             >
               <div className="space-y-6">
                 {/* KWEST logo at top of drawer */}
