@@ -24,7 +24,7 @@ import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart } = useCart();
-  const [deliveryMethod, setDeliveryMethod] = useState<"shop" | "rider">("rider");
+  const [deliveryMethod, setDeliveryMethod] = useState<"shop" | "rider">("shop");
   const [isClient, setIsClient] = useState(false);
   const [showRiderAlert, setShowRiderAlert] = useState(false);
   const alertTimerRef = useRef<any>(null);

@@ -33,7 +33,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { cart, clearCart } = useCart();
   const { addReview } = useReviews();
-  const [deliveryMethod, setDeliveryMethod] = useState<"shop" | "rider">("rider");
+  const [deliveryMethod, setDeliveryMethod] = useState<"shop" | "rider">("shop");
   const [isClient, setIsClient] = useState(false);
 
   // Review states

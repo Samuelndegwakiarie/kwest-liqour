@@ -4,12 +4,14 @@ import { promises as fs } from "fs";
 import path from "path";
 
 // Configure Cloudinary if environment variables are present
-const isCloudinaryConfigured =
-  process.env.CLOUDINARY_CLOUD_NAME &&
-  process.env.CLOUDINARY_API_KEY &&
-  process.env.CLOUDINARY_API_SECRET;
+const isCloudinaryConfigured = !!(
+  process.env.CLOUDINARY_URL ||
+  (process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET)
+);
 
-if (isCloudinaryConfigured) {
+if (isCloudinaryConfigured && !process.env.CLOUDINARY_URL) {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
