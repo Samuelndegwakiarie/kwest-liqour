@@ -23,8 +23,23 @@ model Product {
   createdAt     DateTime     @default(now())
 }
 
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  name       String
+  phone      String?
+  avatar     String?
+  tier       String   @default("Amber Private Reserve")
+  memberNo   String   @unique
+  joinedDate DateTime @default(now())
+  orders     Order[]
+}
+
 model Order {
   id            String       @id
+  userId        String?
+  user          User?        @relation(fields: [userId], references: [id])
   customer      String
   email         String
   phone         String

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -182,10 +182,61 @@ export default function TrackOrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("all");
-  const [expandedOrders, setExpandedOrders] = useState<Record<string, boolean>>({
-    "KW-9812-2026": true, // Expand the most recent by default
-  });
+  const [expandedOrders, setExpandedOrders] = useState<Record<string, boolean>>({});
   const [copyStates, setCopyStates] = useState<Record<string, boolean>>({});
+
+  // Real orders fetched from the DB
+  const [dbOrders, setDbOrders] = useState<Order[] | null>(null);
+
+  // ── Auth guard ──
+  useEffect(() => {
+    if (sessionStorage.getItem("kwest_admin") === "authenticated") return;
+    fetch("/api/auth/verify", { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) router.replace("/account?redirect=/orders");
+      })
+      .catch(() => {
+        if (!localStorage.getItem("kwest_user")) router.replace("/account?redirect=/orders");
+      });
+  }, []);
+
+  // ── Fetch user orders from DB ──
+  useEffect(() => {
+    fetch("/api/orders", { credentials: "include" })
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data: any[] = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          // Map DB orders to Order shape
+          const mapped: Order[] = data.map((o: any) => ({
+            id: o.id,
+            date: o.date?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+            status: (o.status?.toLowerCase().replace(" ", "-") || "processing") as Order["status"],
+            items: (o.items || []).map((item: any) => ({
+              name: item.name,
+              brand: item.brand,
+              price: item.price,
+              qty: item.quantity,
+              volume: item.volume || "750ml",
+              img: `/placeholder_bottle.png`,
+            })),
+            trackingNo: `TRK-MPESA-${o.id}`,
+            deliveryMethod: (o.delivery || "shop") as Order["deliveryMethod"],
+            eta: o.status === "Delivered" ? "Delivered" : "Estimated 1-3 days",
+            address: o.address || o.delivery || "Kwest Flagship Store",
+            paymentMode: o.mpesaReceipt ? `M-Pesa: ${o.mpesaReceipt}` : "M-Pesa",
+          }));
+          setDbOrders(mapped);
+          if (mapped.length > 0) {
+            setExpandedOrders({ [mapped[0].id]: true });
+          }
+        }
+      })
+      .catch(() => {
+        // Use mockOrders as fallback
+        setExpandedOrders({ "KW-9812-2026": true });
+      });
+  }, []);
 
   const checkIsWithin24Hours = (dateStr?: string) => {
     if (!dateStr) return false;
@@ -238,8 +289,11 @@ export default function TrackOrdersPage() {
     return items.reduce((acc, item) => acc + item.price * item.qty, 0);
   };
 
+  // Use real DB orders if available, fall back to mock data for demo
+  const sourceOrders = dbOrders ?? mockOrders;
+
   // Filters logic
-  const filteredOrders = mockOrders.filter((order) => {
+  const filteredOrders = sourceOrders.filter((order) => {
     // Search query
     const matchesSearch =
       order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||

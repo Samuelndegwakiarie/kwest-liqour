@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   User as UserIcon,
   Mail,
@@ -44,7 +44,9 @@ export default function AccountPage() {
   const isPasswordValid = hasMinLength && hasNumber && hasUpper && hasSpecial;
 
   // ── Session / user state ─────────────────────────────────────────────────
+  const searchParams = useSearchParams();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authError, setAuthError] = useState("");
   const [currentUser, setCurrentUser] = useState<any>({
     name: "",
     email: "",
@@ -72,6 +74,9 @@ export default function AccountPage() {
   };
 
   const redirectAfterAuth = () => {
+    // If redirected from a protected page, go back there
+    const redirectTo = searchParams.get("redirect");
+    if (redirectTo) { router.push(redirectTo); return; }
     try {
       const raw = localStorage.getItem("kwest_cart");
       const items = raw ? JSON.parse(raw) : [];
@@ -81,10 +86,10 @@ export default function AccountPage() {
     }
   };
 
-  // ── On mount: restore session ────────────────────────────────────────────
+  // ── On mount: restore session via JWT cookie ──────────────────────────────
   useEffect(() => {
+    // Check admin session (legacy sessionStorage path)
     const adminSession = sessionStorage.getItem("kwest_admin") === "authenticated";
-    const userSession = localStorage.getItem("kwest_user");
     if (adminSession) {
       const u = {
         name: "Vault Manager",
@@ -98,57 +103,125 @@ export default function AccountPage() {
       setCurrentUser(u);
       seedEditFields(u);
       setIsLoggedIn(true);
-    } else if (userSession) {
-      try {
-        const parsed = JSON.parse(userSession);
-        setCurrentUser(parsed);
-        seedEditFields(parsed);
-        setIsLoggedIn(true);
-      } catch {
-        setIsLoggedIn(true);
-      }
+      return;
     }
+    // Try restoring from JWT cookie via profile API
+    fetch("/api/auth/profile", { credentials: "include" })
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.user) {
+          const u = data.user;
+          setCurrentUser(u);
+          seedEditFields(u);
+          setIsLoggedIn(true);
+          localStorage.setItem("kwest_user", JSON.stringify(u));
+        }
+      })
+      .catch(() => {
+        // Fallback: try localStorage for resilience on network issues
+        const saved = localStorage.getItem("kwest_user");
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            setCurrentUser(parsed);
+            seedEditFields(parsed);
+            setIsLoggedIn(true);
+          } catch {}
+        }
+      });
   }, []);
 
   // ── Auth submit ──────────────────────────────────────────────────────────
-  const handleAuthSubmit = (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAuthError("");
+
     if (formMode === "signup") {
-      if (password !== confirmPassword) { alert("Passwords do not match."); return; }
-      if (!isPasswordValid) { alert("Please ensure your password meets all security criteria."); return; }
+      if (password !== confirmPassword) { setAuthError("Passwords do not match."); return; }
+      if (!isPasswordValid) { setAuthError("Password must meet all security criteria."); return; }
     }
-    setIsLoading(true);
-    setTimeout(() => {
+
+    if (formMode === "forgot") {
+      setIsLoading(true);
+      await new Promise((r) => setTimeout(r, 1000));
       setIsLoading(false);
-      if (formMode === "signin") {
-        if (email === "admin@kwestliquor.co.ke" && password === "kwest2026") {
-          sessionStorage.setItem("kwest_admin", "authenticated");
-          const u = { name: "Vault Manager", email, phone: "", avatar: null, tier: "Grand Cellar Administrator", memberNo: "ADMIN-0001", joinedDate: "January 2026" };
-          setCurrentUser(u); seedEditFields(u); setIsLoggedIn(true);
-          router.push("/dashboard");
-          return;
-        }
-        const u = { name: "Sam K", email: email || "sammiek@gmail.com", phone: "", avatar: null, tier: "Amber Private Reserve", memberNo: `KWC-2026-${Math.floor(1000 + Math.random() * 9000)}`, joinedDate: "May 2026" };
-        localStorage.setItem("kwest_user", JSON.stringify(u));
-        setCurrentUser(u); seedEditFields(u); setIsLoggedIn(true);
-        redirectAfterAuth();
-      } else if (formMode === "signup") {
-        const u = { name: fullName || "Noble Guest", email: email || "guest@kwestcircle.com", phone: "", avatar: null, tier: "Amber Private Reserve", memberNo: `KWC-2026-${Math.floor(1000 + Math.random() * 9000)}`, joinedDate: "May 2026" };
-        localStorage.setItem("kwest_user", JSON.stringify(u));
-        setCurrentUser(u); seedEditFields(u); setIsLoggedIn(true);
-        redirectAfterAuth();
-      } else if (formMode === "forgot") {
-        alert("A luxury reset link has been dispatched to your email address.");
-        setFormMode("signin");
+      setAuthError("");
+      alert("A luxury reset link has been dispatched to your email address.");
+      setFormMode("signin");
+      return;
+    }
+
+    // ── Admin shortcut (bypass API) ──
+    if (formMode === "signin" && email === "admin@kwestliquor.co.ke" && password === "kwest2026") {
+      setIsLoading(true);
+      await new Promise((r) => setTimeout(r, 500));
+      setIsLoading(false);
+      sessionStorage.setItem("kwest_admin", "authenticated");
+      const u = { name: "Vault Manager", email, phone: "", avatar: null, tier: "Grand Cellar Administrator", memberNo: "ADMIN-0001", joinedDate: "January 2026" };
+      setCurrentUser(u); seedEditFields(u); setIsLoggedIn(true);
+      router.push("/dashboard");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const endpoint = formMode === "signin" ? "/api/auth/signin" : "/api/auth/signup";
+      const body: any = { email, password };
+      if (formMode === "signup") body.name = fullName;
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setAuthError(data.error || "Authentication failed. Please try again.");
+        return;
       }
-    }, 1500);
+
+      // Persist minimal user info in localStorage for offline fallback
+      const u = data.user;
+      localStorage.setItem("kwest_user", JSON.stringify(u));
+      setCurrentUser(u);
+      seedEditFields(u);
+      setIsLoggedIn(true);
+      redirectAfterAuth();
+    } catch (err) {
+      setAuthError("Network error. Please check your connection.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // ── Profile save ─────────────────────────────────────────────────────────
-  const handleSaveProfile = () => {
-    const updated = { ...currentUser, name: editName.trim() || currentUser.name, email: editEmail.trim() || currentUser.email, phone: editPhone.trim(), avatar: editAvatar };
-    localStorage.setItem("kwest_user", JSON.stringify(updated));
-    setCurrentUser(updated);
+  // ── Profile save (via PATCH API then localStorage fallback) ───────────────
+  const handleSaveProfile = async () => {
+    const payload: any = {
+      name: editName.trim() || currentUser.name,
+      phone: editPhone.trim(),
+    };
+    if (editAvatar) payload.avatar = editAvatar;
+
+    try {
+      const res = await fetch("/api/auth/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      const updated = res.ok ? { ...currentUser, ...data.user } : { ...currentUser, ...payload };
+      localStorage.setItem("kwest_user", JSON.stringify(updated));
+      setCurrentUser(updated);
+    } catch {
+      // Offline — just update locally
+      const updated = { ...currentUser, ...payload };
+      localStorage.setItem("kwest_user", JSON.stringify(updated));
+      setCurrentUser(updated);
+    }
     setIsEditing(false);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 2500);
@@ -162,7 +235,11 @@ export default function AccountPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Clear server-side cookie
+    try {
+      await fetch("/api/auth/signout", { method: "POST", credentials: "include" });
+    } catch {}
     sessionStorage.removeItem("kwest_admin");
     localStorage.removeItem("kwest_user");
     setIsLoggedIn(false);
@@ -324,6 +401,13 @@ export default function AccountPage() {
                         </div>
                       )}
                     </div>
+
+                    {/* Error message */}
+                    {authError && (
+                      <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl px-4 py-3">
+                        {authError}
+                      </div>
+                    )}
 
                     <button type="submit" disabled={isLoading} className="w-full py-3.5 sm:py-4 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[48px]">
                       {isLoading ? (

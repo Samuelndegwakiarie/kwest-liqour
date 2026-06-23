@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   ShoppingBag,
   Trash2,
@@ -24,6 +25,7 @@ import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart } = useCart();
+  const router = useRouter();
   const [deliveryMethod, setDeliveryMethod] = useState<"shop" | "rider">("shop");
   const [isClient, setIsClient] = useState(false);
   const [showRiderAlert, setShowRiderAlert] = useState(false);
@@ -36,6 +38,24 @@ export default function CartPage() {
     if (savedMethod) {
       setDeliveryMethod(savedMethod);
     }
+  }, []);
+
+  // ── Auth guard: redirect to login if not authenticated ──
+  useEffect(() => {
+    // Admin is always permitted
+    if (sessionStorage.getItem("kwest_admin") === "authenticated") return;
+    fetch("/api/auth/verify", { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) {
+          router.replace("/account?redirect=/cart");
+        }
+      })
+      .catch(() => {
+        // On network error, fall back to localStorage check
+        if (!localStorage.getItem("kwest_user")) {
+          router.replace("/account?redirect=/cart");
+        }
+      });
   }, []);
 
   const handleDeliveryChange = (method: "shop" | "rider") => {

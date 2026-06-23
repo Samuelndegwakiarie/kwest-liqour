@@ -216,6 +216,7 @@ export async function createOrder(data: any) {
   return prisma.order.create({
     data: {
       id: data.id || `KW-${Math.floor(1000 + Math.random() * 9000)}-2026`,
+      userId: data.userId || null,
       customer: data.customer,
       email: data.email,
       phone: data.phone,

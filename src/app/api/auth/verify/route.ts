@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { verifyToken } from "@/lib/auth";
 
-// Mock admin credentials — swap for real auth provider (NextAuth, Clerk, etc.)
+// Mock admin credentials
 const ADMIN_EMAIL = "admin@kwestliquor.co.ke";
 const ADMIN_PASSWORD = "kwest2026";
 
+// POST — legacy credential check for admin dashboard
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
@@ -14,4 +17,17 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "Auth verification failed" }, { status: 500 });
   }
+}
+
+// GET — verify JWT session cookie (used by cart / orders page auth guard)
+export async function GET(req: NextRequest) {
+  const token = req.cookies.get("kwest_session")?.value;
+  if (!token) {
+    return NextResponse.json({ authenticated: false }, { status: 401 });
+  }
+  const payload = verifyToken(token);
+  if (!payload) {
+    return NextResponse.json({ authenticated: false }, { status: 401 });
+  }
+  return NextResponse.json({ authenticated: true, userId: payload.userId, role: payload.role });
 }

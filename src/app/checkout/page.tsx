@@ -180,8 +180,16 @@ export default function CheckoutPage() {
     setOrderRef(mockId);
     setPurchasedItems(cart.map((item) => `${item.brand} ${item.name}`));
 
+    // Attach authenticated user ID if available
+    let userId: string | null = null;
+    try {
+      const u = localStorage.getItem("kwest_user");
+      if (u) userId = JSON.parse(u).id || null;
+    } catch {}
+
     const orderData = {
       id: mockId,
+      userId: userId,
       customer: fullName,
       email: email || "customer@kwest.com",
       phone: phone,
