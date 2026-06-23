@@ -123,7 +123,7 @@ export default function ProductDetailPage({ params }: { params: Promise<Params> 
       <ParticleField count={20} className="z-[5]" />
 
       {/* ═══ 100vh Split Layout ═══ */}
-      <div className="relative z-20 w-full max-w-[1280px] mx-auto px-6 h-[calc(100vh-var(--bottom-nav-height))] lg:h-screen pt-[var(--bottom-nav-height)] lg:pt-0 flex flex-col justify-center">
+      <div className="relative z-20 w-full max-w-[1280px] mx-auto px-6 min-h-[calc(100vh-var(--bottom-nav-height))] lg:min-h-screen pt-[calc(var(--bottom-nav-height)+24px)] lg:pt-28 lg:pb-12 flex flex-col justify-start lg:justify-center">
         {/* Back Link */}
         <div className="mb-6 lg:mb-10 pt-4 lg:pt-0">
           <Link
