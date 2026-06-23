@@ -393,7 +393,7 @@ export default function CheckoutPage() {
                               id="checkout-coords"
                               value={coordinates}
                               onChange={(e) => handleCoordinatesChange(e.target.value)}
-                              placeholder="e.g. -1.286389, 36.817223"
+                              placeholder="e.g. -1.2850, 36.8258"
                               className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all border-b-2 font-mono"
                             />
                             {isLoadingAddress && (
