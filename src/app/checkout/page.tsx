@@ -51,6 +51,19 @@ export default function CheckoutPage() {
 
   const [paymentOption, setPaymentOption] = useState<"mpesa" | "paypal">("mpesa");
   const [mpesaPhone, setMpesaPhone] = useState("");
+  const [isMpesaEdited, setIsMpesaEdited] = useState(false);
+
+  const handlePhoneChange = (val: string) => {
+    setPhone(val);
+    if (!isMpesaEdited) {
+      setMpesaPhone(val);
+    }
+  };
+
+  const handleMpesaPhoneChange = (val: string) => {
+    setMpesaPhone(val);
+    setIsMpesaEdited(true);
+  };
 
   // UI States
   const [isGeolocating, setIsGeolocating] = useState(false);
@@ -360,7 +373,7 @@ export default function CheckoutPage() {
                             id="checkout-phone"
                             required
                             value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            onChange={(e) => handlePhoneChange(e.target.value)}
                             placeholder="+254 700 000 000"
                             className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl pl-11 pr-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all border-b-2"
                           />
@@ -512,7 +525,7 @@ export default function CheckoutPage() {
                                 id="checkout-mpesa"
                                 required={paymentOption === "mpesa"}
                                 value={mpesaPhone}
-                                onChange={(e) => setMpesaPhone(e.target.value)}
+                                onChange={(e) => handleMpesaPhoneChange(e.target.value)}
                                 placeholder="e.g. 0712345678"
                                 className="w-full bg-black/40 border border-white/[0.08] focus:border-primary/40 focus:outline-none rounded-xl px-4 py-3 text-base md:text-xs text-white placeholder:text-white/20 transition-all border-b-2 font-mono"
                               />
