@@ -81,6 +81,22 @@ export default function CheckoutPage() {
     if (savedMethod) {
       setDeliveryMethod(savedMethod);
     }
+    
+    // Auto-fill logged-in user profile details
+    const userStr = localStorage.getItem("kwest_user");
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user.name) setFullName(user.name);
+        if (user.email) setEmail(user.email);
+        if (user.phone) {
+          setPhone(user.phone);
+          setMpesaPhone(user.phone);
+        }
+      } catch (e) {
+        console.error("Error parsing user from localStorage", e);
+      }
+    }
   }, []);
 
   // Geocoding Coordinates lookup

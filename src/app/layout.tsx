@@ -35,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("dark", "font-sans", geist.variable)} suppressHydrationWarning>
+    <html lang="en" className={cn("dark", "font-sans", geist.variable)} suppressHydrationWarning data-scroll-behavior="smooth">
       <body
         className={`${bodoni.variable} ${jost.variable} font-sans antialiased bg-background text-foreground`}
       >
