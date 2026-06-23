@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -24,7 +24,19 @@ import { motion, AnimatePresence } from "motion/react";
 import { ParticleField } from "@/components/ParticleField";
 import { GlassCard } from "@/components/GlassCard";
 
-export default function AccountPage() {
+// Format ISO date or month string to readable "June 2026"
+function formatJoinedDate(raw: string | undefined): string {
+  if (!raw) return "";
+  try {
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return raw; // Already readable string
+    return d.toLocaleDateString("en-KE", { month: "long", year: "numeric" });
+  } catch {
+    return raw;
+  }
+}
+
+function AccountPageContent() {
   const router = useRouter();
 
   // ── Auth form state ──────────────────────────────────────────────────────
@@ -111,7 +123,10 @@ export default function AccountPage() {
         if (!res.ok) return;
         const data = await res.json();
         if (data?.user) {
-          const u = data.user;
+          const u = {
+            ...data.user,
+            joinedDate: formatJoinedDate(data.user.joinedDate),
+          };
           setCurrentUser(u);
           seedEditFields(u);
           setIsLoggedIn(true);
@@ -184,7 +199,10 @@ export default function AccountPage() {
       }
 
       // Persist minimal user info in localStorage for offline fallback
-      const u = data.user;
+      const u = {
+        ...data.user,
+        joinedDate: formatJoinedDate(data.user?.joinedDate),
+      };
       localStorage.setItem("kwest_user", JSON.stringify(u));
       setCurrentUser(u);
       seedEditFields(u);
@@ -608,5 +626,17 @@ export default function AccountPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={
+      <main className="bg-background min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </main>
+    }>
+      <AccountPageContent />
+    </Suspense>
   );
 }
