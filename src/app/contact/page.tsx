@@ -24,13 +24,23 @@ export default function Concierge() {
 
   useEffect(() => {
     fetch("/api/admin/hero-images")
-      .then(r => r.json())
-      .then(data => setImages(data))
+      .then(r => {
+        if (!r.ok) throw new Error("Failed to fetch images");
+        return r.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setImages(data);
+        } else {
+          console.error("Expected array from hero-images API, got:", data);
+        }
+      })
       .catch(err => console.error("Error loading contact images:", err));
   }, []);
 
   const getImageUrl = (key: string, fallback: string) => {
-    const match = images.find(x => x.page === "contact" && x.key === key);
+    if (!Array.isArray(images)) return fallback;
+    const match = images.find(x => x && x.page === "contact" && x.key === key);
     return match ? match.url : fallback;
   };
 

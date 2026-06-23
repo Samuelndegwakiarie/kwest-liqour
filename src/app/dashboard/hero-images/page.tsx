@@ -38,9 +38,14 @@ export default function CardImagesPage() {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/hero-images");
+      if (!res.ok) throw new Error("Failed to fetch images");
       const data = await res.json();
-      setImages(data);
-    } catch {
+      if (Array.isArray(data)) {
+        setImages(data);
+      } else {
+        console.error("Expected array from hero-images API, got:", data);
+      }
+    } catch (err) {
       showToast("Failed to load images.");
     } finally {
       setLoading(false);
@@ -94,7 +99,8 @@ export default function CardImagesPage() {
   };
 
   const getImageUrl = (page: string, key: string) => {
-    const match = images.find(x => x.page === page && x.key === key);
+    if (!Array.isArray(images)) return null;
+    const match = images.find(x => x && x.page === page && x.key === key);
     return match ? match.url : null;
   };
 
