@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   ShieldCheck,
   Check,
@@ -29,6 +30,7 @@ import { ParticleField } from "@/components/ParticleField";
 import { GlassCard } from "@/components/GlassCard";
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { cart, clearCart } = useCart();
   const { addReview } = useReviews();
   const [deliveryMethod, setDeliveryMethod] = useState<"shop" | "rider">("rider");
@@ -271,6 +273,10 @@ export default function CheckoutPage() {
       productNames: purchasedItems,
     });
     setReviewSubmitted(true);
+    setTimeout(() => {
+      handleSuccessFinished();
+      router.push("/products");
+    }, 2000);
   };
 
   // Pricing calculations

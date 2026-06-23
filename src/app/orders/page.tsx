@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   Search,
   ChevronDown,
@@ -171,6 +172,7 @@ const mockOrders: Order[] = [
 ];
 
 export default function TrackOrdersPage() {
+  const router = useRouter();
   const { reviews, addReview, hasReviewedOrder } = useReviews();
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [hoverRatings, setHoverRatings] = useState<Record<string, number>>({});
@@ -214,6 +216,9 @@ export default function TrackOrdersPage() {
       productNames,
     });
     setLocalReviewed((prev) => ({ ...prev, [orderId]: true }));
+    setTimeout(() => {
+      router.push("/products");
+    }, 2000);
   };
 
   const toggleExpand = (id: string) => {
