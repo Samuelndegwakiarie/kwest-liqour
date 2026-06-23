@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -13,6 +13,8 @@ import {
   ChevronLeft,
   Store,
   Bike,
+  ShieldCheck,
+  AlertTriangle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { ParticleField } from "@/components/ParticleField";
@@ -24,6 +26,8 @@ export default function CartPage() {
   const { cart, updateQuantity, removeFromCart } = useCart();
   const [deliveryMethod, setDeliveryMethod] = useState<"shop" | "rider">("rider");
   const [isClient, setIsClient] = useState(false);
+  const [showRiderAlert, setShowRiderAlert] = useState(false);
+  const alertTimerRef = useRef<any>(null);
 
   // Avoid Next.js hydration issues with local storage
   useEffect(() => {
@@ -37,6 +41,23 @@ export default function CartPage() {
   const handleDeliveryChange = (method: "shop" | "rider") => {
     setDeliveryMethod(method);
     localStorage.setItem("kwest_delivery_method", method);
+    
+    // Clear any active timer
+    if (alertTimerRef.current) {
+      clearTimeout(alertTimerRef.current);
+    }
+    
+    if (method === "rider") {
+      setShowRiderAlert(false);
+      setTimeout(() => {
+        setShowRiderAlert(true);
+        alertTimerRef.current = setTimeout(() => {
+          setShowRiderAlert(false);
+        }, 5000);
+      }, 50);
+    } else {
+      setShowRiderAlert(false);
+    }
   };
 
   // Calculations
@@ -208,97 +229,148 @@ export default function CartPage() {
 
               {/* Right Column: Order Summary */}
               <div className="space-y-6">
-                <GlassCard padding="p-6 md:p-8" hover={false} glow={true} className="space-y-6">
-                  <h3 className="text-xl font-serif font-bold text-white tracking-tight border-b border-white/[0.06] pb-4">
-                    checkout Invoice
-                  </h3>
+                <GlassCard padding="p-6 md:p-8" hover={false} glow={true} className="space-y-6 relative overflow-hidden border-white/[0.08]">
+                  {/* Subtle top-right ambient gold/cyan gradient glow */}
+                  <div className="absolute -top-12 -right-12 w-32 h-32 bg-[radial-gradient(circle_at_center,rgba(0,240,255,0.08)_0%,transparent_70%)] pointer-events-none" />
+                  
+                  <div className="flex justify-between items-start border-b border-white/[0.06] pb-4">
+                    <div>
+                      <h3 className="text-lg font-serif font-bold text-white tracking-tight">
+                        Checkout Invoice
+                      </h3>
+                      <p className="text-[8px] text-text-subtle tracking-widest uppercase mt-0.5">
+                        Secure Cellar Summary
+                      </p>
+                    </div>
+                    {/* Mock Invoice Serial Barcode tag */}
+                    <div className="text-[8px] font-mono border border-white/[0.08] px-2.5 py-1 rounded bg-black/40 text-white/30 tracking-widest uppercase">
+                      KW-582-X
+                    </div>
+                  </div>
 
                   {/* Delivery Selection */}
                   <div className="space-y-3">
-                    <h4 className="text-[10px] caps-label text-text-muted">Delivery Option</h4>
+                    <h4 className="text-[9px] caps-label text-text-muted tracking-wider">Delivery Option</h4>
                     <div className="grid grid-cols-2 gap-3">
                       {/* Pick at Shop */}
                       <button
                         onClick={() => handleDeliveryChange("shop")}
-                        className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between h-20 ${
+                        className={`p-4 rounded-2xl border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between h-24 relative overflow-hidden ${
                           deliveryMethod === "shop"
-                            ? "bg-primary/10 border-primary text-primary shadow-[0_0_15px_rgba(0,240,255,0.08)]"
-                            : "bg-black/20 border-white/[0.06] text-text-muted hover:border-white/20 hover:text-white"
+                            ? "bg-primary/[0.04] border-primary text-primary shadow-[0_0_20px_rgba(0,240,255,0.08)]"
+                            : "bg-black/30 border-white/[0.05] text-text-muted hover:border-white/20 hover:bg-white/[0.02] hover:text-white"
                         }`}
                       >
-                        <Store className="w-4 h-4" />
+                        {deliveryMethod === "shop" && (
+                          <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(0,240,255,0.8)] animate-pulse" />
+                        )}
+                        <Store className={`w-4 h-4 transition-transform duration-300 ${deliveryMethod === "shop" ? "scale-110" : ""}`} />
                         <div>
                           <p className="text-[10px] font-bold uppercase tracking-wider">Pick at Shop</p>
-                          <p className="text-[8px] text-text-subtle mt-0.5">Complimentary</p>
+                          <p className="text-[8px] text-text-subtle mt-1">Complimentary</p>
                         </div>
                       </button>
 
                       {/* Rider */}
                       <button
                         onClick={() => handleDeliveryChange("rider")}
-                        className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between h-20 ${
+                        className={`p-4 rounded-2xl border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between h-24 relative overflow-hidden ${
                           deliveryMethod === "rider"
-                            ? "bg-primary/10 border-primary text-primary shadow-[0_0_15px_rgba(0,240,255,0.08)]"
-                            : "bg-black/20 border-white/[0.06] text-text-muted hover:border-white/20 hover:text-white"
+                            ? "bg-primary/[0.04] border-primary text-primary shadow-[0_0_20px_rgba(0,240,255,0.08)]"
+                            : "bg-black/30 border-white/[0.05] text-text-muted hover:border-white/20 hover:bg-white/[0.02] hover:text-white"
                         }`}
                       >
-                        <Bike className="w-4 h-4" />
+                        {deliveryMethod === "rider" && (
+                          <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(0,240,255,0.8)] animate-pulse" />
+                        )}
+                        <Bike className={`w-4 h-4 transition-transform duration-300 ${deliveryMethod === "rider" ? "scale-110" : ""}`} />
                         <div>
                           <p className="text-[10px] font-bold uppercase tracking-wider">Rider</p>
-                          <p className="text-[8px] text-text-subtle mt-0.5">Pay Rider on Delivery</p>
+                          <p className="text-[8px] text-text-subtle mt-1">Pay on Delivery</p>
                         </div>
                       </button>
                     </div>
                   </div>
 
+                  {/* Rider Alert Banner */}
+                  <AnimatePresence>
+                    {showRiderAlert && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                        animate={{
+                          opacity: [0, 1, 0, 1], // dynamic flash effect (flashes 2 times)
+                          height: "auto",
+                          marginTop: 16,
+                        }}
+                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                        transition={{
+                          opacity: { times: [0, 0.35, 0.7, 1], duration: 1.5 },
+                          height: { duration: 0.3 },
+                          marginTop: { duration: 0.3 }
+                        }}
+                        className="bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl p-3.5 text-xs flex items-start gap-3 shadow-[0_0_20px_rgba(245,158,11,0.02)] relative overflow-hidden"
+                      >
+                        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-primary animate-pulse" />
+                        <div className="text-left">
+                          <p className="font-bold tracking-wider uppercase text-[8px] text-primary">Rider Fees Alert</p>
+                          <p className="mt-0.5 text-text-muted leading-relaxed">
+                            You will pay the rider fees upon delivery.
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   {/* Pricing Breakdown */}
-                  <div className="space-y-4 text-sm pt-4 border-t border-white/[0.06]">
-                    <div className="flex justify-between text-text-muted">
+                  <div className="space-y-4 pt-5 border-t border-dashed border-white/[0.08]">
+                    <div className="flex justify-between text-xs text-text-muted tracking-wide">
                       <span>Subtotal</span>
-                      <span className="text-white font-medium">
+                      <span className="text-white font-semibold">
                         KES {subtotal.toLocaleString()}
                       </span>
                     </div>
 
-                    <div className="flex justify-between text-text-muted">
-                      <span>Delivery Fee</span>
+                    <div className="flex justify-between text-xs text-text-muted tracking-wide">
+                      <span>Delivery Service</span>
                       {deliveryMethod === "shop" ? (
-                        <span className="text-primary font-bold tracking-widest text-[10px] caps-label">
+                        <span className="text-primary font-bold tracking-widest text-[9px] caps-label text-glow">
                           FREE
                         </span>
                       ) : (
-                        <span className="text-primary font-bold tracking-widest text-[9px] caps-label text-right leading-tight">
+                        <span className="text-primary font-bold tracking-widest text-[9px] caps-label text-right leading-tight text-glow">
                           PAY RIDER ON DELIVERY
                         </span>
                       )}
                     </div>
 
-                    {/* Total */}
-                    <div className="flex justify-between items-end pt-4 border-t border-white/[0.06]">
-                      <span className="text-white font-medium">Grand Total</span>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-primary text-glow font-serif">
-                          KES {total.toLocaleString()}
-                        </p>
-                        <p className="text-[9px] text-text-subtle tracking-wider uppercase mt-0.5">
+                    {/* Total Box */}
+                    <div className="bg-black/45 border border-white/[0.04] p-4 rounded-xl flex items-center justify-between mt-6 shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]">
+                      <div>
+                        <span className="text-xs font-semibold text-text-muted tracking-wide block">Grand Total</span>
+                        <span className="text-[9px] text-text-subtle tracking-wider uppercase mt-0.5 block">
                           16% VAT Included
-                        </p>
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-primary text-glow font-serif tracking-tight">
+                          KES {total.toLocaleString()}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Checkout Action */}
-                  <Link href="/checkout" className="block w-full">
+                  <Link href="/checkout" className="block w-full pt-2">
                     <button
-                      className="w-full py-4 bg-primary text-background font-bold text-xs caps-label tracking-widest rounded-xl hover:shadow-[0_0_35px_rgba(0,240,255,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2 group"
+                      className="w-full py-4 bg-gradient-to-r from-primary to-cyan-400 text-[#060B18] font-bold text-xs caps-label tracking-widest rounded-xl shadow-[0_0_25px_rgba(0,240,255,0.2)] hover:shadow-[0_0_35px_rgba(0,240,255,0.45)] hover:scale-[1.02] transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 group"
                     >
-                      checkout
-                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                      Checkout
+                      <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                     </button>
                   </Link>
 
-                  <div className="flex items-center justify-center gap-2 text-[10px] text-text-subtle mt-4">
-                    <Lock className="w-3.5 h-3.5 text-primary" />
+                  <div className="flex items-center justify-center gap-2 text-[9px] caps-label tracking-wider text-text-subtle mt-4">
+                    <ShieldCheck className="w-4 h-4 text-primary animate-pulse" />
                     <span>Luminous Secure Dispatch Guarantee</span>
                   </div>
                 </GlassCard>
