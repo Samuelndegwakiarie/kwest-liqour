@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getHeroImages, updateHeroImageByKey } from "@/lib/db";
 
 export async function GET() {
@@ -18,6 +19,11 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Missing page, key, or url" }, { status: 400 });
     }
     const updated = await updateHeroImageByKey(page, key, url);
+    
+    // Trigger Next.js ISR/cache revalidation
+    revalidatePath("/about");
+    revalidatePath("/contact");
+    
     return NextResponse.json(updated);
   } catch (err) {
     return NextResponse.json({ error: "Failed to update card image" }, { status: 500 });
