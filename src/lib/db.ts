@@ -1,9 +1,122 @@
 import { PrismaClient } from "@prisma/client";
 import { promises as fs } from "fs";
 import path from "path";
+import dns from "dns";
+
+// Robust DNS resolver for pooler hostname
+async function resolveHostWithRetry(host: string, retries = 5, delay = 500): Promise<string | null> {
+  for (let i = 0; i < retries; i++) {
+    // 1. dns.resolve4
+    try {
+      const ip = await new Promise<string>((resolve, reject) => {
+        dns.resolve4(host, (err, addresses) => {
+          if (err || !addresses || addresses.length === 0) reject(err || new Error("No addresses"));
+          else resolve(addresses[0]);
+        });
+      });
+      return ip;
+    } catch (e) {
+      // ignore
+    }
+
+    // 2. Google DoH
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const res = await fetch(`https://dns.google/resolve?name=${host}&type=A`, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      const data = await res.json();
+      const ip = data.Answer?.find((ans: any) => ans.type === 1)?.data;
+      if (ip) return ip;
+    } catch (e) {
+      // ignore
+    }
+
+    // 3. Cloudflare DoH
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const res = await fetch(`https://cloudflare-dns.com/dns-query?name=${host}&type=A`, {
+        headers: { 'Accept': 'application/dns-json' },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      const data = await res.json();
+      const ip = data.Answer?.find((ans: any) => ans.type === 1)?.data;
+      if (ip) return ip;
+    } catch (e) {
+      // ignore
+    }
+
+    if (i < retries - 1) {
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  return null;
+}
+
+let prismaInstance: PrismaClient | null = null;
+let initPromise: Promise<PrismaClient> | null = null;
+
+async function getPrismaClient() {
+  if (prismaInstance) return prismaInstance;
+  if (initPromise) return initPromise;
+
+  initPromise = (async () => {
+    let databaseUrl = process.env.DATABASE_URL || "";
+    const hostname = "aws-1-eu-north-1.pooler.supabase.com";
+    if (databaseUrl.includes(hostname)) {
+      try {
+        const ip = await resolveHostWithRetry(hostname);
+        if (ip) {
+          databaseUrl = databaseUrl.replace(hostname, ip);
+          console.log("[DB Info] Successfully resolved database host IP via DOH:", ip);
+        }
+      } catch (err: any) {
+        console.warn("[DB Warning] Failed to resolve host via DoH, using default:", err.message);
+      }
+    }
+
+    prismaInstance = new PrismaClient({
+      datasources: {
+        db: {
+          url: databaseUrl,
+        },
+      },
+    });
+    return prismaInstance;
+  })();
+
+  return initPromise;
+}
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
-export const prisma = globalForPrisma.prisma || new PrismaClient();
+
+const prismaProxy = new Proxy({} as PrismaClient, {
+  get(target, prop) {
+    if (prop === "$connect" || prop === "$disconnect" || prop === "$queryRaw" || prop === "$executeRaw" || prop === "$transaction") {
+      return async (...args: any[]) => {
+        const client = await getPrismaClient();
+        return (client as any)[prop](...args);
+      };
+    }
+
+    return new Proxy({}, {
+      get(modelTarget, methodProp) {
+        return async (...args: any[]) => {
+          const client = await getPrismaClient();
+          const delegate = (client as any)[prop];
+          if (!delegate) {
+            throw new Error(`Prisma model delegate for '${String(prop)}' not found.`);
+          }
+          return delegate[methodProp](...args);
+        };
+      }
+    });
+  }
+});
+
+export const prisma = prismaProxy;
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 // Default Seeding Data
