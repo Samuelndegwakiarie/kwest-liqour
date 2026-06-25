@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
+import { createClient } from "@/lib/supabase-server";
 import { v2 as cloudinary } from "cloudinary";
 import { promises as fs } from "fs";
 import path from "path";
@@ -30,20 +31,29 @@ if (isCloudinaryConfigured) {
 // GET — fetch profile of the currently authenticated user
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get("kwest_session")?.value
-      || req.headers.get("authorization")?.replace("Bearer ", "");
+    const supabase = await createClient();
+    const { data: { user: authUser } } = await supabase.auth.getUser();
 
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    let userId = "";
+    if (authUser) {
+      userId = authUser.id;
+    } else {
+      const token = req.cookies.get("kwest_session")?.value
+        || req.headers.get("authorization")?.replace("Bearer ", "");
+      if (token) {
+        const payload = verifyToken(token);
+        if (payload && payload.userId && payload.userId !== "admin-id") {
+          userId = payload.userId;
+        }
+      }
     }
 
-    const payload = verifyToken(token);
-    if (!payload || !payload.userId || payload.userId === "admin-id") {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
+      where: { id: userId },
       select: {
         id: true,
         email: true,
@@ -70,15 +80,24 @@ export async function GET(req: NextRequest) {
 // PATCH — update name, phone, avatar of the authenticated user
 export async function PATCH(req: NextRequest) {
   try {
-    const token = req.cookies.get("kwest_session")?.value
-      || req.headers.get("authorization")?.replace("Bearer ", "");
+    const supabase = await createClient();
+    const { data: { user: authUser } } = await supabase.auth.getUser();
 
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    let userId = "";
+    if (authUser) {
+      userId = authUser.id;
+    } else {
+      const token = req.cookies.get("kwest_session")?.value
+        || req.headers.get("authorization")?.replace("Bearer ", "");
+      if (token) {
+        const payload = verifyToken(token);
+        if (payload && payload.userId && payload.userId !== "admin-id") {
+          userId = payload.userId;
+        }
+      }
     }
 
-    const payload = verifyToken(token);
-    if (!payload || !payload.userId || payload.userId === "admin-id") {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -140,7 +159,7 @@ export async function PATCH(req: NextRequest) {
               await fs.mkdir(uploadsDir, { recursive: true });
             }
 
-            const fileName = `avatar_${payload.userId}_${Date.now()}${fileExt}`;
+            const fileName = `avatar_${userId}_${Date.now()}${fileExt}`;
             const filePath = path.join(uploadsDir, fileName);
             await fs.writeFile(filePath, buffer);
             updateData.avatar = `/uploads/${fileName}`;
@@ -154,7 +173,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const user = await prisma.user.update({
-      where: { id: payload.userId },
+      where: { id: userId },
       data: updateData,
       select: {
         id: true,
@@ -174,3 +193,4 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Failed to update profile." }, { status: 500 });
   }
 }
+

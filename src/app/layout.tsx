@@ -3,6 +3,7 @@ import { Bodoni_Moda, Jost, Geist } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { ReviewProvider } from "@/context/ReviewContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
@@ -39,15 +40,18 @@ export default function RootLayout({
       <body
         className={`${bodoni.variable} ${jost.variable} font-sans antialiased bg-background text-foreground`}
       >
-        <CartProvider>
-          <ReviewProvider>
-            <ClientLayoutWrapper>
-              {children}
-            </ClientLayoutWrapper>
-          </ReviewProvider>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <ReviewProvider>
+              <ClientLayoutWrapper>
+                {children}
+              </ClientLayoutWrapper>
+            </ReviewProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );
 }
+
 

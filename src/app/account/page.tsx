@@ -3,6 +3,8 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   User as UserIcon,
@@ -38,6 +40,7 @@ function formatJoinedDate(raw: string | undefined): string {
 
 function AccountPageContent() {
   const router = useRouter();
+  const { user, dbUser, signOut: authSignOut, refreshUser } = useAuth();
 
   // ── Auth form state ──────────────────────────────────────────────────────
   const [formMode, setFormMode] = useState<"signin" | "signup" | "forgot">("signin");
@@ -98,11 +101,10 @@ function AccountPageContent() {
     }
   };
 
-  // ── On mount: restore session via JWT cookie ──────────────────────────────
+  // Sync state with global AuthContext
   useEffect(() => {
-    // Check admin session (legacy sessionStorage path)
     const adminSession = sessionStorage.getItem("kwest_admin") === "authenticated";
-    if (adminSession) {
+    if (adminSession && !dbUser) {
       const u = {
         name: "Vault Manager",
         email: "admin@kwestliquor.co.ke",
@@ -117,35 +119,19 @@ function AccountPageContent() {
       setIsLoggedIn(true);
       return;
     }
-    // Try restoring from JWT cookie via profile API
-    fetch("/api/auth/profile", { credentials: "include" })
-      .then(async (res) => {
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data?.user) {
-          const u = {
-            ...data.user,
-            joinedDate: formatJoinedDate(data.user.joinedDate),
-          };
-          setCurrentUser(u);
-          seedEditFields(u);
-          setIsLoggedIn(true);
-          localStorage.setItem("kwest_user", JSON.stringify(u));
-        }
-      })
-      .catch(() => {
-        // Fallback: try localStorage for resilience on network issues
-        const saved = localStorage.getItem("kwest_user");
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            setCurrentUser(parsed);
-            seedEditFields(parsed);
-            setIsLoggedIn(true);
-          } catch {}
-        }
-      });
-  }, []);
+
+    if (dbUser) {
+      const u = {
+        ...dbUser,
+        joinedDate: formatJoinedDate(dbUser.joinedDate),
+      };
+      setCurrentUser(u);
+      seedEditFields(u);
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [dbUser]);
 
   // ── Auth submit ──────────────────────────────────────────────────────────
   const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -155,16 +141,6 @@ function AccountPageContent() {
     if (formMode === "signup") {
       if (password !== confirmPassword) { setAuthError("Passwords do not match."); return; }
       if (!isPasswordValid) { setAuthError("Password must meet all security criteria."); return; }
-    }
-
-    if (formMode === "forgot") {
-      setIsLoading(true);
-      await new Promise((r) => setTimeout(r, 1000));
-      setIsLoading(false);
-      setAuthError("");
-      alert("A luxury reset link has been dispatched to your email address.");
-      setFormMode("signin");
-      return;
     }
 
     // ── Admin shortcut (bypass API) ──
@@ -181,35 +157,110 @@ function AccountPageContent() {
 
     setIsLoading(true);
     try {
-      const endpoint = formMode === "signin" ? "/api/auth/signin" : "/api/auth/signup";
-      const body: any = { email, password };
-      if (formMode === "signup") body.name = fullName;
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setAuthError(data.error || "Authentication failed. Please try again.");
+      if (formMode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/account`,
+        });
+        if (error) {
+          setAuthError(error.message);
+        } else {
+          alert("A luxury reset link has been dispatched to your email address.");
+          setFormMode("signin");
+        }
         return;
       }
 
-      // Persist minimal user info in localStorage for offline fallback
-      const u = {
-        ...data.user,
-        joinedDate: formatJoinedDate(data.user?.joinedDate),
-      };
-      localStorage.setItem("kwest_user", JSON.stringify(u));
-      setCurrentUser(u);
-      seedEditFields(u);
-      setIsLoggedIn(true);
-      redirectAfterAuth();
-    } catch (err) {
-      setAuthError("Network error. Please check your connection.");
+      if (formMode === "signin") {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          setAuthError(error.message);
+          return;
+        }
+
+        // Fetch user from profile database to sync local storage
+        const res = await fetch("/api/auth/me", { cache: "no-store" });
+        if (res.ok) {
+          const meData = await res.json();
+          if (meData?.user) {
+            const u = {
+              ...meData.user,
+              joinedDate: formatJoinedDate(meData.user.joinedDate),
+            };
+            localStorage.setItem("kwest_user", JSON.stringify(u));
+            setCurrentUser(u);
+            seedEditFields(u);
+            setIsLoggedIn(true);
+
+            if (meData.user.role === "admin") {
+              sessionStorage.setItem("kwest_admin", "authenticated");
+              router.push("/dashboard");
+            } else {
+              redirectAfterAuth();
+            }
+            return;
+          }
+        }
+        redirectAfterAuth();
+        return;
+      }
+
+      if (formMode === "signup") {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              name: fullName,
+            }
+          }
+        });
+
+        if (error) {
+          setAuthError(error.message);
+          return;
+        }
+
+        if (!data.user) {
+          setAuthError("Failed to register. Please try again.");
+          return;
+        }
+
+        // Call our sync API
+        const syncRes = await fetch("/api/auth/create-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: data.user.id,
+            email: data.user.email,
+            name: fullName,
+            phone: "",
+            avatar: null,
+          }),
+        });
+
+        if (!syncRes.ok) {
+          const syncErr = await syncRes.json();
+          setAuthError(syncErr.error || "Failed to sync profile to database.");
+          return;
+        }
+
+        const syncData = await syncRes.json();
+        const u = {
+          ...syncData.user,
+          joinedDate: formatJoinedDate(syncData.user.joinedDate),
+        };
+        localStorage.setItem("kwest_user", JSON.stringify(u));
+        setCurrentUser(u);
+        seedEditFields(u);
+        setIsLoggedIn(true);
+        redirectAfterAuth();
+      }
+    } catch (err: any) {
+      setAuthError(err.message || "Network error. Please check your connection.");
     } finally {
       setIsLoading(false);
     }
@@ -234,6 +285,7 @@ function AccountPageContent() {
       const updated = res.ok ? { ...currentUser, ...data.user } : { ...currentUser, ...payload };
       localStorage.setItem("kwest_user", JSON.stringify(updated));
       setCurrentUser(updated);
+      await refreshUser();
     } catch {
       // Offline — just update locally
       const updated = { ...currentUser, ...payload };
@@ -254,12 +306,7 @@ function AccountPageContent() {
   };
 
   const handleLogout = async () => {
-    // Clear server-side cookie
-    try {
-      await fetch("/api/auth/signout", { method: "POST", credentials: "include" });
-    } catch {}
-    sessionStorage.removeItem("kwest_admin");
-    localStorage.removeItem("kwest_user");
+    await authSignOut();
     setIsLoggedIn(false);
     setEmail(""); setPassword(""); setConfirmPassword(""); setFullName("");
     router.push("/");

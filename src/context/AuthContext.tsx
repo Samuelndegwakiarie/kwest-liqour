@@ -1,0 +1,135 @@
+"use client";
+
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { User, Session } from "@supabase/supabase-js";
+
+interface DbUser {
+  id: string;
+  email: string;
+  name: string;
+  phone: string | null;
+  avatar: string | null;
+  tier: string;
+  memberNo: string;
+  joinedDate: string;
+  role: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  dbUser: DbUser | null;
+  session: Session | null;
+  isAdmin: boolean;
+  isLoading: boolean;
+  signOut: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [dbUser, setDbUser] = useState<DbUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchMe = async () => {
+    try {
+      const res = await fetch("/api/auth/me", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.user) {
+          setDbUser(data.user);
+          localStorage.setItem("kwest_user", JSON.stringify(data.user));
+          if (data.user.role === "admin") {
+            sessionStorage.setItem("kwest_admin", "authenticated");
+          } else {
+            sessionStorage.removeItem("kwest_admin");
+          }
+          return;
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching user profile:", err);
+    }
+    
+    // Clear cache if me api returns not ok
+    setDbUser(null);
+    localStorage.removeItem("kwest_user");
+    sessionStorage.removeItem("kwest_admin");
+  };
+
+  useEffect(() => {
+    // 1. Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchMe().finally(() => setIsLoading(false));
+      } else {
+        setDbUser(null);
+        localStorage.removeItem("kwest_user");
+        sessionStorage.removeItem("kwest_admin");
+        setIsLoading(false);
+      }
+    });
+
+    // 2. Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
+
+      if (newSession?.user) {
+        setIsLoading(true);
+        await fetchMe();
+        setIsLoading(false);
+      } else {
+        setDbUser(null);
+        localStorage.removeItem("kwest_user");
+        sessionStorage.removeItem("kwest_admin");
+        setIsLoading(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const signOut = async () => {
+    setIsLoading(true);
+    await supabase.auth.signOut();
+    try {
+      await fetch("/api/auth/signout", { method: "POST" });
+    } catch (err) {
+      console.error("Error calling signout API:", err);
+    }
+    setSession(null);
+    setUser(null);
+    setDbUser(null);
+    localStorage.removeItem("kwest_user");
+    sessionStorage.removeItem("kwest_admin");
+    setIsLoading(false);
+  };
+
+  const refreshUser = async () => {
+    await fetchMe();
+  };
+
+  const isAdmin = dbUser?.role === "admin" || user?.email === "admin@kwestliquor.co.ke";
+
+  return (
+    <AuthContext.Provider value={{ user, dbUser, session, isAdmin, isLoading, signOut, refreshUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
