@@ -6,6 +6,8 @@ import { Search, ShoppingBag, User, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+
 
 const desktopLinks = [
   { name: "Drinks", href: "/products" },
@@ -23,6 +25,7 @@ const mobileLinks = [
 ];
 
 export function Navbar() {
+  const { signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -96,10 +99,12 @@ export function Navbar() {
     }
   };
 
-  const handleLogoutClick = () => {
-    sessionStorage.removeItem("kwest_admin");
-    localStorage.removeItem("kwest_user");
-    setIsLoggedIn(false);
+  const handleLogoutClick = async () => {
+    try {
+      await signOut();
+    } catch (err) {
+      console.error("Logout click error:", err);
+    }
     setIsMobileMenuOpen(false);
     router.push("/");
     router.refresh();
