@@ -34,9 +34,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [dbUser, setDbUser] = useState<DbUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchMe = async () => {
+  const fetchMe = async (token?: string) => {
     try {
-      const res = await fetch("/api/auth/me", { cache: "no-store" });
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      const res = await fetch("/api/auth/me", {
+        headers,
+        cache: "no-store"
+      });
       if (res.ok) {
         const data = await res.json();
         if (data && data.user) {
@@ -66,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchMe().finally(() => setIsLoading(false));
+        fetchMe(session.access_token).finally(() => setIsLoading(false));
       } else {
         setDbUser(null);
         localStorage.removeItem("kwest_user");
@@ -82,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (newSession?.user) {
         setIsLoading(true);
-        await fetchMe();
+        await fetchMe(newSession.access_token);
         setIsLoading(false);
       } else {
         setDbUser(null);
@@ -114,7 +121,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const refreshUser = async () => {
-    await fetchMe();
+    const currentSession = session || (await supabase.auth.getSession()).data.session;
+    await fetchMe(currentSession?.access_token);
   };
 
   const isAdmin = dbUser?.role === "admin" || user?.email === "admin@kwestliquor.co.ke";

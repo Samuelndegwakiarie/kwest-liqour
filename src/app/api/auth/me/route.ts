@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import { prisma } from "@/lib/db";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const authHeader = req.headers.get("authorization");
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.substring(7) : undefined;
+
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
       return NextResponse.json({ user: null }, { status: 200 });
