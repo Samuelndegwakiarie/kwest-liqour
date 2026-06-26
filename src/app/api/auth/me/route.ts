@@ -64,12 +64,13 @@ export async function GET(req: NextRequest) {
             memberNo,
             password: "SUPABASE_AUTH_NO_LOCAL_PASSWORD",
             tier: "Amber Private Reserve",
+            isAdmin: user.email === "admin@kwestliquor.co.ke"
           }
         });
       }
     }
 
-    const role = dbUser.email === "admin@kwestliquor.co.ke" ? "admin" : "user";
+    const role = dbUser.isAdmin ? "admin" : "user";
 
     const responseUser = {
       id: dbUser.id,
@@ -77,10 +78,11 @@ export async function GET(req: NextRequest) {
       name: dbUser.name,
       phone: dbUser.phone,
       avatar: dbUser.avatar,
-      tier: dbUser.email === "admin@kwestliquor.co.ke" ? "Grand Cellar Administrator" : dbUser.tier,
-      memberNo: dbUser.email === "admin@kwestliquor.co.ke" ? "ADMIN-0001" : dbUser.memberNo,
+      tier: dbUser.isAdmin ? "Grand Cellar Administrator" : dbUser.tier,
+      memberNo: dbUser.isAdmin ? "ADMIN-0001" : dbUser.memberNo,
       joinedDate: dbUser.joinedDate.toISOString(),
       role,
+      isAdmin: dbUser.isAdmin,
     };
 
     return NextResponse.json({ user: responseUser });

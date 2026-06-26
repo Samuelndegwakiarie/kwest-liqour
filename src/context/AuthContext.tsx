@@ -14,6 +14,7 @@ interface DbUser {
   memberNo: string;
   joinedDate: string;
   role: string;
+  isAdmin: boolean;
 }
 
 interface AuthContextType {
@@ -131,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await fetchMe(currentSession?.access_token);
   };
 
-  const isAdmin = dbUser?.role === "admin" || user?.email === "admin@kwestliquor.co.ke";
+  const isAdmin = !!dbUser?.isAdmin || dbUser?.role === "admin" || user?.email === "admin@kwestliquor.co.ke";
 
   return (
     <AuthContext.Provider value={{ user, dbUser, session, isAdmin, isLoading, signOut, refreshUser }}>

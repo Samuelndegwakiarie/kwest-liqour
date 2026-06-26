@@ -52,7 +52,7 @@ export function Navbar() {
   useEffect(() => {
     const adminAuth = typeof window !== "undefined" && sessionStorage.getItem("kwest_admin") === "authenticated";
     setIsLoggedIn(!!user || adminAuth);
-    setIsAdmin(dbUser?.role === "admin" || user?.email === "admin@kwestliquor.co.ke" || adminAuth);
+    setIsAdmin(!!dbUser?.isAdmin || dbUser?.role === "admin" || user?.email === "admin@kwestliquor.co.ke" || adminAuth);
     setUserAvatar(dbUser?.avatar || null);
   }, [user, dbUser]);
 

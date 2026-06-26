@@ -15,7 +15,10 @@ export async function GET(req: NextRequest) {
 
     if (authUser) {
       userId = authUser.id;
-      role = authUser.email === "admin@kwestliquor.co.ke" ? "admin" : "user";
+      const dbUser = await prisma.user.findUnique({
+        where: { id: authUser.id }
+      });
+      role = dbUser?.isAdmin || authUser.email === "admin@kwestliquor.co.ke" ? "admin" : "user";
     } else {
       const token = req.cookies.get("kwest_session")?.value
         || req.headers.get("authorization")?.replace("Bearer ", "");

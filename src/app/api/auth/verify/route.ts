@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import { createClient } from "@/lib/supabase-server";
+import { prisma } from "@/lib/db";
 
 // Mock admin credentials
 const ADMIN_EMAIL = "admin@kwestliquor.co.ke";
@@ -28,7 +29,10 @@ export async function GET(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (user) {
-      const role = user.email === ADMIN_EMAIL ? "admin" : "user";
+      const dbUser = await prisma.user.findUnique({
+        where: { id: user.id }
+      });
+      const role = dbUser?.isAdmin || user.email === ADMIN_EMAIL ? "admin" : "user";
       return NextResponse.json({ authenticated: true, userId: user.id, role });
     }
 
