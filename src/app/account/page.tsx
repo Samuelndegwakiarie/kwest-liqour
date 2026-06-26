@@ -40,7 +40,7 @@ function formatJoinedDate(raw: string | undefined): string {
 
 function AccountPageContent() {
   const router = useRouter();
-  const { user, dbUser, signOut: authSignOut, refreshUser } = useAuth();
+  const { user, dbUser, signOut: authSignOut, refreshUser, isLoading: authLoading } = useAuth();
 
   // ── Auth form state ──────────────────────────────────────────────────────
   const [formMode, setFormMode] = useState<"signin" | "signup" | "forgot">("signin");
@@ -79,6 +79,15 @@ function AccountPageContent() {
   const [editEmail, setEditEmail] = useState("");
   const [editPhone, setEditPhone] = useState("");
   const [editAvatar, setEditAvatar] = useState<string | null>(null);
+
+  // ── Render loading spinner while checking session ──
+  if (authLoading) {
+    return (
+      <main className="bg-background min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
   const seedEditFields = (u: any) => {
@@ -181,8 +190,17 @@ function AccountPageContent() {
           return;
         }
 
-        // Fetch user from profile database to sync local storage
-        const res = await fetch("/api/auth/me", { cache: "no-store" });
+        // Fetch user from profile database to sync local storage using Bearer token
+        const token = data.session?.access_token;
+        const headers: Record<string, string> = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const res = await fetch("/api/auth/me", { 
+          headers,
+          cache: "no-store" 
+        });
         if (res.ok) {
           const meData = await res.json();
           if (meData?.user) {
