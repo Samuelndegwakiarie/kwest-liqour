@@ -568,14 +568,10 @@ function AccountPageContent() {
                       <input
                         type="email"
                         value={editEmail}
-                        onChange={(e) => setEditEmail(e.target.value)}
-                        disabled={!isEditing}
+                        disabled={true}
+                        readOnly={true}
                         placeholder="your@email.com"
-                        className={`w-full rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-all border min-h-[48px] ${
-                          isEditing
-                            ? "bg-black/40 border-primary/30 focus:border-primary/60 focus:shadow-[0_0_12px_rgba(0,240,255,0.08)]"
-                            : "bg-white/[0.03] border-white/[0.06] cursor-default"
-                        }`}
+                        className="w-full rounded-xl px-4 py-3 text-sm text-white/50 placeholder:text-white/20 outline-none transition-all border min-h-[48px] bg-white/[0.02] border-white/[0.04] cursor-not-allowed opacity-60"
                       />
                     </div>
 

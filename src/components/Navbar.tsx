@@ -25,16 +25,17 @@ const mobileLinks = [
 ];
 
 export function Navbar() {
-  const { signOut } = useAuth();
+  const { user, dbUser, signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const [searchVal, setSearchVal] = useState("");
   const { cartCount } = useCart();
-  const [userAvatar, setUserAvatar] = useState<string | null>(null);
 
   const currentDesktopLinks = isAdmin
     ? [...desktopLinks, { name: "Dashboard", href: "/dashboard" }]
@@ -52,31 +53,27 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Check auth status regularly or on path changes
+  // Sync auth state reactively
   useEffect(() => {
-    const checkAuth = () => {
-      const adminAuth = sessionStorage.getItem("kwest_admin") === "authenticated";
-      const userRaw = localStorage.getItem("kwest_user");
-      const userAuth = userRaw !== null;
-      setIsLoggedIn(adminAuth || userAuth);
-      setIsAdmin(adminAuth);
+    const adminAuth = typeof window !== "undefined" && sessionStorage.getItem("kwest_admin") === "authenticated";
+    setIsLoggedIn(!!user || adminAuth);
+    setIsAdmin(dbUser?.role === "admin" || user?.email === "admin@kwestliquor.co.ke" || adminAuth);
+    setUserAvatar(dbUser?.avatar || null);
+  }, [user, dbUser]);
 
-      if (userRaw) {
-        try {
-          const parsed = JSON.parse(userRaw);
-          setUserAvatar(parsed.avatar || null);
-        } catch {
-          setUserAvatar(null);
-        }
-      } else {
-        setUserAvatar(null);
+  // Click outside listener for dropdown
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".navbar-profile-container")) {
+        setDropdownOpen(false);
       }
     };
-    checkAuth();
-
-    const interval = setInterval(checkAuth, 1000);
-    return () => clearInterval(interval);
-  }, [pathname]);
+    if (dropdownOpen) {
+      window.addEventListener("click", handleOutsideClick);
+    }
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, [dropdownOpen]);
 
   // Lock scroll when mobile menu is open
   useEffect(() => {
@@ -176,21 +173,63 @@ export function Navbar() {
               {cartCount}
             </span>
           </Link>
-          <Link
-            href="/account"
-            className="text-white/40 hover:text-primary transition-colors duration-300 cursor-pointer flex items-center"
-            aria-label="User Account Profile"
-          >
-            {userAvatar ? (
-              <img
-                src={userAvatar}
-                alt="User Profile"
-                className="w-5 h-5 rounded-full object-cover border border-primary/30 hover:border-primary/60 transition-all duration-300"
-              />
-            ) : (
+          {isLoggedIn ? (
+            <div className="relative navbar-profile-container flex items-center">
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="text-white/40 hover:text-primary transition-colors duration-300 cursor-pointer flex items-center outline-none focus:outline-none"
+                aria-label="User Menu"
+                aria-expanded={dropdownOpen}
+              >
+                {userAvatar ? (
+                  <img
+                    src={userAvatar}
+                    alt="User Profile"
+                    className="w-5 h-5 rounded-full object-cover border border-primary/30 hover:border-primary/60 transition-all duration-300"
+                  />
+                ) : (
+                  <User className="w-5 h-5" aria-hidden="true" />
+                )}
+              </button>
+              
+              <AnimatePresence>
+                {dropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 top-full mt-3 w-48 rounded-xl bg-[#0d0d0d]/95 backdrop-blur-xl border border-white/[0.08] shadow-[0_10px_30px_rgba(0,0,0,0.5)] p-2 z-[120] flex flex-col gap-1"
+                  >
+                    <Link
+                      href="/account"
+                      onClick={() => setDropdownOpen(false)}
+                      className="w-full text-left px-4 py-2.5 rounded-lg text-[10px] caps-label tracking-widest text-white/70 hover:text-white hover:bg-white/[0.04] transition-all"
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        handleLogoutClick();
+                      }}
+                      className="w-full text-left px-4 py-2.5 rounded-lg text-[10px] caps-label tracking-widest text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all cursor-pointer"
+                    >
+                      Log Out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <Link
+              href="/account"
+              className="text-white/40 hover:text-primary transition-colors duration-300 cursor-pointer flex items-center"
+              aria-label="User Account Profile"
+            >
               <User className="w-5 h-5" aria-hidden="true" />
-            )}
-          </Link>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Actions */}

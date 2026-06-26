@@ -55,16 +55,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             sessionStorage.removeItem("kwest_admin");
           }
           return;
+        } else {
+          // Explicitly signed out or invalid session from server
+          setDbUser(null);
+          localStorage.removeItem("kwest_user");
+          sessionStorage.removeItem("kwest_admin");
         }
+      } else if (res.status === 401 || res.status === 403) {
+        // Explicitly unauthorized/expired session
+        setDbUser(null);
+        localStorage.removeItem("kwest_user");
+        sessionStorage.removeItem("kwest_admin");
       }
     } catch (err) {
       console.error("Error fetching user profile:", err);
+      // Ignore network exceptions to preserve local session resilience during transient downtime
     }
-    
-    // Clear cache if me api returns not ok
-    setDbUser(null);
-    localStorage.removeItem("kwest_user");
-    sessionStorage.removeItem("kwest_admin");
   };
 
   useEffect(() => {
