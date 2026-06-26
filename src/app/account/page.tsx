@@ -80,15 +80,6 @@ function AccountPageContent() {
   const [editPhone, setEditPhone] = useState("");
   const [editAvatar, setEditAvatar] = useState<string | null>(null);
 
-  // ── Render loading spinner while checking session ──
-  if (authLoading) {
-    return (
-      <main className="bg-background min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      </main>
-    );
-  }
-
   // ── Helpers ──────────────────────────────────────────────────────────────
   const seedEditFields = (u: any) => {
     setEditName(u.name || "");
@@ -112,7 +103,7 @@ function AccountPageContent() {
 
   // Sync state with global AuthContext
   useEffect(() => {
-    const adminSession = sessionStorage.getItem("kwest_admin") === "authenticated";
+    const adminSession = typeof window !== "undefined" && sessionStorage.getItem("kwest_admin") === "authenticated";
     if (adminSession && !dbUser) {
       const u = {
         name: "Vault Manager",
@@ -141,6 +132,15 @@ function AccountPageContent() {
       setIsLoggedIn(false);
     }
   }, [dbUser]);
+
+  // ── Render loading spinner while checking session ──
+  if (authLoading) {
+    return (
+      <main className="bg-background min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
 
   // ── Auth submit ──────────────────────────────────────────────────────────
   const handleAuthSubmit = async (e: React.FormEvent) => {
