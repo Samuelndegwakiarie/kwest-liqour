@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, ShoppingBag, User, Menu, X } from "lucide-react";
+import { Search, ShoppingBag, User, Menu, X, LayoutDashboard } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
@@ -37,13 +37,8 @@ export function Navbar() {
   const [searchVal, setSearchVal] = useState("");
   const { cartCount } = useCart();
 
-  const currentDesktopLinks = isAdmin
-    ? [...desktopLinks, { name: "Dashboard", href: "/dashboard" }]
-    : desktopLinks;
-
-  const currentMobileLinks = isAdmin
-    ? [...mobileLinks, { name: "DASHBOARD", href: "/dashboard" }]
-    : mobileLinks;
+  const currentDesktopLinks = desktopLinks;
+  const currentMobileLinks = mobileLinks;
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
@@ -208,6 +203,17 @@ export function Navbar() {
                     >
                       Profile
                     </Link>
+                    
+                    {isAdmin && (
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setDropdownOpen(false)}
+                        className="w-full text-left px-4 py-2.5 rounded-lg text-[10px] caps-label tracking-widest text-[#d4af37] hover:text-white hover:bg-[#d4af37]/10 transition-all"
+                      >
+                        Dashboard
+                      </Link>
+                    )}
+
                     <button
                       onClick={() => {
                         setDropdownOpen(false);
@@ -340,6 +346,18 @@ export function Navbar() {
                       )}
                       <span className="text-[10px] font-bold caps-label tracking-widest">Account</span>
                     </Link>
+                    
+                    {isAdmin && (
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="relative group flex items-center justify-center gap-2.5 py-3 px-4 w-full rounded-xl bg-white/[0.03] border border-[#d4af37]/20 hover:border-[#d4af37]/50 shadow-[0_0_15px_rgba(212,175,55,0.05)] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:bg-[#d4af37]/[0.04] transition-all duration-300 text-[#d4af37] hover:text-white cursor-pointer"
+                        aria-label="Admin Dashboard"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-[#d4af37] group-hover:scale-110 transition-transform duration-300" aria-hidden="true" />
+                        <span className="text-[10px] font-bold caps-label tracking-widest">Dashboard</span>
+                      </Link>
+                    )}
                   </div>
                 </div>
 
